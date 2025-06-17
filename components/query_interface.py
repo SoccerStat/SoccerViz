@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit_shortcuts as sts
 import pandas as pd
 from utils.helpers import format_query_result_info, get_sample_queries
 
@@ -50,14 +51,14 @@ def _display_query_editor():
     query = st.text_area(
         "Votre requête SQL:",
         height=150,
-        placeholder="SELECT * FROM ma_table LIMIT 10;",
+        placeholder="SELECT * FROM upper.player LIMIT 10;",
         key="sql_query"
     )
 
     col1, col2, col3 = st.columns([1, 1, 4])
 
     with col1:
-        execute_btn = st.button("▶️ Exécuter", type="primary")
+        execute_shortcut_btn = sts.shortcut_button("▶️ Exécuter", "cmd+Enter", type="primary")
 
     with col2:
         if st.button("🗑️ Effacer"):
@@ -65,7 +66,7 @@ def _display_query_editor():
             st.rerun()
 
     # Exécution de la requête
-    if execute_btn and query.strip():
+    if execute_shortcut_btn and query.strip():
         _execute_query(query)
 
 

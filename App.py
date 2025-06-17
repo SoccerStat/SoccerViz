@@ -21,6 +21,9 @@ def main():
     # Sidebar pour la connexion
     sidebar_connection()
 
+    if st.button("Page 1"):
+        st.switch_page("pages/Page 1.py")
+
     # Interface principale selon l'état de connexion
     if not st.session_state.connected:
         st.info("👈 Veuillez vous connecter à votre base PostgreSQL via la sidebar")
@@ -34,13 +37,6 @@ def main():
             - **Database**: Nom de la base de données
             - **User**: Nom d'utilisateur PostgreSQL
             - **Password**: Mot de passe
-
-            **Exemple de configuration locale:**
-            - Host: localhost
-            - Port: 5432
-            - Database: postgres
-            - User: postgres
-            - Password: votre_mot_de_passe
             """)
     else:
         # Interface principale avec onglets
