@@ -12,7 +12,7 @@ def main():
         layout=APP_CONFIG['layout']
     )
 
-    st.title("🐘 PostgreSQL Data Explorer")
+    st.title("SoccerStat-II")
 
     # Initialisation des variables de session
     if 'connected' not in st.session_state:
@@ -21,8 +21,16 @@ def main():
     # Sidebar pour la connexion
     sidebar_connection()
 
-    if st.button("Page 1"):
-        st.switch_page("pages/Page 1.py")
+    if st.button("Basic Stats"):
+        st.switch_page("pages/Basic Stats.py")
+    if st.button("Monitoring"):
+        st.switch_page("pages/Monitoring.py")
+    if st.button("Anomaly Detection"):
+        st.switch_page("pages/Anomaly Detection.py")
+    if st.button("Team Stats"):
+        st.switch_page("pages/Team Stats.py")
+    if st.button("Player Stats"):
+        st.switch_page("pages/Player Stats.py")
 
     # Interface principale selon l'état de connexion
     if not st.session_state.connected:
