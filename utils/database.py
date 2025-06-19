@@ -3,6 +3,7 @@ import psycopg2
 from sqlalchemy import create_engine
 from typing import Optional
 import streamlit as st
+import hashlib
 
 
 class DatabaseConnection:
@@ -14,24 +15,20 @@ class DatabaseConnection:
 
     def connect(self, host: str, port: str, user: str, password: str, database: str) -> bool:
         """Établit la connexion à PostgreSQL"""
-        try:
-            # Connexion avec psycopg2
-            self.connection = psycopg2.connect(
-                host=host,
-                port=port,
-                user=user,
-                password=password,
-                database=database
-            )
+        # Connexion avec psycopg2
+        self.connection = psycopg2.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database
+        )
 
-            # Engine SQLAlchemy pour pandas
-            connection_string = f"postgresql://{user}:{password}@{host}:{port}/{database}"
-            self.engine = create_engine(connection_string)
+        # Engine SQLAlchemy pour pandas
+        connection_string = f"postgresql://{user}:{password}@{host}:{port}/{database}"
+        self.engine = create_engine(connection_string)
 
-            return True
-        except Exception as e:
-            st.error(f"Erreur de connexion : {str(e)}")
-            return False
+        return True
 
     def execute_query(self, query: str) -> Optional[pd.DataFrame]:
         """Exécute une requête et retourne un DataFrame"""
@@ -46,29 +43,119 @@ class DatabaseConnection:
             st.error(f"Erreur lors de l'exécution de la requête : {str(e)}")
             return None
 
-    def get_tables(self) -> Optional[pd.DataFrame]:
-        """Récupère la liste des tables"""
-        query = """
-                SELECT table_name
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                ORDER BY table_name; \
-                """
-        return self.execute_query(query)
-
-    def get_table_info(self, table_name: str) -> Optional[pd.DataFrame]:
-        """Récupère les informations sur une table"""
-        query = f"""
-        SELECT column_name, data_type, is_nullable
-        FROM information_schema.columns 
-        WHERE table_name = '{table_name}'
-        ORDER BY ordinal_position;
-        """
-        return self.execute_query(query)
-
     def close(self):
         """Ferme la connexion"""
         if self.connection:
             self.connection.close()
         if self.engine:
             self.engine.dispose()
+
+@st.cache_resource
+def create_database_connection(host, port, user, password, database):
+    """Crée et cache une connexion à la base de données"""
+    db = DatabaseConnection()
+    if db.connect(host, port, user, password, database):
+        return db
+    return None
+
+
+def init_session_state():
+    """Initialise les variables de session avec persistance"""
+    # Initialisation des variables de base
+    if "db_conn" not in st.session_state:
+        st.session_state.db_conn = None
+    if "connected" not in st.session_state:
+        st.session_state.connected = False
+    if "db_credentials" not in st.session_state:
+        st.session_state.db_credentials = {}
+
+    # Clé unique pour identifier la session de connexion
+    if "connection_hash" not in st.session_state:
+        st.session_state.connection_hash = None
+
+    # Tentative de restauration de la connexion si les credentials existent
+    if st.session_state.db_credentials and not st.session_state.connected:
+        restore_connection()
+
+
+def restore_connection():
+    """Restaure la connexion depuis les credentials en cache"""
+    creds = st.session_state.db_credentials
+    st.write("Trying to restore connection with creds:", creds)
+
+    if all(key in creds for key in ['host', 'port', 'user', 'password', 'database']) and creds['password']:
+        try:
+            # Génère un hash unique pour cette configuration de connexion
+            config_str = f"{creds['host']}:{creds['port']}:{creds['database']}:{creds['user']}"
+            connection_hash = hashlib.md5(config_str.encode()).hexdigest()
+
+            print(st.session_state.connection_hash, "/", connection_hash, config_str)
+
+            # Si le hash correspond, tente de restaurer la connexion
+            print("reeee")
+            db = create_database_connection(
+                creds['host'],
+                creds['port'],
+                creds['user'],
+                creds['password'],
+                creds['database']
+            )
+            if db:
+                print("ah oui hein")
+                st.session_state.db_conn = db
+                st.session_state.connected = True
+                st.session_state.connection_hash = connection_hash
+                return True
+            else:
+                print("wut")
+
+        except Exception as e:
+            print("heiin", creds["password"], str(e))
+            clear_session()
+    else:
+        st.warning("Impossible de restaurer la connexion : mot de passe absent ou incomplet.")
+
+    return False
+
+
+def save_persistent_credentials(host, port, database, user, password):
+    """Sauvegarde les credentials de manière persistante"""
+    credentials = {
+        'host': host,
+        'port': port,
+        'database': database,
+        'user': user,
+        'password': password  # En production, chiffrez ce mot de passe
+    }
+
+    # Génère un hash pour cette configuration
+    config_str = f"{host}:{port}:{database}:{user}"
+    connection_hash = hashlib.md5(config_str.encode()).hexdigest()
+
+    # Sauvegarde dans session_state
+    st.session_state.db_credentials = credentials
+    st.session_state.connection_hash = connection_hash
+
+    # Optionnel: Sauvegarde dans le cache navigateur (attention sécurité)
+    # En production, utilisez un système de session sécurisé
+    try:
+        # Utilise les secrets Streamlit pour le chiffrement (optionnel)
+        st.session_state.persistent_connection = True
+    except Exception as e:
+        st.sidebar.warning("Session persistante non disponible")
+
+def clear_session():
+    """Nettoie complètement la session"""
+    if st.session_state.db_conn:
+        try:
+            st.session_state.db_conn.close()
+        except:
+            pass
+
+    st.session_state.db_conn = None
+    st.session_state.connected = False
+    st.session_state.db_credentials = {}
+    st.session_state.connection_hash = None
+
+    # Nettoie également le cache
+    # st.cache_resource.clear()
