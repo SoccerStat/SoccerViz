@@ -14,6 +14,21 @@ PAGES_CONFIG = [
     "Player Stats"
 ]
 
+COMPETITION_AND_COLORS = {
+    "All": "#888888",
+    "Premier League": "#6200EA",
+    "La Liga": "#FBC02D",
+    "Buli": "#D32F2F",
+    "Serie A": "#1976D2",
+    "Ligue 1": "#2E7D32",
+    "Champions League": "#0D47A1",
+    "Europa League": "#EF6C00",
+    "Conference League": "#388E3C"
+}
+
+START_SEASON = 2023
+END_SEASON = 2025
+
 DATABASE_CONFIG = {
     'default_host': os.getenv('DB_HOST', '10.0.0.1'),
     'default_port': os.getenv('DB_PORT', '5432'),

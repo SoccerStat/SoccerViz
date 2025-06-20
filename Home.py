@@ -1,9 +1,8 @@
 import streamlit as st
-from components.connection import sidebar_connection, ensure_connection, get_connection
-from components.query_interface import query_interface
+from components.connection import ensure_connection, get_connection
+from components.sidebar import sidebar_connection
+from components.queries.home.query_interface import query_interface
 from components.charts import visualization_interface
-import psycopg2
-from psycopg2 import sql
 from pathlib import Path
 from config import APP_CONFIG, PAGES_CONFIG, FALLBACK_CSS
 
@@ -29,14 +28,29 @@ def main():
 
     load_css("Home.css")
 
-    # SIDEBAR - Menu et Credentials PostgreSQL
+    # Titre centré
+    st.markdown('<h1 class="main-title">SoccerStat-II</h1>', unsafe_allow_html=True)
+
+    # Section Navigation avec boutons horizontaux
+    st.markdown('<h3 class="nav-title">Navigation</h3>', unsafe_allow_html=True)
+
+    with st.container():
+        cols = st.columns(len(PAGES_CONFIG))
+        for i, page in enumerate(PAGES_CONFIG):
+            with cols[i]:
+                if st.button(page, key=f"nav_{page}"):
+                    st.switch_page(f"pages/{page}.py")
+
+
+    st.divider()
+
     sidebar_connection()
 
     if ensure_connection():
-        st.success("✅ Base de données connectée et prête à l'emploi!")
+        st.success("✅ Database connected and ready to use!")
         main_content()
     else:
-        st.warning("⚠️ Veuillez vous connecter à la base de données via la barre latérale")
+        st.warning("⚠️ Please connect to the database via the sidebar.")
 
     st.markdown("""
     <style>
@@ -67,21 +81,6 @@ def main():
 
 def main_content():
     """Corps principal de l'application après connexion"""
-    # Titre centré
-    st.markdown('<h1 class="main-title">SoccerStat-II</h1>', unsafe_allow_html=True)
-
-    # Section Navigation avec boutons horizontaux
-    st.markdown('<div class="nav-section">', unsafe_allow_html=True)
-    st.markdown('<h3 class="nav-title">Navigation</h3>', unsafe_allow_html=True)
-
-    cols = st.columns(len(PAGES_CONFIG))
-    for i, page in enumerate(PAGES_CONFIG):
-        with cols[i]:
-            if st.button(page, key=f"nav_{page}"):
-                st.switch_page(f"pages/{page}.py")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.divider()
 
     conn = get_connection()
     if conn:
