@@ -1,29 +1,85 @@
 import os
 
 APP_CONFIG = {
-    'title': 'PostgreSQL Data Explorer',
     'icon': '⚽️',
     'layout': 'wide'
 }
 
+PREFIX_PAGE = "SoccerStat-II"
+HOME_PAGE = PREFIX_PAGE
+BASIC_STATS_PAGE = "Basic Stats"
+MONITORING_PAGE = "Monitoring"
+ANOMALY_DETECTION_PAGE = "Anomaly Detection"
+TEAM_STATS_PAGE = "Team Stats"
+PLAYER_STATS_PAGE = "Player Stats"
+
 PAGES_CONFIG = [
-    "Basic Stats",
-    "Monitoring",
-    "Anomaly Detection",
-    "Team Stats",
-    "Player Stats"
+    BASIC_STATS_PAGE,
+    MONITORING_PAGE,
+    ANOMALY_DETECTION_PAGE,
+    TEAM_STATS_PAGE,
+    PLAYER_STATS_PAGE
 ]
 
+ALL_BUTTON_CONFIG = {
+    "id": "all",
+    "label": "All",
+    "style": {
+            "bg_color": "#888888"
+        }
+
+}
+
 COMPETITION_AND_COLORS = {
-    "All": "#888888",
-    "Premier League": "#6200EA",
-    "La Liga": "#FBC02D",
-    "Buli": "#D32F2F",
-    "Serie A": "#1976D2",
-    "Ligue 1": "#2E7D32",
-    "Champions League": "#0D47A1",
-    "Europa League": "#EF6C00",
-    "Conference League": "#388E3C"
+    "premier_league": {
+        "label": "Premier League",
+        "style": {
+            "bg_color": "#6200EA"
+        }
+    },
+    "la_liga": {
+        "label": "La Liga",
+        "style": {
+             "bg_color": "#FBC02D"
+        }
+    },
+    "fussball_bundesliga": {
+        "label": "Bundesliga",
+        "id_comp": "fussball_bundesliga",
+        "style": {
+            "bg_color": "#D32F2F"
+        }
+    },
+    "serie_a": {
+        "label": "Serie A",
+        "style": {
+            "bg_color": "#1976D2"
+        }
+    },
+    "ligue_1": {
+        "label": "Ligue 1",
+        "style": {
+            "bg_color": "#2E7D32"
+        }
+    },
+    "uefa_champions_league": {
+        "label": "Champions League",
+        "style": {
+            "bg_color": "#0D47A1"
+        }
+    },
+    "uefa_europa_league": {
+        "label": "Europa League",
+        "style": {
+            "bg_color": "#EF6C00"
+        }
+    },
+    "uefa_conference_league": {
+        "label": "Conference League",
+        "style": {
+            "bg_color": "#388E3C"
+        }
+    }
 }
 
 START_SEASON = 2023

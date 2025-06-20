@@ -1,6 +1,13 @@
-import streamlit as st
+from utils.commons.common_page_config import BasePage
+from config import PLAYER_STATS_PAGE
 
-st.title("Player Stats")
 
-if st.button("← Retour à l'accueil"):
-    st.switch_page("Home.py")
+class PlayerStatsPage(BasePage):
+    def render(self):
+        self.set_page_config()
+        self.set_page_title()
+        self.set_back_home_button()
+
+if __name__ == "__main__" or True:
+    page = PlayerStatsPage(PLAYER_STATS_PAGE)
+    page.render()

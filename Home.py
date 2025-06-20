@@ -3,30 +3,13 @@ from components.connection import ensure_connection, get_connection
 from components.sidebar import sidebar_connection
 from components.queries.home.query_interface import query_interface
 from components.charts import visualization_interface
-from pathlib import Path
-from config import APP_CONFIG, PAGES_CONFIG, FALLBACK_CSS
-
-
-def load_css(file_name):
-    """Charge le CSS depuis un fichier externe"""
-    try:
-        css_file_path = Path(__file__).parent / "assets" / "styles" / file_name
-        with open(css_file_path) as f:
-            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-    except FileNotFoundError:
-        # CSS de fallback
-        st.markdown(FALLBACK_CSS, unsafe_allow_html=True)
+from config import PAGES_CONFIG, HOME_PAGE
+from utils.page_helper.page_config import set_page_config
 
 
 def main():
     """Fonction principale de l'application"""
-    st.set_page_config(
-        page_title=APP_CONFIG['title'],
-        page_icon=APP_CONFIG['icon'],
-        layout=APP_CONFIG['layout']
-    )
-
-    load_css("Home.css")
+    set_page_config(HOME_PAGE)
 
     # Titre centré
     st.markdown('<h1 class="main-title">SoccerStat-II</h1>', unsafe_allow_html=True)
