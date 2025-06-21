@@ -1,6 +1,7 @@
 import streamlit as st
 from components.queries.execute_query import execute_query
 from config import START_SEASON, END_SEASON
+from utils.file_helper.reader import read_sql_file
 
 
 def set_all_seasons_basic_stats(db_conn):
@@ -11,7 +12,7 @@ def set_all_seasons_basic_stats(db_conn):
             all_seasons = [f"season_{y}_{y+1}" for y in range(START_SEASON, END_SEASON)]
 
             with players:
-                query = "SELECT count(*) from upper.player"
+                query = read_sql_file("components/queries/basic_stats/n_players.sql")
                 resu = execute_query(db_conn, query)
                 if resu is not None:
                     st.write(f"{int(resu.iloc[0, 0])} Players")
@@ -24,10 +25,10 @@ def set_all_seasons_basic_stats(db_conn):
                     st.write(f"{int(resu.iloc[0, 0])} Matches")
 
             with clubs:
-                query = "SELECT count(*) from upper.club"
+                query = read_sql_file("components/queries/basic_stats/n_clubs.sql")
                 resu = execute_query(db_conn, query)
                 if resu is not None:
                     st.write(f"{int(resu.iloc[0, 0])} Clubs")
 
             with seasons:
-                st.write(f"{len(all_seasons)} Seasons")
+                st.write(f"{len(all_seasons)} Seasons") # TODO: à revoir

@@ -23,7 +23,7 @@ PAGES_CONFIG = [
 
 ALL_BUTTON_CONFIG = {
     "id": "all",
-    "label": "All",
+    "label": "All competitions",
     "style": {
             "bg_color": "#888888"
         }

@@ -67,10 +67,6 @@ def choose_comp_buttons():
 
                 with set_button_with_style(key, bg_color, font_color, border_color):
                     if st.button(comp_config["diminutive"], key=key, use_container_width=True):
-                        st.session_state.clicked = comp
                         id_comp = comp
-
-    if st.session_state.clicked:
-        st.write(st.session_state.clicked)
 
     return id_comp
