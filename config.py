@@ -35,14 +35,18 @@ COMPETITION_AND_COLORS = {
         "label": "Premier League",
         "diminutive": "PL",
         "style": {
-            "bg_color": "#6200EA"
+            "bg_color": "#6200EA",
+            "font_color": "#6200EA",
+            "border_color": "#B388FF"
         }
     },
     "la_liga": {
         "label": "La Liga",
         "diminutive": "LL",
         "style": {
-             "bg_color": "#FBC02D"
+             "bg_color": "#FBC02D",
+            "font_color": "#FBC02D",
+            "border_color": "#FFF176"
         }
     },
     "fussball_bundesliga": {
@@ -50,42 +54,54 @@ COMPETITION_AND_COLORS = {
         "diminutive": "BL",
         "id_comp": "fussball_bundesliga",
         "style": {
-            "bg_color": "#D32F2F"
+            "bg_color": "#D32F2F",
+            "font_color": "#D32F2F",
+            "border_color": "#FF6659"
         }
     },
     "serie_a": {
         "label": "Serie A",
         "diminutive": "SA",
         "style": {
-            "bg_color": "#1976D2"
+            "bg_color": "#2E7D32",
+            "font_color": "#2E7D32",
+            "border_color": "#81C784"
         }
     },
     "ligue_1": {
         "label": "Ligue 1",
         "diminutive": "L1",
         "style": {
-            "bg_color": "#2E7D32"
+            "bg_color": "#1976D2",
+            "font_color": "#1976D2",
+            "border_color": "#64B5F6"
         }
     },
     "uefa_champions_league": {
         "label": "Champions League",
         "diminutive": "UCL",
         "style": {
-            "bg_color": "#0D47A1"
+            "bg_color": "#050A30",
+            "font_color": "white",
+            "border_color": "#143F6B"
         }
     },
     "uefa_europa_league": {
         "label": "Europa League",
         "diminutive": "UEL",
         "style": {
-            "bg_color": "#EF6C00"
+            "bg_color": "#D35400",
+            "font_color": "white",
+            "border_color": "#ED722E"
         }
     },
     "uefa_conference_league": {
         "label": "Conference League",
         "diminutive": "UECL",
         "style": {
-            "bg_color": "#388E3C"
+            "bg_color": "#2E8B57",
+            "font_color": "white",
+            "border_color": "#55BC39"
         }
     }
 }
