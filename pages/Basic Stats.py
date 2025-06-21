@@ -1,11 +1,11 @@
 import streamlit as st
 
 from components.connection import get_connection
-from components.pages.choose_comp_buttons import choose_comp_buttons
-from components.pages.choose_season_button import choose_season_button
-from components.pages.set_all_seasons_basic_stats import set_all_seasons_basic_stats
+from components.pages.basic_stats.choose_comp_buttons import choose_comp_buttons
+from components.pages.basic_stats.choose_season_button import choose_season_button
+from components.pages.basic_stats.set_all_seasons_basic_stats import set_all_seasons_basic_stats
 from components.sidebar import sidebar_connection
-from config import COMPETITION_AND_COLORS, BASIC_STATS_PAGE, BASIC_STATS_PAGE
+from config import BASIC_STATS_PAGE
 
 from utils.commons.common_page_config import BasePage
 
@@ -23,7 +23,6 @@ class BasicStats(BasePage):
         st.divider()
 
         id_comp = choose_comp_buttons()
-        print("coucou", id_comp)
 
         st.divider()
 

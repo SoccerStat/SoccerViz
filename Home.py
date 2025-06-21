@@ -1,9 +1,11 @@
 import streamlit as st
-from components.connection import ensure_connection, get_connection
-from components.sidebar import sidebar_connection
-from components.queries.home.query_interface import query_interface
+
 from components.charts import visualization_interface
-from config import PAGES_CONFIG, HOME_PAGE
+from components.connection import ensure_connection, get_connection
+from components.pages.home.navigation_buttons import set_navigation_buttons
+from components.queries.home.query_interface import query_interface
+from components.sidebar import sidebar_connection
+from config import HOME_PAGE
 from utils.page_helper.page_config import set_page_config
 
 
@@ -11,19 +13,11 @@ def main():
     """Fonction principale de l'application"""
     set_page_config(HOME_PAGE)
 
-    # Titre centré
     st.markdown('<h1 class="main-title">SoccerStat-II</h1>', unsafe_allow_html=True)
 
-    # Section Navigation avec boutons horizontaux
     st.markdown('<h3 class="nav-title">Navigation</h3>', unsafe_allow_html=True)
 
-    with st.container():
-        cols = st.columns(len(PAGES_CONFIG))
-        for i, page in enumerate(PAGES_CONFIG):
-            with cols[i]:
-                if st.button(page, key=f"nav_{page}"):
-                    st.switch_page(f"pages/{page}.py")
-
+    set_navigation_buttons()
 
     st.divider()
 
@@ -31,7 +25,7 @@ def main():
 
     if ensure_connection():
         st.success("✅ Database connected and ready to use!")
-        main_content()
+        home_content()
     else:
         st.warning("⚠️ Please connect to the database via the sidebar.")
 
@@ -62,7 +56,7 @@ def main():
     """, unsafe_allow_html=True)
 
 
-def main_content():
+def home_content():
     """Corps principal de l'application après connexion"""
 
     conn = get_connection()
@@ -72,10 +66,6 @@ def main_content():
             query_interface(conn)
         with tab2:
             visualization_interface()
-
-    st.divider()
-    st.markdown("---")
-    st.markdown("*Application créée avec Streamlit 🎈*", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

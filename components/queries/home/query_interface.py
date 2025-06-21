@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit_shortcuts as sts
-from components.queries.execute_query import execute_query, result_query
+
+from components.queries.execute_query import result_query
 
 
 def query_interface(db_conn):
@@ -9,7 +10,6 @@ def query_interface(db_conn):
 
     st.divider()
 
-    # Zone de requête
     _display_query_editor(db_conn)
 
 
@@ -17,7 +17,6 @@ def _display_query_editor(db_conn):
     """Affiche l'éditeur de requêtes"""
     st.subheader("Exécuter une requête")
 
-    # Éditeur de requête
     query = st.text_area(
         "Votre requête SQL:",
         height=150,
@@ -28,7 +27,7 @@ def _display_query_editor(db_conn):
     col1, col2, col3 = st.columns([1, 1, 4])
 
     with col1:
-        execute_shortcut_btn = sts.shortcut_button("▶️ Run", "cmd+Enter", type="primary")
+        execute_shortcut_btn = sts.shortcut_button("▶️ Run", "cmd+Enter")
 
     if execute_shortcut_btn and query.strip():
         result_query(db_conn, query)

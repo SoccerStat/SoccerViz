@@ -33,18 +33,21 @@ ALL_BUTTON_CONFIG = {
 COMPETITION_AND_COLORS = {
     "premier_league": {
         "label": "Premier League",
+        "diminutive": "PL",
         "style": {
             "bg_color": "#6200EA"
         }
     },
     "la_liga": {
         "label": "La Liga",
+        "diminutive": "LL",
         "style": {
              "bg_color": "#FBC02D"
         }
     },
     "fussball_bundesliga": {
         "label": "Bundesliga",
+        "diminutive": "BL",
         "id_comp": "fussball_bundesliga",
         "style": {
             "bg_color": "#D32F2F"
@@ -52,30 +55,35 @@ COMPETITION_AND_COLORS = {
     },
     "serie_a": {
         "label": "Serie A",
+        "diminutive": "SA",
         "style": {
             "bg_color": "#1976D2"
         }
     },
     "ligue_1": {
         "label": "Ligue 1",
+        "diminutive": "L1",
         "style": {
             "bg_color": "#2E7D32"
         }
     },
     "uefa_champions_league": {
         "label": "Champions League",
+        "diminutive": "UCL",
         "style": {
             "bg_color": "#0D47A1"
         }
     },
     "uefa_europa_league": {
         "label": "Europa League",
+        "diminutive": "UEL",
         "style": {
             "bg_color": "#EF6C00"
         }
     },
     "uefa_conference_league": {
         "label": "Conference League",
+        "diminutive": "UECL",
         "style": {
             "bg_color": "#388E3C"
         }
