@@ -2,7 +2,7 @@ import streamlit as st
 
 def set_main_title(name):
     st.markdown(f"""
-        <h1 style='text-align: center; color: black; font-size: 2.5rem; margin-bottom: 2rem;'>{name}</h1>
+        <h1 style='text-align: center; font-size: 2.5rem; margin-bottom: 2rem;'>{name}</h1>
     """, unsafe_allow_html=True)
 
 def set_sub_title(name):

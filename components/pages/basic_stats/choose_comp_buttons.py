@@ -8,8 +8,11 @@ def choose_comp_buttons():
 
     key_all_comps = f"{ALL_BUTTON_CONFIG["id"]}_comps"
 
-    if "selected_comp" not in st.session_state:
-        st.session_state.selected_comp = key_all_comps
+    if "selected_id_comp" not in st.session_state:
+        st.session_state.selected_id_comp = key_all_comps
+
+    if "selected_name_comp" not in st.session_state:
+        st.session_state.selected_name_comp = None
 
     col_all, col_comps = st.columns([1, 8], gap="large")
 
@@ -17,11 +20,13 @@ def choose_comp_buttons():
         st.session_state.clicked = False
 
     with col_all:
+        all_comps = ALL_BUTTON_CONFIG["label_comps"]
         with set_button_with_style(key_all_comps, width='155%'):
-            if st.button(ALL_BUTTON_CONFIG["label_comps"], key=key_all_comps, use_container_width=True):
+            if st.button(all_comps, key=key_all_comps, use_container_width=True):
                 id_comp = ALL_BUTTON_CONFIG["id"]
                 st.session_state.clicked = id_comp
-                st.session_state.selected_comp = key_all_comps
+                st.session_state.selected_id_comp = key_all_comps
+                st.session_state.selected_name_comp = all_comps
 
     with col_comps:
         cols = st.columns(len(competitions))
@@ -37,6 +42,7 @@ def choose_comp_buttons():
 
                 with set_button_with_style(key, bg_color, font_color, border_color):
                     if st.button(comp_config["diminutive"], key=key, use_container_width=True):
-                        st.session_state.selected_comp = comp
+                        st.session_state.selected_id_comp = comp
+                        st.session_state.selected_name_comp = comp_config["label"]
 
-    return st.session_state.selected_comp
+    return st.session_state.selected_id_comp, st.session_state.selected_name_comp

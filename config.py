@@ -84,7 +84,7 @@ COMPETITION_AND_COLORS = {
         }
     },
     "uefa_champions_league": {
-        "label": "Champions League",
+        "label": "UEFA Champions League",
         "diminutive": "UCL",
         "style": {
             "bg_color": "#050A30",
@@ -93,7 +93,7 @@ COMPETITION_AND_COLORS = {
         }
     },
     "uefa_europa_league": {
-        "label": "Europa League",
+        "label": "UEFA Europa League",
         "diminutive": "UEL",
         "style": {
             "bg_color": "#D35400",
@@ -102,7 +102,7 @@ COMPETITION_AND_COLORS = {
         }
     },
     "uefa_conference_league": {
-        "label": "Conference League",
+        "label": "UEFA Conference League",
         "diminutive": "UECL",
         "style": {
             "bg_color": "#2E8B57",
@@ -111,6 +111,10 @@ COMPETITION_AND_COLORS = {
         }
     }
 }
+
+ALL_SEASONS_MODE = "All Seasons"
+RANGE_SEASONS_MODE = "Range of Seasons"
+COMPARE_SEASONS_MODE = "Compare Seasons"
 
 DATABASE_CONFIG = {
     'default_host': os.getenv('DB_HOST', '10.0.0.1'),

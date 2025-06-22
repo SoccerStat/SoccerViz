@@ -1,9 +1,9 @@
 import streamlit as st
 
-from components.commons.set_button_style import set_button_with_style
-from components.commons.get_all_seasons import get_all_seasons
+from components.commons.get_all_seasons import get_all_seasons, get_seasons
 from components.queries.execute_query import execute_query
-from config import ALL_BUTTON_CONFIG
+from config import ALL_SEASONS_MODE, RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE
+
 
 def select_all_seasons_by_comp(db_conn, all_seasons, id_comp):
     if id_comp != "all_comps":
@@ -14,32 +14,42 @@ def select_all_seasons_by_comp(db_conn, all_seasons, id_comp):
     union_query = " UNION ALL ".join(
         [
             f"(SELECT '{schema[7:]}' as season FROM {schema}.match {condition_comp} LIMIT 1)"
-            for schema in all_seasons]
+            for schema in all_seasons
+        ]
     )
-    final_query = f"SELECT DISTINCT season AS distinct_season FROM ({union_query}) AS all_counts;"
+    final_query = f"""
+        SELECT DISTINCT season AS distinct_season
+        FROM ({union_query}) AS all_counts 
+        ORDER BY season;
+    """
     result = execute_query(db_conn, final_query)
     return result['distinct_season'].tolist()
 
-def choose_season_button(db_conn, id_comp):
-    all_seasons = get_all_seasons(db_conn)
-
-    key_all_seasons = f"{ALL_BUTTON_CONFIG["id"]}_seasons"
+def choose_season_button(db_conn, name_comp):
+    all_seasons =  get_seasons(db_conn, name_comp) # get_all_seasons(db_conn)
+    # all_seasons_by_comp = select_all_seasons_by_comp(db_conn, all_seasons, id_comp)
 
     if "selected_seasons" not in st.session_state:
-        st.session_state.selected_seasons = select_all_seasons_by_comp(db_conn, all_seasons, id_comp)
+        st.session_state.selected_seasons = all_seasons
 
     with st.container():
-        col_all, col_range, col_compare = st.columns([1, 1, 1], gap="large")
+        mode = st.radio("Selection mode", [ALL_SEASONS_MODE, RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE], horizontal=True)
 
-        with col_all:
-            with set_button_with_style(key_all_seasons):
-                if st.button(ALL_BUTTON_CONFIG["label_seasons"], key=key_all_seasons):
-                    st.session_state.selected_seasons = select_all_seasons_by_comp(db_conn, all_seasons, id_comp)
 
-        with col_range:
-            pass
+        if mode == ALL_SEASONS_MODE:
+            st.session_state.selected_seasons = all_seasons
 
-        with col_compare:
-            pass
+        if mode == RANGE_SEASONS_MODE:
+            cols = st.columns(2)
+            with cols[0]:
+                min_season = st.selectbox(label="Min season", options=all_seasons)
+                max_season = st.selectbox(label="Max season", options=[season for season in all_seasons if season >= min_season])
+                st.session_state.selected_seasons = [season for season in all_seasons if min_season <= season <= max_season]
+
+        if mode == COMPARE_SEASONS_MODE:
+            cols = st.columns(2)
+            with cols[0]:
+                selected_seasons = st.multiselect(label="select seasons...", options=all_seasons, max_selections=3)
+                st.session_state.selected_seasons = selected_seasons
 
     return st.session_state.selected_seasons
