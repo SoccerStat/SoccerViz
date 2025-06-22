@@ -1,6 +1,7 @@
 import streamlit as st
+
+from components.commons.get_all_seasons import get_all_seasons
 from components.queries.execute_query import execute_query
-from config import START_SEASON, END_SEASON
 from utils.file_helper.reader import read_sql_file
 
 
@@ -9,7 +10,7 @@ def set_all_seasons_basic_stats(db_conn):
         with st.container():
             players, matches, clubs, seasons = st.columns([1,1,1,1])
 
-            all_seasons = [f"season_{y}_{y+1}" for y in range(START_SEASON, END_SEASON)]
+            all_seasons = get_all_seasons(db_conn)
 
             with players:
                 query = read_sql_file("components/queries/basic_stats/n_players.sql")

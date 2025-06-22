@@ -1,7 +1,8 @@
 import streamlit as st
 
 from components.charts import visualization_interface
-from components.connection import ensure_connection, get_connection
+from components.commons.ensure_connection_or_warning import set_connection_or_warning
+from components.connection import get_connection
 from components.pages.home.navigation_buttons import set_navigation_buttons
 from components.queries.home.query_interface import query_interface
 from components.sidebar import sidebar_connection
@@ -23,11 +24,7 @@ def main():
 
     sidebar_connection()
 
-    if ensure_connection():
-        st.success("✅ Database connected and ready to use!")
-        home_content()
-    else:
-        st.warning("⚠️ Please connect to the database via the sidebar.")
+    set_connection_or_warning(home_content)
 
     st.markdown("""
     <style>
@@ -59,11 +56,11 @@ def main():
 def home_content():
     """Corps principal de l'application après connexion"""
 
-    conn = get_connection()
-    if conn:
+    db_conn = get_connection()
+    if db_conn:
         tab1, tab2 = st.tabs(["🔍 Requêtes", "📊 Graphiques"])
         with tab1:
-            query_interface(conn)
+            query_interface(db_conn)
         with tab2:
             visualization_interface()
 

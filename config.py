@@ -23,11 +23,17 @@ PAGES_CONFIG = [
 
 ALL_BUTTON_CONFIG = {
     "id": "all",
-    "label": "All competitions",
+    "label_comps": "All competitions",
+    "label_seasons": "All Seasons",
     "style": {
             "bg_color": "#888888"
         }
+}
 
+SELECTED_BUTTON_CONFIG = {
+    "bg_color": "#FAFAFA",
+    "font_color": "#212121",
+    "border_color": "#607D8B"
 }
 
 COMPETITION_AND_COLORS = {
@@ -105,9 +111,6 @@ COMPETITION_AND_COLORS = {
         }
     }
 }
-
-START_SEASON = 2023
-END_SEASON = 2025
 
 DATABASE_CONFIG = {
     'default_host': os.getenv('DB_HOST', '10.0.0.1'),

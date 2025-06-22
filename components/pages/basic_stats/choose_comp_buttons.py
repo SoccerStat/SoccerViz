@@ -1,45 +1,15 @@
 import streamlit as st
-from streamlit_extras.stylable_container import stylable_container
 
+from components.commons.set_button_style import set_button_with_style
 from config import COMPETITION_AND_COLORS, ALL_BUTTON_CONFIG
-
-def set_button_with_style(key, bg_color="white", font_color="black", border_color="black"):
-    return stylable_container(
-        key=key,
-        css_styles=f"""
-            .stButton > button {{
-                background: {bg_color};
-                color: {font_color};
-                border: 2px solid {border_color};
-                border-radius: 12px;
-                padding: 0.4em 1em;
-                font-weight: 600;
-                font-size: 0.9rem;
-                transition: all 0.2s ease-in-out;
-                cursor: pointer;
-                outline: none;
-            }}
-            .stButton > button:hover {{
-                transform: scale(1.05);
-                box-shadow: 0 4px 12px rgba(0,0,0,0);
-            }}
-            .stButton > button:focus,
-            .stButton > button:active {{
-                background: #FAFAFA !important;
-                color: #212121 !important;
-                border: 2px solid #607D8B !important;
-                box-shadow: none !important;
-                outline: none !important;
-                transform: scale(0.96);
-            }}
-        """
-    )
-
 
 def choose_comp_buttons():
     competitions = list(COMPETITION_AND_COLORS.keys())
 
-    id_comp = None
+    key_all_comps = f"{ALL_BUTTON_CONFIG["id"]}_comps"
+
+    if "selected_comp" not in st.session_state:
+        st.session_state.selected_comp = key_all_comps
 
     col_all, col_comps = st.columns([1, 8], gap="large")
 
@@ -47,11 +17,11 @@ def choose_comp_buttons():
         st.session_state.clicked = False
 
     with col_all:
-        key = f"{ALL_BUTTON_CONFIG["id"]}_comps"
-        with set_button_with_style(key, ):
-            if st.button(ALL_BUTTON_CONFIG["label"], key=key, use_container_width=True):
+        with set_button_with_style(key_all_comps):
+            if st.button(ALL_BUTTON_CONFIG["label_comps"], key=key_all_comps, use_container_width=True):
                 id_comp = ALL_BUTTON_CONFIG["id"]
                 st.session_state.clicked = id_comp
+                st.session_state.selected_comp = key_all_comps
 
     with col_comps:
         cols = st.columns(len(competitions))
@@ -67,6 +37,6 @@ def choose_comp_buttons():
 
                 with set_button_with_style(key, bg_color, font_color, border_color):
                     if st.button(comp_config["diminutive"], key=key, use_container_width=True):
-                        id_comp = comp
+                        st.session_state.selected_comp = comp
 
-    return id_comp
+    return st.session_state.selected_comp

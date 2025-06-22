@@ -1,5 +1,6 @@
 import streamlit as st
 
+from components.commons.set_button_style import set_button_with_style
 from config import PAGES_CONFIG
 
 def set_navigation_buttons():
@@ -7,5 +8,7 @@ def set_navigation_buttons():
         cols = st.columns(len(PAGES_CONFIG))
         for i, page in enumerate(PAGES_CONFIG):
             with cols[i]:
-                if st.button(page, key=f"nav_{page}"):
-                    st.switch_page(f"pages/{page}.py")
+                key = f"nav_{page}"
+                with set_button_with_style(key):
+                    if st.button(page, key=key):
+                        st.switch_page(f"pages/{page}.py")
