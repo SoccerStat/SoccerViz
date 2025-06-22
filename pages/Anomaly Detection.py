@@ -1,6 +1,10 @@
-import streamlit as st
+from utils.commons.BasePage import BasePage
+from config import ANOMALY_DETECTION_PAGE
 
-st.title("Anomaly Detection")
+class MonitoringPage(BasePage):
+    def content(self):
+        pass
 
-if st.button("← Retour à l'accueil"):
-    st.switch_page("Home.py")
+if __name__ == "__main__" or True:
+    page = MonitoringPage(ANOMALY_DETECTION_PAGE)
+    page.render()

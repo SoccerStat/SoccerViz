@@ -3,16 +3,29 @@ from streamlit_extras.stylable_container import stylable_container
 from config import SELECTED_BUTTON_CONFIG
 
 
-def set_button_with_style(key, bg_color="white", font_color="black", border_color="black", is_selected=False):
+def set_button_with_style(
+        key,
+        bg_color="white",
+        font_color="black",
+        border_color="black",
+        width="100%",
+        height='60px',
+        is_selected=False
+):
     """
     Crée un bouton stylé avec possibilité de forcer l'état sélectionné
 
     Args:
-        key: Clé unique du bouton
-        bg_color: Couleur de fond par défaut
-        font_color: Couleur de police par défaut
-        border_color: Couleur de bordure par défaut
-        is_selected: Force l'apparence sélectionnée si True
+        font_color:
+        border_color:
+        is_selected:
+        :param key: Clé unique du bouton
+        :param bg_color: Couleur de fond par défaut
+        :param font_color: Couleur de police par défaut
+        :param border_color: Couleur de bordure par défaut
+        :param width: largeur du bouton
+        :param height: longueur du bouton
+        :param is_selected: Force l'apparence sélectionnée si True
     """
     selected_bg_color = SELECTED_BUTTON_CONFIG["bg_color"]
     selected_font_color = SELECTED_BUTTON_CONFIG["font_color"]
@@ -41,6 +54,8 @@ def set_button_with_style(key, bg_color="white", font_color="black", border_colo
                 font-size: 0.9rem;
                 transition: all 0.2s ease-in-out;
                 cursor: pointer;
+                width: {width};
+                height: {height};
                 outline: none;
             }}
             .stButton > button:hover {{

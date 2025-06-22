@@ -1,12 +1,10 @@
-from utils.commons.common_page_config import BasePage
+from utils.commons.BasePage import BasePage
 from config import PLAYER_STATS_PAGE
 
 
 class PlayerStatsPage(BasePage):
-    def render(self):
-        self.set_page_config()
-        self.set_page_title()
-        self.set_back_home_button()
+    def content(self):
+        pass
 
 if __name__ == "__main__" or True:
     page = PlayerStatsPage(PLAYER_STATS_PAGE)

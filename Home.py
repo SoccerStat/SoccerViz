@@ -7,24 +7,34 @@ from components.pages.home.navigation_buttons import set_navigation_buttons
 from components.queries.home.query_interface import query_interface
 from components.sidebar import sidebar_connection
 from config import HOME_PAGE
-from utils.page_helper.page_config import set_page_config
+from utils.commons.BasePage import BasePage
 
+
+class Home(BasePage):
+    def render(self):
+        self.set_page_config(home=True)
+        self.set_page_title()
+        sidebar_connection()
+        set_connection_or_warning(self.content)
+
+    def content(self):
+        db_conn = get_connection()
+
+        self.set_sub_title("Navigation")
+
+        set_navigation_buttons()
+
+        st.divider()
+
+        if db_conn:
+            tab1, tab2 = st.tabs(["🔍 Queries", "📊 Graphs"])
+            with tab1:
+                query_interface(db_conn)
+            with tab2:
+                visualization_interface()
 
 def main():
     """Fonction principale de l'application"""
-    set_page_config(HOME_PAGE)
-
-    st.markdown('<h1 class="main-title">SoccerStat-II</h1>', unsafe_allow_html=True)
-
-    st.markdown('<h3 class="nav-title">Navigation</h3>', unsafe_allow_html=True)
-
-    set_navigation_buttons()
-
-    st.divider()
-
-    sidebar_connection()
-
-    set_connection_or_warning(home_content)
 
     st.markdown("""
     <style>
@@ -53,17 +63,6 @@ def main():
     """, unsafe_allow_html=True)
 
 
-def home_content():
-    """Corps principal de l'application après connexion"""
-
-    db_conn = get_connection()
-    if db_conn:
-        tab1, tab2 = st.tabs(["🔍 Requêtes", "📊 Graphiques"])
-        with tab1:
-            query_interface(db_conn)
-        with tab2:
-            visualization_interface()
-
-
 if __name__ == "__main__":
-    main()
+    home_page = Home(HOME_PAGE)
+    home_page.render()

@@ -23,7 +23,7 @@ PAGES_CONFIG = [
 
 ALL_BUTTON_CONFIG = {
     "id": "all",
-    "label_comps": "All competitions",
+    "label_comps": "All Competitions",
     "label_seasons": "All Seasons",
     "style": {
             "bg_color": "#888888"
