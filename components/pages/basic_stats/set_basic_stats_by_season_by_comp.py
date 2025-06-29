@@ -3,10 +3,10 @@ import streamlit as st
 from utils.file_helper.reader import read_sql_file
 from components.queries.execute_query import execute_query
 
-def get_matches(db_conn, name_comp, seasons_ids, chosen_ranking):
-    kind = 'clubs' if chosen_ranking == 'Clubs' else 'players'
+def get_stats(db_conn, name_comp, seasons_ids, chosen_ranking, ranking):
+    kind = 'clubs' if chosen_ranking == 'Clubs' else 'Players'
     sql_file = read_sql_file(
-        file_name=f"components/queries/basic_stats/by_season_by_comp/{kind}/matches.sql",
+        file_name=f"components/queries/basic_stats/by_season_by_comp/{kind}/{ranking}.sql",
         name_comp=name_comp,
         seasons_ids=[f"'{s}'" for s in seasons_ids]
     )
@@ -27,14 +27,12 @@ def set_basic_stats_by_season_by_comp(db_conn, name_comp, seasons_ids):
         st.write(seasons)
 
     with players_or_clubs:
-        st.markdown("""
-            <style>
-            .stRadio > label {
-                display: none;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-        chosen_ranking = st.radio("", options=["Players", "Clubs"], horizontal=True)
+        chosen_ranking = st.radio(
+            "Kind of ranking",
+            options=["Clubs", "Players"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
 
     titles = ["Matches", "Goals", "Cartons", "Outcome"]
     cols = st.columns(4, gap="medium")
@@ -59,5 +57,5 @@ def set_basic_stats_by_season_by_comp(db_conn, name_comp, seasons_ids):
                     f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{title}</h4>",
                     unsafe_allow_html=True
                 )
-                df = get_matches(db_conn=db_conn, name_comp=name_comp, seasons_ids=seasons_ids, chosen_ranking=chosen_ranking)
+                df = get_stats(db_conn=db_conn, name_comp=name_comp, seasons_ids=seasons_ids, chosen_ranking=chosen_ranking, ranking=title.lower())
                 st.dataframe(df, use_container_width=True)

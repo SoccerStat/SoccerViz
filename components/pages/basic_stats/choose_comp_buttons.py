@@ -21,7 +21,7 @@ def choose_comp_buttons():
 
     with col_all:
         all_comps = ALL_BUTTON_CONFIG["label_comps"]
-        with set_button_with_style(key_all_comps, width='155%'):
+        with set_button_with_style(key_all_comps, width='140%'):
             if st.button(all_comps, key=key_all_comps, use_container_width=True):
                 id_comp = ALL_BUTTON_CONFIG["id"]
                 st.session_state.clicked = id_comp

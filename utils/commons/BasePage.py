@@ -15,7 +15,7 @@ class BasePage(ABC):
 
     def set_page_config(self, home=False):
         if home:
-            set_page_config(f"{PREFIX_PAGE}")
+            set_page_config(f"{PREFIX_PAGE}", hide_sidebar=False)
         else:
             set_page_config(f"{PREFIX_PAGE} {self.page_title}")
 

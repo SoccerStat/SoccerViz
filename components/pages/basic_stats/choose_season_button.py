@@ -33,7 +33,7 @@ def choose_season_button(db_conn, name_comp):
         st.session_state.selected_seasons = all_seasons
 
     with st.container():
-        mode = st.radio("Selection mode", [ALL_SEASONS_MODE, RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE], horizontal=True)
+        mode = st.radio("Selection mode", [RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE, ALL_SEASONS_MODE], horizontal=True)
 
 
         if mode == ALL_SEASONS_MODE:
