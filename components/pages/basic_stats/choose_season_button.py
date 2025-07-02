@@ -52,4 +52,4 @@ def choose_season_button(db_conn, name_comp):
                 selected_seasons = st.multiselect(label="select seasons...", options=all_seasons, max_selections=3)
                 st.session_state.selected_seasons = selected_seasons
 
-    return st.session_state.selected_seasons
+    return mode, st.session_state.selected_seasons
