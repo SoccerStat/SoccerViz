@@ -1,14 +1,17 @@
-select p.name, count(*) as "Matches"
-from (
-    SELECT id_player
+WITH spp AS (
+    SELECT id_player,
+     SUM(home_minutes + away_minutes) AS "Minutes",
+      COUNT(*) AS "Matches"
     FROM analytics.staging_players_performance
     WHERE
     {% if name_comp != "All Competitions" %}
-    competition = '{{ name_comp }}' and
+    competition = '{{ name_comp }}' AND
     {% endif %}
     season IN ({{ seasons_ids | join(', ') }})
-) as spp
-left join upper.player p
-on spp.id_player = p.id
-group by p.name
-order by "Matches" desc, p.name;
+    GROUP BY id_player
+)
+SELECT p.name, "Matches", "Minutes"/"Matches" as "Min/90"
+FROM spp
+LEFT JOIN upper.player p
+ON spp.id_player = p.id
+ORDER BY "Matches" DESC, p.name;

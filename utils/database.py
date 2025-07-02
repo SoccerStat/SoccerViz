@@ -81,7 +81,6 @@ def init_session_state():
 def restore_connection():
     """Restaure la connexion depuis les credentials en cache"""
     creds = st.session_state.db_credentials
-    st.write("Trying to restore connection with creds:", creds)
 
     if all(key in creds for key in ['host', 'port', 'user', 'password', 'database']) and creds['password']:
         try:
@@ -89,10 +88,7 @@ def restore_connection():
             config_str = f"{creds['host']}:{creds['port']}:{creds['database']}:{creds['user']}"
             connection_hash = hashlib.md5(config_str.encode()).hexdigest()
 
-            print(st.session_state.connection_hash, "/", connection_hash, config_str)
-
             # Si le hash correspond, tente de restaurer la connexion
-            print("reeee")
             db = create_database_connection(
                 creds['host'],
                 creds['port'],
@@ -101,16 +97,12 @@ def restore_connection():
                 creds['database']
             )
             if db:
-                print("ah oui hein")
                 st.session_state.db_conn = db
                 st.session_state.connected = True
                 st.session_state.connection_hash = connection_hash
                 return True
-            else:
-                print("wut")
 
         except Exception as e:
-            print("heiin", creds["password"], str(e))
             clear_session()
     else:
         st.warning("Impossible de restaurer la connexion : mot de passe absent ou incomplet.")
