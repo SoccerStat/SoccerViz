@@ -4,7 +4,7 @@ from components.pages.basic_stats.by_season_by_comp.utils import get_stats
 
 
 def compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
-    titles = ["Goals", "Cartons" if chosen_ranking == "Clubs" else "Assists", "Outcome"]
+    titles = ["Matches", "Goals", "Cartons" if chosen_ranking == "Clubs" else "Assists", "Outcome"]
     cols = st.columns(len(seasons_ids), gap="medium")
 
     st.markdown("""

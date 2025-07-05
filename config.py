@@ -56,7 +56,7 @@ COMPETITION_AND_COLORS = {
         }
     },
     "fussball_bundesliga": {
-        "label": "Bundesliga",
+        "label": "Fußball-Bundesliga",
         "diminutive": "BL",
         "id_comp": "fussball_bundesliga",
         "style": {

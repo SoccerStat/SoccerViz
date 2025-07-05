@@ -14,4 +14,4 @@ SELECT p.name, "Matches", "Minutes"/"Matches" as "Min/90"
 FROM spp
 LEFT JOIN upper.player p
 ON spp.id_player = p.id
-ORDER BY "Matches" DESC, p.name;
+ORDER BY "Matches" DESC, "Min/90" DESC, p.name;
