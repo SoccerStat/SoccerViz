@@ -35,10 +35,14 @@ SELECTED_BUTTON_CONFIG = {
     "border_color": "#607D8B"
 }
 
-COMPETITION_AND_COLORS = {
+KIND_CHP = "CHP"
+KIND_C_CUP = "C_CUP"
+
+COMPETITIONS = {
     "premier_league": {
         "label": "Premier League",
         "diminutive": "PL",
+        "kind": KIND_CHP,
         "style": {
             "bg_color": "#6200EA",
             "font_color": "#6200EA",
@@ -48,6 +52,7 @@ COMPETITION_AND_COLORS = {
     "la_liga": {
         "label": "La Liga",
         "diminutive": "LL",
+        "kind": KIND_CHP,
         "style": {
              "bg_color": "#FBC02D",
             "font_color": "#FBC02D",
@@ -57,6 +62,7 @@ COMPETITION_AND_COLORS = {
     "fussball_bundesliga": {
         "label": "Fußball-Bundesliga",
         "diminutive": "BL",
+        "kind": KIND_CHP,
         "id_comp": "fussball_bundesliga",
         "style": {
             "bg_color": "#D32F2F",
@@ -67,6 +73,7 @@ COMPETITION_AND_COLORS = {
     "serie_a": {
         "label": "Serie A",
         "diminutive": "SA",
+        "kind": KIND_CHP,
         "style": {
             "bg_color": "#2E7D32",
             "font_color": "#2E7D32",
@@ -76,6 +83,7 @@ COMPETITION_AND_COLORS = {
     "ligue_1": {
         "label": "Ligue 1",
         "diminutive": "L1",
+        "kind": KIND_CHP,
         "style": {
             "bg_color": "#1976D2",
             "font_color": "#1976D2",
@@ -85,6 +93,7 @@ COMPETITION_AND_COLORS = {
     "uefa_champions_league": {
         "label": "UEFA Champions League",
         "diminutive": "UCL",
+        "kind": KIND_C_CUP,
         "style": {
             "bg_color": "#050A30",
             "font_color": "white",
@@ -94,6 +103,7 @@ COMPETITION_AND_COLORS = {
     "uefa_europa_league": {
         "label": "UEFA Europa League",
         "diminutive": "UEL",
+        "kind": KIND_C_CUP,
         "style": {
             "bg_color": "#D35400",
             "font_color": "white",
@@ -103,6 +113,7 @@ COMPETITION_AND_COLORS = {
     "uefa_conference_league": {
         "label": "UEFA Conference League",
         "diminutive": "UECL",
+        "kind": KIND_C_CUP,
         "style": {
             "bg_color": "#2E8B57",
             "font_color": "white",
@@ -152,3 +163,29 @@ FALLBACK_CSS = """
     }
 </style>
 """
+
+TEAM_RANKINGS = [
+    "Attendance",
+    "Matches",
+    "Points",
+    "Points/Match",
+    "Wins",
+    "Draws",
+    "Loses",
+    "Goals For",
+    "Goals Against",
+    "Goals Diff",
+    "Clean Sheets",
+    "xG For",
+    "xG For /Match",
+    "xG Against",
+    "xG Against /Match",
+    "Yellow Cards",
+    "Red Cards",
+    "Incl. 2 Yellow Cards",
+    "Fouls",
+    "Shots For",
+    "Shots on Target For",
+    "Shots Against",
+    "Shots on Target Against",
+]

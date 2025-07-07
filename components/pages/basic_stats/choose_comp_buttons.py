@@ -1,10 +1,10 @@
 import streamlit as st
 
 from components.commons.set_button_style import set_button_with_style
-from config import COMPETITION_AND_COLORS, ALL_BUTTON_CONFIG
+from config import COMPETITIONS, ALL_BUTTON_CONFIG
 
 def choose_comp_buttons():
-    competitions = list(COMPETITION_AND_COLORS.keys())
+    competitions = list(COMPETITIONS.keys())
 
     key_all_comps = f"{ALL_BUTTON_CONFIG["id"]}_comps"
 
@@ -32,7 +32,7 @@ def choose_comp_buttons():
         cols = st.columns(len(competitions))
 
         for i, comp in enumerate(competitions):
-            comp_config = COMPETITION_AND_COLORS[comp]
+            comp_config = COMPETITIONS[comp]
 
             with cols[i]:
                 key = f"btn_{comp}"
