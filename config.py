@@ -177,9 +177,9 @@ TEAM_RANKINGS = [
     "Goals Diff",
     "Clean Sheets",
     "xG For",
-    "xG For /Match",
+    "xG For/Match",
     "xG Against",
-    "xG Against /Match",
+    "xG Against/Match",
     "Yellow Cards",
     "Red Cards",
     "Incl. 2 Yellow Cards",
@@ -188,4 +188,9 @@ TEAM_RANKINGS = [
     "Shots on Target For",
     "Shots Against",
     "Shots on Target Against",
+]
+
+C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
+    "Points",
+    "Points/Match"
 ]
