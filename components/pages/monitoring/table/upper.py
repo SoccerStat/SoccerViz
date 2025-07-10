@@ -5,6 +5,7 @@ import altair as alt
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
+@st.cache_data(show_spinner=False)
 def get_counts_by_item(db_conn, column, item):
     sql_file = read_sql_file(
         file_name=f"components/queries/monitoring/tables/upper.sql",

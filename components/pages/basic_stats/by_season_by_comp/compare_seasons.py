@@ -31,5 +31,5 @@ def compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
                     f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{title}</h4>",
                     unsafe_allow_html=True
                 )
-                df = get_stats(db_conn=db_conn, name_comp=name_comp, seasons_ids=[season], chosen_ranking=chosen_ranking, ranking=title.lower())
+                df = get_stats(_db_conn=db_conn, name_comp=name_comp, seasons_ids=[season], chosen_ranking=chosen_ranking, ranking=title.lower())
                 st.dataframe(df, use_container_width=True)
