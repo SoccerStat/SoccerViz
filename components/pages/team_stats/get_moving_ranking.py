@@ -6,23 +6,31 @@ from components.pages.team_stats.get_teams_by_comp_by_season import get_teams_by
 from utils.file_helper.reader import read_sql_file
 from components.commons.get_all_seasons import get_seasons
 from components.queries.execute_query import execute_query
-from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP
+from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
 
 
 @st.cache_data(show_spinner=False)
-def ranking_by_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb_weeks):
+def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb_chp_weeks):
     complete_df = pd.DataFrame()
-
-    for j in range(1, nb_weeks + 1):
+    
+    for j in range(1, nb_chp_weeks + 1):
         sql_file = read_sql_file(
             file_name="components/queries/team_stats/get_moving_ranking.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
+            kind_of_comp=kind_of_comp,
             season=chosen_season,
             week=j,
         )
         df_j = execute_query(_db_conn, sql_file)
         complete_df = pd.concat([complete_df, df_j], ignore_index=True)
+
+    return complete_df
+
+
+@st.cache_data(show_spinner=False)
+def ranking_by_c_cup_week(_db_conn, chosen_ranking, chosen_comp, chosen_season):
+    complete_df = pd.DataFrame()
 
     return complete_df
 
@@ -34,6 +42,8 @@ def get_moving_ranking(db_conn):
         label="Choose competition...",
         options=comps_and_kind.keys())
 
+    kind_of_comp = comps_and_kind[chosen_comp]
+
     chosen_season = st.selectbox(
         key="moving_ranking_season",
         label="Choose season...",
@@ -41,7 +51,6 @@ def get_moving_ranking(db_conn):
     )
 
     teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
-    nb_weeks = 2 * (len(teams) - 1)
 
     chosen_teams = st.multiselect(
         key="moving_ranking_teams",
@@ -55,7 +64,22 @@ def get_moving_ranking(db_conn):
     if chosen_teams:
         with st.spinner("Data loading..."):
 
-            complete_df = ranking_by_week(db_conn, "Points", chosen_comp, chosen_season, nb_weeks)
+            if kind_of_comp == KIND_CHP:
+                complete_df = ranking_by_chp_week(
+                    _db_conn=_db_conn,
+                    chosen_ranking="Points",
+                    chosen_comp=chosen_comp,
+                    chosen_season=chosen_season,
+                    nb_chp_weeks=2 * (len(teams) - 1)
+                )
+
+            elif kind_of_comp == KIND_C_CUP:
+                complete_df = ranking_by_c_cup_week(
+                    _db_conn=db_conn,
+                    chosen_ranking="Points",
+                    chosen_comp=chosen_comp,
+                    chosen_season=chosen_season
+                )
 
             complete_df["Cumulated Points"] = complete_df.groupby("Club")["Points"].cumsum()
             complete_df = complete_df.sort_values(by=["Week", "Cumulated Points"], ascending=[True, False])

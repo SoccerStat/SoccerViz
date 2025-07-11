@@ -1,6 +1,10 @@
 SELECT
     "Club",
+    {% if kind_of_comp == 'CHP' %}
     {{ week }} as "Week",
+    {% else %}
+    {{ week }} as "Week",
+    {% endif %}
     "Stat" as "{{ ranking }}"
 FROM analytics.one_teams_ranking(
     in_ranking := '{{ ranking }}',
