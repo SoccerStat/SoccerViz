@@ -13,6 +13,7 @@ from utils.commons.BasePage import BasePage
 class BasicStats(BasePage):
     def content(self):
         db_conn = get_connection()
+
         set_all_seasons_basic_stats(db_conn)
 
         st.divider()

@@ -1,4 +1,7 @@
-select c.name, COUNT(*) AS "Matches", SUM(points) AS "Points"
+select
+    c.name as "Club",
+    COUNT(*) AS "Matches",
+    SUM(points) AS "Points"
 FROM (
     SELECT id_comp, id_team, home_points + away_points AS points
     FROM analytics.staging_teams_performance

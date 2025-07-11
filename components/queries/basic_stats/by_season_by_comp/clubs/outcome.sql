@@ -1,4 +1,8 @@
-select c.name, sum(n_wins) as "W", sum(n_draws) as "D", sum(n_loses) as "L"
+select
+    c.name as "Club",
+    sum(n_wins) as "W",
+    sum(n_draws) as "D",
+    sum(n_loses) as "L"
 from (
     select
         id_comp,

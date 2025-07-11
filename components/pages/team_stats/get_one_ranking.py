@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.file_helper.reader import read_sql_file
-from components.commons.get_all_seasons import get_seasons
+from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
 from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP
 
@@ -20,7 +20,7 @@ def get_one_ranking(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     chosen_comp = st.selectbox(label="Choose competition...",
                                options=comps_and_kind.keys())
-    chosen_season = st.selectbox("Choose season...", options=get_seasons(db_conn, chosen_comp))
+    chosen_season = st.selectbox("Choose season...", options=get_seasons_by_comp(db_conn, chosen_comp))
 
     if comps_and_kind[chosen_comp] == KIND_C_CUP:
         rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]

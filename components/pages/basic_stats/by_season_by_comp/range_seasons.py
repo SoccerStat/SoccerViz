@@ -7,18 +7,20 @@ def range_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
     titles = ["Matches", "Goals", "Cartons" if chosen_ranking == "Clubs" else "Assists", "Outcome"]
     cols = st.columns(4, gap="medium")
 
-    st.markdown("""
+    table_style = """
         <style>
-        .row_heading.level0, .blank {
-            width: 20px !important;
-            max-width: 20px !important;
+        .basic_stats {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 10px;
         }
-        .dataframe td, .dataframe th {
-            font-size: 0.80rem;
-            padding: 4px 8px;
+        .basic_stats th, .basic_stats td {
+            border: 1px solid #ddd;
+            padding: 4px;
+            text-align: center;
         }
         </style>
-    """, unsafe_allow_html=True)
+    """
 
     for col, title in zip(cols, titles):
         with col:
@@ -28,4 +30,5 @@ def range_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
                     unsafe_allow_html=True
                 )
                 df = get_stats(_db_conn=db_conn, name_comp=name_comp, seasons_ids=seasons_ids, chosen_ranking=chosen_ranking, ranking=title.lower())
+
                 st.dataframe(df, use_container_width=True)

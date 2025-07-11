@@ -3,30 +3,28 @@ import streamlit as st
 from components.commons.set_button_style import set_button_with_style
 from config import COMPETITIONS, ALL_BUTTON_CONFIG
 
+
 def choose_comp_buttons():
     competitions = list(COMPETITIONS.keys())
 
     key_all_comps = f"{ALL_BUTTON_CONFIG["id"]}_comps"
 
-    if "selected_id_comp" not in st.session_state:
-        st.session_state.selected_id_comp = key_all_comps
+    st.session_state.setdefault("basic_stats_id_comp_selected", key_all_comps)
 
-    if "selected_name_comp" not in st.session_state:
-        st.session_state.selected_name_comp = None
+    st.session_state.setdefault("basic_stats_name_comp_selected", None)
 
     col_all, col_comps = st.columns([1, 8], gap="large")
 
-    if "clicked" not in st.session_state:
-        st.session_state.clicked = False
+    st.session_state.setdefault("basic_stats_comp_clicked", False)
 
     with col_all:
         all_comps = ALL_BUTTON_CONFIG["label_comps"]
         with set_button_with_style(key_all_comps, width='140%'):
             if st.button(all_comps, key=key_all_comps, use_container_width=True):
                 id_comp = ALL_BUTTON_CONFIG["id"]
-                st.session_state.clicked = id_comp
-                st.session_state.selected_id_comp = key_all_comps
-                st.session_state.selected_name_comp = all_comps
+                st.session_state.basic_stats_comp_clicked = id_comp
+                st.session_state.basic_stats_id_comp_selected = key_all_comps
+                st.session_state.basic_stats_name_comp_selected = all_comps
 
     with col_comps:
         cols = st.columns(len(competitions))
@@ -42,7 +40,7 @@ def choose_comp_buttons():
 
                 with set_button_with_style(key, bg_color, font_color, border_color):
                     if st.button(comp_config["diminutive"], key=key, use_container_width=True):
-                        st.session_state.selected_id_comp = comp
-                        st.session_state.selected_name_comp = comp_config["label"]
+                        st.session_state.basic_stats_id_comp_selected = comp
+                        st.session_state.basic_stats_name_comp_selected = comp_config["label"]
 
-    return st.session_state.selected_id_comp, st.session_state.selected_name_comp
+    return st.session_state.basic_stats_id_comp_selected, st.session_state.basic_stats_name_comp_selected

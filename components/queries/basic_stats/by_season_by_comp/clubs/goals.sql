@@ -1,4 +1,8 @@
-select c.name, sum(n_goals_for) as "For", sum(n_goals_against) as "Against"
+select
+    c.name as "Club",
+    sum(n_goals_for) as "For",
+    sum(n_goals_against) as "Against",
+    sum(n_goals_for) - sum(n_goals_against) as "Diff"
 from (
     select
         id_comp,

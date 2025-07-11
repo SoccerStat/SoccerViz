@@ -4,7 +4,7 @@ import altair as alt
 
 from components.pages.team_stats.get_teams_by_comp_by_season import get_teams_by_comp_by_season
 from utils.file_helper.reader import read_sql_file
-from components.commons.get_all_seasons import get_seasons
+from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
 from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
 
@@ -47,7 +47,7 @@ def get_moving_ranking(db_conn):
     chosen_season = st.selectbox(
         key="moving_ranking_season",
         label="Choose season...",
-        options=get_seasons(db_conn, chosen_comp)
+        options=get_seasons_by_comp(db_conn, chosen_comp)
     )
 
     teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])

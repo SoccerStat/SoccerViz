@@ -1,4 +1,5 @@
 import streamlit as st
+
 from utils.file_helper.reader import read_sql_file
 from components.queries.execute_query import execute_query
 
@@ -10,4 +11,8 @@ def get_stats(_db_conn, name_comp, seasons_ids, chosen_ranking, ranking):
         name_comp=name_comp,
         seasons_ids=[f"'{s}'" for s in seasons_ids]
     )
-    return execute_query(_db_conn, sql_file)
+
+    df = execute_query(_db_conn, sql_file)
+    df.index = range(1, len(df)+1)
+
+    return df

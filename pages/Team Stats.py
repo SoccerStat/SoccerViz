@@ -11,13 +11,13 @@ class TeamStatsPage(BasePage):
     def content(self):
         db_conn = get_connection()
 
-        with st.container():
-            get_one_ranking(db_conn)
+        self.set_sub_title("Stat ranking by competition by season")
+        get_one_ranking(db_conn)
 
         st.divider()
 
-        with st.container():
-            get_moving_ranking(db_conn)
+        self.set_sub_title("Global ranking throughout the season")
+        get_moving_ranking(db_conn)
 
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGE)

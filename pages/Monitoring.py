@@ -2,7 +2,7 @@ import streamlit as st
 
 from utils.commons.BasePage import BasePage
 
-from components.commons.get_all_seasons import get_all_seasons
+from components.commons.get_seasons import get_all_seasons
 from components.connection import get_connection
 from components.pages.monitoring.plot.upper import plot_upper
 from components.pages.monitoring.plot.by_season import plot_by_season

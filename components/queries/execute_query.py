@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+
 from utils.helpers import format_query_result_info
 from sqlalchemy import text
 

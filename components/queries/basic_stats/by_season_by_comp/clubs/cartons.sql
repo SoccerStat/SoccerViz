@@ -1,4 +1,7 @@
-select c.name, sum(n_r_cards) as "R", sum(n_y_cards) as "Y"
+select
+    c.name as "Club",
+    sum(n_r_cards) as "R",
+    sum(n_y_cards) as "Y"
 from (
     select
         id_comp,

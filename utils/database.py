@@ -62,16 +62,14 @@ def create_database_connection(host, port, user, password, database):
 def init_session_state():
     """Initialise les variables de session avec persistance"""
     # Initialisation des variables de base
-    if "db_conn" not in st.session_state:
-        st.session_state.db_conn = None
-    if "connected" not in st.session_state:
-        st.session_state.connected = False
-    if "db_credentials" not in st.session_state:
-        st.session_state.db_credentials = {}
+    st.session_state.setdefault("db_conn", None)
+
+    st.session_state.setdefault("connected", False)
+
+    st.session_state.setdefault("db_credentials", {})
 
     # Clé unique pour identifier la session de connexion
-    if "connection_hash" not in st.session_state:
-        st.session_state.connection_hash = None
+    st.session_state.setdefault("connection_hash", None)
 
     # Tentative de restauration de la connexion si les credentials existent
     if st.session_state.db_credentials and not st.session_state.connected:

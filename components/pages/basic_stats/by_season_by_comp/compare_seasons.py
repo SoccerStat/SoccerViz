@@ -23,7 +23,7 @@ def compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
     for i, season in enumerate(seasons_ids):
         with cols[i]:
             st.markdown(
-                f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{season}</h4>",
+                f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{season.replace('_','-')}</h4>",
                 unsafe_allow_html=True
             )
             for title in titles:
