@@ -18,7 +18,6 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
             file_name="components/queries/team_stats/get_moving_ranking.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
-            kind_of_comp=kind_of_comp,
             season=chosen_season,
             week=j,
         )
@@ -66,7 +65,7 @@ def get_moving_ranking(db_conn):
 
             if kind_of_comp == KIND_CHP:
                 complete_df = ranking_by_chp_week(
-                    _db_conn=_db_conn,
+                    _db_conn=db_conn,
                     chosen_ranking="Points",
                     chosen_comp=chosen_comp,
                     chosen_season=chosen_season,

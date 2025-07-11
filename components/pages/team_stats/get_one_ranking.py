@@ -5,7 +5,7 @@ from components.queries.execute_query import execute_query
 from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def one_ranking(_db_conn, chosen_comp, chosen_season, chosen_ranking):
     sql_file = read_sql_file(
         file_name="components/queries/team_stats/get_one_ranking.sql",
