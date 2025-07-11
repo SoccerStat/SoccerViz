@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import streamlit as st
 
 from components.commons.set_button_style import set_button_with_style
-from components.commons.set_titles import set_main_title, set_sub_title
+from components.commons.set_titles import set_main_title, set_sub_title, set_sub_sub_title
 from config import PREFIX_PAGE
 from utils.page_helper.page_config import set_page_config
 from components.sidebar import sidebar_connection
@@ -24,6 +24,9 @@ class BasePage(ABC):
 
     def set_sub_title(self, name):
         set_sub_title(name)
+
+    def set_sub_sub_title(self, name):
+        set_sub_sub_title(name)
 
     def set_back_home_button(self):
         with set_button_with_style("back_home", width="auto"):

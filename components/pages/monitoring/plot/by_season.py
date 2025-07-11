@@ -9,7 +9,7 @@ from utils.file_helper.reader import read_sql_file
 def get_counts_by_item(_db_conn, chosen_season, column, item):
     sql_file = read_sql_file(
         file_name=f"components/queries/monitoring/plot/by_season.sql",
-        in_season=chosen_season,
+        in_season=f"season_{chosen_season}",
         date_column=column,
         in_tab=item
     )

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from datetime import datetime, timedelta
 
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
@@ -28,29 +29,34 @@ def plot_upper(db_conn, column):
     df_melted = df.melt(
         id_vars=column,
         value_vars=["club_count", "player_count"],
-        var_name="type",
+        var_name="Table",
         value_name="count"
     )
 
-    df_melted["type"] = df_melted["type"].replace({
+    df_melted["Table"] = df_melted["Table"].replace({
         "club_count": clubs,
         "player_count": players
     })
+
+   #  min_date = str(datetime.today() - timedelta(days=15))
+    # df = df[df[column] >= min_date]
 
     chart = alt.Chart(df_melted).mark_line(point=True).encode(
         x=alt.X(f"{column}:T", title="Date"),
         y=alt.Y("count:Q", title=f"Number {'inserted' if column == 'inserted_at' else 'updated'}"),
         color=alt.Color(
-            "type:N",
+            "Table:N",
             scale=alt.Scale(
                 domain=[clubs, players],
                 range=["#1f77b4", "#ffcc00"]
             ),
             title="Item"
         ),
-        tooltip=[f"{column}:T", "type:N", "count:Q"]
+        # column=alt.Column('type:N', title=''),
+        tooltip=[f"{column}:T", "Table:N", "count:Q"]
     ).properties(
-        title=f"Daily {'insertion' if column == 'inserted_at' else 'update'} - Upper items",
+        title=f"Daily {'insertion' if column == 'inserted_at' else 'update'}",
+        # width=400,
     )
 
     st.altair_chart(chart, use_container_width=True)

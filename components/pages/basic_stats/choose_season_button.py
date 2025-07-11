@@ -50,14 +50,24 @@ def choose_season_button(db_conn, name_comp):
             if selected_mode == RANGE_SEASONS_MODE:
                 cols = st.columns(2)
                 with cols[0]:
-                    min_season = st.selectbox(label="Min season", options=all_seasons)
-                    max_season = st.selectbox(label="Max season", options=[season for season in all_seasons if season >= min_season])
+                    min_season = st.selectbox(
+                        label="Min season",
+                        options=all_seasons
+                    )
+                    max_season = st.selectbox(
+                        label="Max season",
+                        options=[season for season in all_seasons if season >= min_season]
+                    )
                     st.session_state.basic_stats_seasons_selected = [season for season in all_seasons if min_season <= season <= max_season]
 
             elif selected_mode == COMPARE_SEASONS_MODE:
                 cols = st.columns(2)
                 with cols[0]:
-                    selected_seasons = st.multiselect(label="select seasons...", options=all_seasons, max_selections=3)
+                    selected_seasons = st.multiselect(
+                        label="select seasons...",
+                        options=all_seasons,
+                        max_selections=3
+                    )
                     st.session_state.basic_stats_seasons_selected = selected_seasons
 
             elif selected_mode == ALL_SEASONS_MODE:
