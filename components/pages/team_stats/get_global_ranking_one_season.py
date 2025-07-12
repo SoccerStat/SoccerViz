@@ -38,31 +38,31 @@ def get_global_ranking_one_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
-    st.session_state.setdefault("team_stats_moving_ranking_chosen_comp", comps[0])
-    st.session_state.team_stats_moving_ranking_chosen_comp = st.selectbox(
+    st.session_state.setdefault("team_stats_global_ranking_chosen_comp", comps[0])
+    st.session_state.team_stats_global_ranking_chosen_comp = st.selectbox(
         key="comp_over_one_season",
         label="Choose competition...",
         options=comps,
-        index=comps.index(st.session_state.team_stats_moving_ranking_chosen_comp)
+        index=comps.index(st.session_state.team_stats_global_ranking_chosen_comp)
     )
-    chosen_comp = st.session_state.team_stats_moving_ranking_chosen_comp
+    chosen_comp = st.session_state.team_stats_global_ranking_chosen_comp
 
     kind_of_comp = comps_and_kind[chosen_comp]
 
     seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    st.session_state.setdefault("team_stats_moving_ranking_chosen_season", seasons_by_comp[0])
+    st.session_state.setdefault("team_stats_global_ranking_chosen_season", seasons_by_comp[0])
 
-    if st.session_state.team_stats_moving_ranking_chosen_season not in seasons_by_comp:
-        st.session_state.team_stats_moving_ranking_chosen_season = seasons_by_comp[0]
+    if st.session_state.team_stats_global_ranking_chosen_season not in seasons_by_comp:
+        st.session_state.team_stats_global_ranking_chosen_season = seasons_by_comp[0]
 
-    st.session_state.team_stats_moving_ranking_chosen_season = st.selectbox(
+    st.session_state.team_stats_global_ranking_chosen_season = st.selectbox(
         key="season_over_one_season",
         label="Choose season...",
         options=seasons_by_comp,
-        index=seasons_by_comp.index(st.session_state.team_stats_moving_ranking_chosen_season)
+        index=seasons_by_comp.index(st.session_state.team_stats_global_ranking_chosen_season)
     )
-    chosen_season = st.session_state.team_stats_moving_ranking_chosen_season
+    chosen_season = st.session_state.team_stats_global_ranking_chosen_season
 
     teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
     n_teams = len(teams)

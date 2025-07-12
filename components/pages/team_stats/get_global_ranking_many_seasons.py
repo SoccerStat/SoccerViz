@@ -30,14 +30,14 @@ def get_global_ranking_many_seasons(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
-    st.session_state.setdefault("team_stats_moving_ranking_chosen_comp", comps[0])
-    st.session_state.team_stats_moving_ranking_chosen_comp = st.selectbox(
+    st.session_state.setdefault("team_stats_global_ranking_chosen_comp", comps[0])
+    st.session_state.team_stats_global_ranking_chosen_comp = st.selectbox(
         key="comp_over_many_seasons",
         label="Choose competition...",
         options=comps,
-        index=comps.index(st.session_state.team_stats_moving_ranking_chosen_comp)
+        index=comps.index(st.session_state.team_stats_global_ranking_chosen_comp)
     )
-    chosen_comp = st.session_state.team_stats_moving_ranking_chosen_comp
+    chosen_comp = st.session_state.team_stats_global_ranking_chosen_comp
 
     kind_of_comp = comps_and_kind[chosen_comp]
 
