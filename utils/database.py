@@ -50,7 +50,7 @@ class DatabaseConnection:
         if self.engine:
             self.engine.dispose()
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def create_database_connection(host, port, user, password, database):
     """Crée et cache une connexion à la base de données"""
     db = DatabaseConnection()

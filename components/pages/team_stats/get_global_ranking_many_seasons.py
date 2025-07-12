@@ -1,0 +1,90 @@
+import streamlit as st
+import pandas as pd
+import altair as alt
+
+from components.pages.team_stats.get_teams_by_comp_by_season import get_teams_by_comp_by_season
+from utils.file_helper.reader import read_sql_file
+from components.commons.get_seasons import get_seasons_by_comp
+from components.queries.execute_query import execute_query
+from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
+
+
+@st.cache_data(show_spinner=False)
+def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
+    complete_df = pd.DataFrame()
+
+    for season in chosen_seasons:
+        sql_file = read_sql_file(
+            file_name="components/queries/team_stats/get_global_ranking_many_seasons.sql",
+            ranking=chosen_ranking,
+            name_comp=chosen_comp,
+            season=season,
+        )
+        df_season = execute_query(_db_conn, sql_file)
+        complete_df = pd.concat([complete_df, df_season], ignore_index=True)
+
+    return complete_df
+
+
+def get_global_ranking_many_seasons(db_conn):
+    comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
+    comps = list(comps_and_kind.keys())
+
+    st.session_state.setdefault("team_stats_moving_ranking_chosen_comp", comps[0])
+    st.session_state.team_stats_moving_ranking_chosen_comp = st.selectbox(
+        key="comp_over_many_seasons",
+        label="Choose competition...",
+        options=comps,
+        index=comps.index(st.session_state.team_stats_moving_ranking_chosen_comp)
+    )
+    chosen_comp = st.session_state.team_stats_moving_ranking_chosen_comp
+
+    kind_of_comp = comps_and_kind[chosen_comp]
+
+    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+    n_seasons = len(seasons_by_comp)
+
+    teams = get_teams_by_comp_by_season(db_conn, chosen_comp, seasons_by_comp)
+    n_teams = len(teams)
+
+    chosen_teams = st.multiselect(
+        key="teams_over_many_seasons",
+        label="Choose teams...",
+        options=["All"] + teams,
+    )
+
+    if 'All' in chosen_teams:
+        chosen_teams = teams
+
+    if chosen_teams:
+        with st.spinner("Data loading..."):
+
+            complete_df = ranking_by_chp_week(
+                _db_conn=db_conn,
+                chosen_ranking="Points",
+                chosen_comp=chosen_comp,
+                chosen_seasons=seasons_by_comp,
+            )
+
+            # TODO: je veux pas de cumulé !!! juste le ranking et le nombre de points
+
+            complete_df["Ranking"] = complete_df.groupby("Season")["Points"].rank(
+                method="dense",
+                ascending=False
+            ).astype(int)
+            complete_df = complete_df[complete_df["Club"].isin(chosen_teams)]
+
+            line_chart = alt.Chart(complete_df).mark_line(point=True, interpolate="linear").encode(
+                x=alt.X('Season:O', title='Season'),
+                y=alt.Y('Points:Q', title=f'Points'),
+                color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
+                tooltip=['Club', 'Season', "Points", "Ranking"]
+            ).properties(
+                title=f"Number of points over seasons - {chosen_comp}",
+                height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
+            )
+
+            st.altair_chart(line_chart, use_container_width=True)
+            st.write("**Only the number of points are considered for ranking => regardless the Goals Diff.**")
+
+            # TODO: enable dataframe export for analyzes.

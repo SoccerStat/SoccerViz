@@ -15,7 +15,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
     
     for j in range(1, nb_chp_weeks + 1):
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/get_moving_ranking.sql",
+            file_name="components/queries/team_stats/get_global_ranking_one_season.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=chosen_season,
@@ -34,27 +34,43 @@ def ranking_by_c_cup_week(_db_conn, chosen_ranking, chosen_comp, chosen_season):
     return complete_df
 
 
-def get_moving_ranking(db_conn):
+def get_global_ranking_one_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
-    chosen_comp = st.selectbox(
-        key="moving_ranking_comp",
+    comps = list(comps_and_kind.keys())
+
+    st.session_state.setdefault("team_stats_moving_ranking_chosen_comp", comps[0])
+    st.session_state.team_stats_moving_ranking_chosen_comp = st.selectbox(
+        key="comp_over_one_season",
         label="Choose competition...",
-        options=comps_and_kind.keys())
+        options=comps,
+        index=comps.index(st.session_state.team_stats_moving_ranking_chosen_comp)
+    )
+    chosen_comp = st.session_state.team_stats_moving_ranking_chosen_comp
 
     kind_of_comp = comps_and_kind[chosen_comp]
 
-    chosen_season = st.selectbox(
-        key="moving_ranking_season",
+    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+
+    st.session_state.setdefault("team_stats_moving_ranking_chosen_season", seasons_by_comp[0])
+
+    if st.session_state.team_stats_moving_ranking_chosen_season not in seasons_by_comp:
+        st.session_state.team_stats_moving_ranking_chosen_season = seasons_by_comp[0]
+
+    st.session_state.team_stats_moving_ranking_chosen_season = st.selectbox(
+        key="season_over_one_season",
         label="Choose season...",
-        options=get_seasons_by_comp(db_conn, chosen_comp)
+        options=seasons_by_comp,
+        index=seasons_by_comp.index(st.session_state.team_stats_moving_ranking_chosen_season)
     )
+    chosen_season = st.session_state.team_stats_moving_ranking_chosen_season
 
     teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
+    n_teams = len(teams)
 
     chosen_teams = st.multiselect(
-        key="moving_ranking_teams",
+        key="teams_over_one_season",
         label="Choose teams...",
-        options=["All"] + teams
+        options=["All"] + teams,
     )
 
     if 'All' in chosen_teams:
@@ -64,15 +80,17 @@ def get_moving_ranking(db_conn):
         with st.spinner("Data loading..."):
 
             if kind_of_comp == KIND_CHP:
+                n_weeks = 2 * (n_teams - 1)
                 complete_df = ranking_by_chp_week(
                     _db_conn=db_conn,
                     chosen_ranking="Points",
                     chosen_comp=chosen_comp,
                     chosen_season=chosen_season,
-                    nb_chp_weeks=2 * (len(teams) - 1)
+                    nb_chp_weeks=n_weeks
                 )
 
             elif kind_of_comp == KIND_C_CUP:
+                n_weeks = 100
                 complete_df = ranking_by_c_cup_week(
                     _db_conn=db_conn,
                     chosen_ranking="Points",
@@ -92,10 +110,11 @@ def get_moving_ranking(db_conn):
             line_chart = alt.Chart(complete_df).mark_line(point=True).encode(
                 x=alt.X('Week:O', title='Week'),
                 y=alt.Y('Cumulated Points:Q', title=f'Cumulated Points'),
-                color='Club:N',
+                color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
                 tooltip=['Club', 'Week', "Points", "Cumulated Points", "Ranking"]
             ).properties(
-                title=f"Evolution of points - {chosen_comp} ({chosen_season})"
+                title=f"Evolution of points - {chosen_comp} ({chosen_season})",
+                height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
             )
 
             st.altair_chart(line_chart, use_container_width=True)

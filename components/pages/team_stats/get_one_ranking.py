@@ -18,20 +18,42 @@ def one_ranking(_db_conn, chosen_comp, chosen_season, chosen_ranking):
 
 def get_one_ranking(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
-    chosen_comp = st.selectbox(label="Choose competition...",
-                               options=comps_and_kind.keys())
-    chosen_season = st.selectbox("Choose season...", options=get_seasons_by_comp(db_conn, chosen_comp))
+    comps = list(comps_and_kind.keys())
+
+    st.session_state.setdefault("team_stats_one_ranking_chosen_comp", comps[0])
+    st.session_state.team_stats_one_ranking_chosen_comp = st.selectbox(
+        key="one_ranking_comp",
+        label="Choose competition...",
+        options=comps,
+        index=comps.index(st.session_state.team_stats_one_ranking_chosen_comp)
+    )
+    chosen_comp = st.session_state.team_stats_one_ranking_chosen_comp
+
+    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+
+    st.session_state.setdefault("team_stats_one_ranking_chosen_season", seasons_by_comp[0])
+    st.session_state.team_stats_one_ranking_chosen_season = st.selectbox(
+        key="moving_one_season",
+        label="Choose season...",
+        options=seasons_by_comp,
+        index=seasons_by_comp.index(st.session_state.team_stats_one_ranking_chosen_season)
+    )
+    chosen_season = st.session_state.team_stats_one_ranking_chosen_season
 
     if comps_and_kind[chosen_comp] == KIND_C_CUP:
         rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]
     else:
         rankings = TEAM_RANKINGS
 
-    chosen_ranking = st.selectbox(
+    st.session_state.setdefault("team_stats_one_ranking_chosen_ranking", rankings[0])
+    st.session_state.team_stats_one_ranking_chosen_ranking = st.selectbox(
         key="one_ranking_ranking",
         label="Choose ranking...",
-        options=rankings
+        options=rankings,
+        index=rankings.index(st.session_state.team_stats_one_ranking_chosen_ranking)
     )
+
+    chosen_ranking = st.session_state.team_stats_one_ranking_chosen_ranking
 
     if chosen_ranking:
         df = one_ranking(db_conn, chosen_comp, chosen_season, chosen_ranking)
