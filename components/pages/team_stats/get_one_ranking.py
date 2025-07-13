@@ -45,16 +45,20 @@ def get_one_ranking(db_conn):
     else:
         rankings = TEAM_RANKINGS
 
-    st.session_state.setdefault("team_stats_one_ranking_chosen_ranking", rankings[0])
-    st.session_state.team_stats_one_ranking_chosen_ranking = st.selectbox(
+    chosen_ranking = st.selectbox(
         key="one_ranking_ranking",
         label="Choose ranking...",
-        options=rankings,
-        index=rankings.index(st.session_state.team_stats_one_ranking_chosen_ranking)
+        options=rankings
     )
-
-    chosen_ranking = st.session_state.team_stats_one_ranking_chosen_ranking
 
     if chosen_ranking:
         df = one_ranking(db_conn, chosen_comp, chosen_season, chosen_ranking)
         st.dataframe(df.set_index("Ranking"))
+
+        csv = df.to_csv(index=False, sep='|')
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv,
+            file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_{chosen_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
+            mime="text/csv"
+        )

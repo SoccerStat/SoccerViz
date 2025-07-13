@@ -1,6 +1,7 @@
 SELECT
     "Club",
     '{{ season }}' as "Season",
+    "Ranking",
     "Stat" as "{{ ranking }}"
 FROM analytics.one_teams_ranking(
     in_ranking := '{{ ranking }}',

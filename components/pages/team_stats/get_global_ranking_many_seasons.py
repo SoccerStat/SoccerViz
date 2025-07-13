@@ -59,22 +59,20 @@ def get_global_ranking_many_seasons(db_conn):
     if chosen_teams:
         with st.spinner("Data loading..."):
 
-            complete_df = ranking_by_chp_week(
+            df = ranking_by_chp_week(
                 _db_conn=db_conn,
                 chosen_ranking="Points",
                 chosen_comp=chosen_comp,
                 chosen_seasons=seasons_by_comp,
             )
 
-            # TODO: je veux pas de cumulé !!! juste le ranking et le nombre de points
+            # df["Ranking"] = df.groupby("Season")["Points"].rank(
+            #     method="dense",
+            #     ascending=False
+            # ).astype(int)
+            filtered_df = df[df["Club"].isin(chosen_teams)]
 
-            complete_df["Ranking"] = complete_df.groupby("Season")["Points"].rank(
-                method="dense",
-                ascending=False
-            ).astype(int)
-            complete_df = complete_df[complete_df["Club"].isin(chosen_teams)]
-
-            line_chart = alt.Chart(complete_df).mark_line(point=True, interpolate="linear").encode(
+            line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
                 x=alt.X('Season:O', title='Season'),
                 y=alt.Y('Points:Q', title=f'Points'),
                 color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
@@ -84,7 +82,30 @@ def get_global_ranking_many_seasons(db_conn):
                 height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
             )
 
+            # line_text = line_chart.mark_text(
+            #     align='center',
+            #     baseline='bottom',
+            #     fontSize=12,
+            #     dy=-2,
+            #     color='black'
+            # ).encode(
+            #     text=alt.Text('Ranking:Q')
+            # )
+
+            # chart = alt.layer(
+            #     line_chart,
+            #     line_text
+            # )
+
             st.altair_chart(line_chart, use_container_width=True)
             st.write("**Only the number of points are considered for ranking => regardless the Goals Diff.**")
+
+            csv = df.to_csv(index=False, sep='|')
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_many_seasons.csv",
+                mime="text/csv"
+            )
 
             # TODO: enable dataframe export for analyzes.

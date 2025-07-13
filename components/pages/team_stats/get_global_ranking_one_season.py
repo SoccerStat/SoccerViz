@@ -81,7 +81,7 @@ def get_global_ranking_one_season(db_conn):
 
             if kind_of_comp == KIND_CHP:
                 n_weeks = 2 * (n_teams - 1)
-                complete_df = ranking_by_chp_week(
+                df = ranking_by_chp_week(
                     _db_conn=db_conn,
                     chosen_ranking="Points",
                     chosen_comp=chosen_comp,
@@ -91,27 +91,28 @@ def get_global_ranking_one_season(db_conn):
 
             elif kind_of_comp == KIND_C_CUP:
                 n_weeks = 100
-                complete_df = ranking_by_c_cup_week(
+                df = ranking_by_c_cup_week(
                     _db_conn=db_conn,
                     chosen_ranking="Points",
                     chosen_comp=chosen_comp,
                     chosen_season=chosen_season
                 )
 
-            complete_df["Cumulated Points"] = complete_df.groupby("Club")["Points"].cumsum()
-            complete_df = complete_df.sort_values(by=["Week", "Cumulated Points"], ascending=[True, False])
+            # df["Cumulated Points"] = df.groupby("Club")["Points"].cumsum()
+            # df = df.sort_values(by=["Week", "Cumulated Points"], ascending=[True, False])
+            df = df.sort_values(by=["Week", "Points"], ascending=[True, False])
 
-            complete_df["Ranking"] = complete_df.groupby("Week")["Cumulated Points"].rank(
-                method="dense",
-                ascending=False
-            ).astype(int)
-            complete_df = complete_df[complete_df["Club"].isin(chosen_teams)]
+            # df["Ranking"] = df.groupby("Week")["Cumulated Points"].rank(
+            #     method="dense",
+            #     ascending=False
+            # ).astype(int)
+            filtered_df = df[df["Club"].isin(chosen_teams)]
 
-            line_chart = alt.Chart(complete_df).mark_line(point=True).encode(
+            line_chart = alt.Chart(filtered_df).mark_line(point=True).encode(
                 x=alt.X('Week:O', title='Week'),
-                y=alt.Y('Cumulated Points:Q', title=f'Cumulated Points'),
+                y=alt.Y('Points:Q', title=f'Points'),
                 color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
-                tooltip=['Club', 'Week', "Points", "Cumulated Points", "Ranking"]
+                tooltip=['Club', 'Week', "Points", "Points", "Ranking"]
             ).properties(
                 title=f"Evolution of points - {chosen_comp} ({chosen_season})",
                 height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
@@ -119,5 +120,13 @@ def get_global_ranking_one_season(db_conn):
 
             st.altair_chart(line_chart, use_container_width=True)
             st.write("**Only the number of points are considered for ranking => regardless the Goals Diff.**")
+
+            csv = df.to_csv(index=False, sep='|')
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_global_ranking_one_season.csv",
+                mime="text/csv"
+            )
 
             # TODO: enable dataframe export for analyzes.
