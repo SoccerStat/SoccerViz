@@ -75,14 +75,13 @@ def get_global_ranking_by_season(db_conn):
         teams = get_teams_by_comp_by_season(db_conn, chosen_comp, chosen_seasons)
         n_teams = len(teams)
 
-        chosen_team = st.selectbox(
+        chosen_teams = st.multiselect(
             key="teams_by_season",
             label="Choose teams...",
-            options=[""] + teams,
-            index=0
+            options=teams
         )
 
-        if chosen_team != "":
+        if chosen_teams:
             with st.spinner("Data loading..."):
 
                 df = ranking_by_chp_by_week_by_season(
@@ -91,13 +90,14 @@ def get_global_ranking_by_season(db_conn):
                     chosen_comp=chosen_comp,
                     chosen_seasons=chosen_seasons,
                 )
-                st.write(chosen_team)
-                filtered_df = df[df["Club"].isin([chosen_team])]
+
+                filtered_df = df[df["Club"].isin(chosen_teams)]
+                filtered_df["Season_Club"] = filtered_df["Season"] + '-' + filtered_df["Club"]
 
                 line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
                     x=alt.X('Week:O', title='Weeks'),
                     y=alt.Y('Points:Q', title=f'Points'),
-                    color=alt.Color('Season:N', legend=alt.Legend(title="Seasons", orient="right", labelLimit=2000)),
+                    color=alt.Color('Season_Club:N', legend=alt.Legend(title="Season - Club", orient="right", labelLimit=2000)),
                     tooltip=['Club', 'Season', "Points", "Ranking"]
                 ).properties(
                     title=f"Number of points over weeks by season - {chosen_comp}",
@@ -120,13 +120,12 @@ def get_global_ranking_by_season(db_conn):
                 )
 
                 st.altair_chart(chart, use_container_width=True)
-                st.write("**Only the number of points are considered for ranking => regardless the Goals Diff.**")
 
                 csv = df.to_csv(index=False, sep='|')
                 st.download_button(
                     label="📥 Download CSV",
                     data=csv,
-                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_many_seasons.csv",
+                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_by_season.csv",
                     mime="text/csv"
                 )
 

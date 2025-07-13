@@ -101,7 +101,6 @@ def get_global_ranking_many_seasons(db_conn):
             )
 
             st.altair_chart(chart, use_container_width=True)
-            st.write("**Only the number of points are considered for ranking => regardless the Goals Diff.**")
 
             csv = df.to_csv(index=False, sep='|')
             st.download_button(
