@@ -48,10 +48,11 @@ def get_one_ranking(db_conn):
     chosen_ranking = st.selectbox(
         key="one_ranking_ranking",
         label="Choose ranking...",
-        options=rankings
+        options=[""] + rankings,
+        index=0
     )
 
-    if chosen_ranking:
+    if chosen_ranking != "":
         df = one_ranking(db_conn, chosen_comp, chosen_season, chosen_ranking)
         st.dataframe(df.set_index("Ranking"))
 

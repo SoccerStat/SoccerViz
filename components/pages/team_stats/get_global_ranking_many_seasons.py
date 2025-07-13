@@ -66,10 +66,13 @@ def get_global_ranking_many_seasons(db_conn):
                 chosen_seasons=seasons_by_comp,
             )
 
-            # df["Ranking"] = df.groupby("Season")["Points"].rank(
-            #     method="dense",
-            #     ascending=False
-            # ).astype(int)
+            all_combinations = pd.MultiIndex.from_product(
+                [teams, seasons_by_comp],
+                names=['Club', 'Season']
+            ).to_frame(index=False)
+
+            df = pd.merge(all_combinations, df, how='left', on=['Club', 'Season'])
+
             filtered_df = df[df["Club"].isin(chosen_teams)]
 
             line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
@@ -82,22 +85,22 @@ def get_global_ranking_many_seasons(db_conn):
                 height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
             )
 
-            # line_text = line_chart.mark_text(
-            #     align='center',
-            #     baseline='bottom',
-            #     fontSize=12,
-            #     dy=-2,
-            #     color='black'
-            # ).encode(
-            #     text=alt.Text('Ranking:Q')
-            # )
+            line_text = line_chart.mark_text(
+                align='center',
+                baseline='bottom',
+                fontSize=12,
+                dy=-2,
+                color='black'
+            ).encode(
+                text=alt.Text('Ranking:Q')
+            )
 
-            # chart = alt.layer(
-            #     line_chart,
-            #     line_text
-            # )
+            chart = alt.layer(
+                line_chart,
+                line_text
+            )
 
-            st.altair_chart(line_chart, use_container_width=True)
+            st.altair_chart(chart, use_container_width=True)
             st.write("**Only the number of points are considered for ranking => regardless the Goals Diff.**")
 
             csv = df.to_csv(index=False, sep='|')
