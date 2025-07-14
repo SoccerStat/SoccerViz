@@ -17,7 +17,7 @@ def ranking_by_chp_by_week_of_season(_db_conn, chosen_ranking, chosen_comp, seas
     nb_weeks = 2 * (len(teams) - 1)
     for week in range(1, nb_weeks + 1):
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/get_global_ranking_by_season.sql",
+            file_name="components/queries/team_stats/get_ranking_by_season.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -44,39 +44,30 @@ def get_global_ranking_by_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
-    st.session_state.setdefault("team_stats_global_ranking_chosen_comp", comps[0])
-    st.session_state.team_stats_global_ranking_chosen_comp = st.selectbox(
-        key="comp_by_season",
+    chosen_comp = st.selectbox(
+        key="global_ranking_by_season__comp",
         label="Choose competition...",
-        options=comps,
-        index=comps.index(st.session_state.team_stats_global_ranking_chosen_comp)
+        options=comps
     )
-    chosen_comp = st.session_state.team_stats_global_ranking_chosen_comp
-    kind_of_comp = comps_and_kind[chosen_comp]
+
+    # kind_of_comp = comps_and_kind[chosen_comp]
 
     seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    st.session_state.setdefault("team_stats_global_ranking_chosen_season", seasons_by_comp[0])
-
-    if st.session_state.team_stats_global_ranking_chosen_season not in seasons_by_comp:
-        st.session_state.team_stats_global_ranking_chosen_season = seasons_by_comp[0]
-
-    st.session_state.team_stats_global_ranking_chosen_season = st.multiselect(
-        key="season_by_season",
+    chosen_seasons = st.multiselect(
+        key="global_ranking_by_season__seasons",
         label="Choose season...",
         options=seasons_by_comp
     )
-    chosen_seasons = st.session_state.team_stats_global_ranking_chosen_season
 
     if chosen_seasons:
-
-        n_seasons = len(seasons_by_comp)
+        # n_seasons = len(seasons_by_comp)
 
         teams = get_teams_by_comp_by_season(db_conn, chosen_comp, chosen_seasons)
         n_teams = len(teams)
 
         chosen_teams = st.multiselect(
-            key="teams_by_season",
+            key="global_ranking_by_season__mteams",
             label="Choose teams...",
             options=teams
         )
@@ -92,12 +83,12 @@ def get_global_ranking_by_season(db_conn):
                 )
 
                 filtered_df = df[df["Club"].isin(chosen_teams)]
-                filtered_df["Season_Club"] = filtered_df["Season"] + '-' + filtered_df["Club"]
+                filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
 
                 line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
                     x=alt.X('Week:O', title='Weeks'),
                     y=alt.Y('Points:Q', title=f'Points'),
-                    color=alt.Color('Season_Club:N', legend=alt.Legend(title="Season - Club", orient="right", labelLimit=2000)),
+                    color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
                     tooltip=['Club', 'Season', "Points", "Ranking"]
                 ).properties(
                     title=f"Number of points over weeks by season - {chosen_comp}",

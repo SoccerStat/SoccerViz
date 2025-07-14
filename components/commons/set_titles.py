@@ -14,3 +14,8 @@ def set_sub_sub_title(name):
     st.markdown(f"""
         <h3 style='text-align: center; margin-bottom: 0.5rem; margin-top: 0rem;'>{name}</h3>
     """, unsafe_allow_html=True)
+
+def set_sub_sub_sub_title(name):
+    st.markdown(f"""
+        <h4 style='text-align: center; margin-bottom: 0.5rem; margin-top: 0rem;'>{name}</h4>
+    """, unsafe_allow_html=True)

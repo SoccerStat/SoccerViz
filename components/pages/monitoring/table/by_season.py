@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
+from components.commons.set_titles import set_sub_sub_sub_title
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
@@ -24,20 +25,12 @@ def get_by_season_tables(_db_conn, chosen_season, column):
     df_teams = get_data_by_item(_db_conn, chosen_season, column, teams.lower()[:-1])
     df_team_players = get_data_by_item(_db_conn, chosen_season, column, team_players.lower().replace(' ', '_')[:-1])
 
-    st.markdown(
-        f"""<h4><strong>{matches}</strong></h4>
-        """,unsafe_allow_html = True
-    )
+
+    set_sub_sub_sub_title(matches)
     st.dataframe(df_matches)
 
-    st.markdown(
-        f"""<h4><strong>{teams}</strong></h4>
-            """, unsafe_allow_html=True
-    )
+    set_sub_sub_sub_title(teams)
     st.dataframe(df_teams)
 
-    st.markdown(
-        f"""<h4><strong>{team_players}</strong></h4>
-            """, unsafe_allow_html=True
-    )
+    set_sub_sub_sub_title(team_players)
     st.dataframe(df_team_players)

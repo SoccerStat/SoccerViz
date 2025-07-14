@@ -30,22 +30,22 @@ def choose_season_button(db_conn, name_comp):
     if name_comp:
         all_seasons =  get_seasons_by_comp(db_conn, name_comp)
 
-        st.session_state.setdefault("basic_stats_seasons_selected", all_seasons)
+        st.session_state.setdefault("basic_stats__seasons_selected", all_seasons)
 
         with st.container():
             season_modes = [RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE, ALL_SEASONS_MODE]
 
-            st.session_state.setdefault("basic_stats_season_mode_selected", season_modes[0])
+            st.session_state.setdefault("basic_stats__season_mode_selected", season_modes[0])
 
             st.radio(
-                key="basic_stats_season_mode_selected",
+                key="basic_stats__season_mode_selected",
                 label="Selection mode",
                 options=season_modes,
                 horizontal=True,
-                index=season_modes.index(st.session_state["basic_stats_season_mode_selected"]),
+                index=season_modes.index(st.session_state["basic_stats__season_mode_selected"]),
             )
 
-            selected_mode = st.session_state.basic_stats_season_mode_selected
+            selected_mode = st.session_state.basic_stats__season_mode_selected
 
             if selected_mode == RANGE_SEASONS_MODE:
                 cols = st.columns(2)
@@ -58,21 +58,22 @@ def choose_season_button(db_conn, name_comp):
                         label="Max season",
                         options=[season for season in all_seasons if season >= min_season]
                     )
-                    st.session_state.basic_stats_seasons_selected = [season for season in all_seasons if min_season <= season <= max_season]
+                    st.session_state.basic_stats__seasons_selected = [season for season in all_seasons if min_season <= season <= max_season]
 
             elif selected_mode == COMPARE_SEASONS_MODE:
                 cols = st.columns(2)
                 with cols[0]:
-                    selected_seasons = st.multiselect(
+                    chosen_seasons = st.multiselect(
+                        key="basic_stats__chosen_seasons",
                         label="select seasons...",
                         options=all_seasons,
                         max_selections=3
                     )
-                    st.session_state.basic_stats_seasons_selected = selected_seasons
+                    st.session_state.basic_stats__seasons_selected = chosen_seasons
 
             elif selected_mode == ALL_SEASONS_MODE:
-                st.session_state.basic_stats_seasons_selected = all_seasons
+                st.session_state.basic_stats__seasons_selected = all_seasons
 
-        return st.session_state.basic_stats_season_mode_selected, st.session_state.basic_stats_seasons_selected
+        return st.session_state.basic_stats__season_mode_selected, st.session_state.basic_stats__seasons_selected
 
     return None, None

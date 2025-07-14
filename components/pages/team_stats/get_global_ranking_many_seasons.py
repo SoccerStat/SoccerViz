@@ -15,7 +15,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/get_global_ranking_many_seasons.sql",
+            file_name="components/queries/team_stats/get_ranking_many_seasons.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -30,25 +30,22 @@ def get_global_ranking_many_seasons(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
-    st.session_state.setdefault("team_stats_global_ranking_chosen_comp", comps[0])
-    st.session_state.team_stats_global_ranking_chosen_comp = st.selectbox(
-        key="comp_over_many_seasons",
+    chosen_comp = st.selectbox(
+        key="global_ranking_many_seasons__comp",
         label="Choose competition...",
-        options=comps,
-        index=comps.index(st.session_state.team_stats_global_ranking_chosen_comp)
+        options=comps
     )
-    chosen_comp = st.session_state.team_stats_global_ranking_chosen_comp
 
-    kind_of_comp = comps_and_kind[chosen_comp]
+    # kind_of_comp = comps_and_kind[chosen_comp]
 
     seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
-    n_seasons = len(seasons_by_comp)
+    # n_seasons = len(seasons_by_comp)
 
     teams = get_teams_by_comp_by_season(db_conn, chosen_comp, seasons_by_comp)
     n_teams = len(teams)
 
     chosen_teams = st.multiselect(
-        key="teams_over_many_seasons",
+        key="global_ranking_many_seasons__teams",
         label="Choose teams...",
         options=["All"] + teams,
     )
@@ -109,5 +106,3 @@ def get_global_ranking_many_seasons(db_conn):
                 file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_many_seasons.csv",
                 mime="text/csv"
             )
-
-            # TODO: enable dataframe export for analyzes.

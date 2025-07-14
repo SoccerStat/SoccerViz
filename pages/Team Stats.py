@@ -4,7 +4,7 @@ from components.connection import get_connection
 from components.pages.team_stats.get_global_ranking_one_season import get_global_ranking_one_season
 from components.pages.team_stats.get_global_ranking_many_seasons import get_global_ranking_many_seasons
 from components.pages.team_stats.get_global_ranking_by_season import get_global_ranking_by_season
-from components.pages.team_stats.get_one_ranking import get_one_ranking
+from components.pages.team_stats.get_single_ranking_one_season import get_single_ranking_one_season
 from config import TEAM_STATS_PAGE
 from utils.commons.BasePage import BasePage
 
@@ -14,7 +14,7 @@ class TeamStatsPage(BasePage):
         db_conn = get_connection()
 
         self.set_sub_title("Stat ranking by competition by season")
-        get_one_ranking(db_conn)
+        get_single_ranking_one_season(db_conn)
 
         st.divider()
 

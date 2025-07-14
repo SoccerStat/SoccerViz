@@ -15,7 +15,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
     
     for j in range(1, nb_chp_weeks + 1):
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/get_global_ranking_one_season.sql",
+            file_name="components/queries/team_stats/get_cumulative_ranking_one_season.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=chosen_season,
@@ -38,40 +38,32 @@ def get_global_ranking_one_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
-    st.session_state.setdefault("team_stats_global_ranking_chosen_comp", comps[0])
-    st.session_state.team_stats_global_ranking_chosen_comp = st.selectbox(
-        key="comp_over_one_season",
+    chosen_comp = st.selectbox(
+        key="global_ranking_one_season__comp",
         label="Choose competition...",
-        options=comps,
-        index=comps.index(st.session_state.team_stats_global_ranking_chosen_comp)
+        options=comps
     )
-    chosen_comp = st.session_state.team_stats_global_ranking_chosen_comp
 
     kind_of_comp = comps_and_kind[chosen_comp]
 
     seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    st.session_state.setdefault("team_stats_global_ranking_chosen_season", seasons_by_comp[0])
-
-    if st.session_state.team_stats_global_ranking_chosen_season not in seasons_by_comp:
-        st.session_state.team_stats_global_ranking_chosen_season = seasons_by_comp[0]
-
-    st.session_state.team_stats_global_ranking_chosen_season = st.selectbox(
-        key="season_over_one_season",
+    chosen_season = st.selectbox(
+        key="global_ranking_one_season__season",
         label="Choose season...",
-        options=seasons_by_comp,
-        index=seasons_by_comp.index(st.session_state.team_stats_global_ranking_chosen_season)
+        options=seasons_by_comp
     )
-    chosen_season = st.session_state.team_stats_global_ranking_chosen_season
 
     teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
     n_teams = len(teams)
 
-    chosen_teams = st.multiselect(
-        key="teams_over_one_season",
+    st.multiselect(
+        key="global_ranking_one_season__teams",
         label="Choose teams...",
-        options=["All"] + teams,
+        options=["All"] + teams
     )
+
+    chosen_teams = st.session_state.global_ranking_one_season__teams
 
     if 'All' in chosen_teams:
         chosen_teams = teams
@@ -90,7 +82,7 @@ def get_global_ranking_one_season(db_conn):
                 )
 
             elif kind_of_comp == KIND_C_CUP:
-                n_weeks = 100
+                # n_weeks = 100
                 df = ranking_by_c_cup_week(
                     _db_conn=db_conn,
                     chosen_ranking="Points",
@@ -98,14 +90,8 @@ def get_global_ranking_one_season(db_conn):
                     chosen_season=chosen_season
                 )
 
-            # df["Cumulated Points"] = df.groupby("Club")["Points"].cumsum()
-            # df = df.sort_values(by=["Week", "Cumulated Points"], ascending=[True, False])
             df = df.sort_values(by=["Week", "Points"], ascending=[True, False])
 
-            # df["Ranking"] = df.groupby("Week")["Cumulated Points"].rank(
-            #     method="dense",
-            #     ascending=False
-            # ).astype(int)
             filtered_df = df[df["Club"].isin(chosen_teams)]
 
             line_chart = alt.Chart(filtered_df).mark_line(point=True).encode(
