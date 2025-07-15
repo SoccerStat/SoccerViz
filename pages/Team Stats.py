@@ -1,6 +1,7 @@
 import streamlit as st
 
 from components.connection import get_connection
+from components.pages.team_stats.get_dual_history import get_dual_history
 from components.pages.team_stats.get_global_ranking_one_season import get_global_ranking_one_season
 from components.pages.team_stats.get_global_ranking_many_seasons import get_global_ranking_many_seasons
 from components.pages.team_stats.get_global_ranking_by_season import get_global_ranking_by_season
@@ -36,6 +37,10 @@ class TeamStatsPage(BasePage):
 
         self.set_sub_title("Teams Performance against Top/Bottom teams")
         get_team_performance_against_top_and_bottom(db_conn)
+
+        st.divider()
+        self.set_sub_title("Dual history")
+        get_dual_history(db_conn)
 
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGE)

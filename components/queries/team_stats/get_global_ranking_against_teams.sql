@@ -8,8 +8,9 @@ select
     "Goals For",
     "Goals Against"
 from analytics.teams_oppositions(
-    seasons := ARRAY['{{ season }}'],
-    comps := array['{{ name_comp }}'],
-    team := '{{ name_team }}'
+    ARRAY['{{ season }}'],
+    array['{{ name_comp }}'],
+    '{{ name_team }}',
+    '{{ side }}'
 )
 where "Opponent" = any(array[{{ opponents }}]);

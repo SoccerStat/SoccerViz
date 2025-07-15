@@ -190,6 +190,15 @@ TEAM_RANKINGS = [
     "Shots on Target Against",
 ]
 
+DUAL_STATS = [
+    "Matches",
+    "Wins",
+    "Draws",
+    "Loses",
+    "Goals For",
+    "Goals Against"
+]
+
 C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
     "Points",
     "Points/Match"
