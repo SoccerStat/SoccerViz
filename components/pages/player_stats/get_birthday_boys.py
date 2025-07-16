@@ -1,11 +1,27 @@
 import streamlit as st
+import pandas as pd
 
+from components.commons.get_seasons import get_all_seasons
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
 
-def get_birthday_boys(db_conn):
+@st.cache_data(show_spinner=False)
+def get_birthday_boys_by_season(_db_conn, season_schema):
     sql_file = read_sql_file(
-        file_name=f"components/queries/player_stats/birthday_boys.sql"
+        file_name=f"components/queries/player_stats/birthday_boys.sql",
+        season_schema=season_schema
     )
-    return st.dataframe(execute_query(db_conn, sql_file), hide_index=True)
+    return execute_query(_db_conn, sql_file)
+
+def get_birthday_boys(db_conn):
+    n_seasons = 5
+    all_seasons_schema = get_all_seasons(db_conn)
+
+    df = pd.DataFrame()
+
+    for season_schema in all_seasons_schema[:n_seasons]:
+        df_season = get_birthday_boys_by_season(db_conn, season_schema)
+        df = pd.concat([df, df_season], ignore_index=True)
+
+    st.dataframe(df.drop_duplicates(), hide_index=True)
