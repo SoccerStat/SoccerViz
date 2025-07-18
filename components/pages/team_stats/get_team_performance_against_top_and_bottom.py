@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
 
+from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.set_titles import set_sub_sub_title
-from utils.file_helper.reader import read_sql_file
 from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
-from components.pages.team_stats.get_teams_by_comp_by_season import get_teams_by_comp_by_season
 
+from utils.file_helper.reader import read_sql_file
 from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
 
 

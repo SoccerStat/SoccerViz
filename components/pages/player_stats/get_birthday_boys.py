@@ -30,7 +30,7 @@ def get_birthday_boys(db_conn):
     df = df
     season_club_dict = (
         df.groupby(["Id", "Player", "Age"])
-        .apply(lambda x: x.groupby("Club")["Season"].apply(list).to_dict())
+        .apply(lambda x: x.groupby("Club")["Season"].apply(list).to_dict(), include_groups=False)
     )
 
     df["Season x Club"] = (df
