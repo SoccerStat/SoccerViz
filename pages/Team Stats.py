@@ -1,6 +1,7 @@
 import streamlit as st
 
 from components.connection import get_connection
+from components.pages.team_stats.get_combined_ranking_one_season import get_combined_ranking_one_season
 from components.pages.team_stats.get_dual_history import get_dual_history
 from components.pages.team_stats.get_global_ranking_one_season import get_global_ranking_one_season
 from components.pages.team_stats.get_global_ranking_many_seasons import get_global_ranking_many_seasons
@@ -19,8 +20,11 @@ class TeamStatsPage(BasePage):
         self.set_sub_title("Get Stats of one Team")
         get_stats_one_team(db_conn)
 
-        self.set_sub_title("Stat ranking by competition by season")
+        self.set_sub_title("Single stat ranking by competition by season")
         get_single_ranking_one_season(db_conn)
+
+        self.set_sub_title("Combined stat ranking by competition by season")
+        get_combined_ranking_one_season(db_conn)
 
         st.divider()
 

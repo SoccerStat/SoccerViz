@@ -5,7 +5,11 @@ SELECT
     "Draws",
     "Loses",
     "Goals For",
-    "Goals Against"
+    "Goals Against",
+    "Shots Conversion Rate For",
+    "Shots Conversion Rate Against",
+    "Shots on Target Conversion Rate For",
+    "Shots on Target Conversion Rate Against"
 FROM analytics.all_teams_rankings(
     in_comp := '{{ name_comp }}',
     in_seasons := array['{{ season }}'],

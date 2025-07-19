@@ -1,4 +1,5 @@
 import streamlit as st
+import altair as alt
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -21,7 +22,7 @@ def get_one_ranking(
         last_date
 ):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/get_ranking_one_season.sql",
+        file_name="components/queries/team_stats/get_single_ranking_one_season.sql",
         name_comp=chosen_comp,
         season=chosen_season,
         ranking=chosen_ranking,
@@ -127,7 +128,8 @@ def get_single_ranking_one_season(db_conn):
             label="Side",
             options=[f"Home", "Both", f"Away"],
             horizontal=True,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            index=1
         )
 
         chosen_ranking = st.selectbox(
@@ -149,7 +151,26 @@ def get_single_ranking_one_season(db_conn):
                 first_date,
                 last_date
             )
-            st.dataframe(df.set_index("Ranking"))
+
+            bars = alt.Chart(df).mark_bar().encode(
+                x=chosen_ranking,
+                y=alt.Y('Club', sort='-x')
+            )
+
+            text = alt.Chart(df).mark_text(
+                align='left',
+                baseline='middle',
+                dx=3  # décalage horizontal
+            ).encode(
+                x=chosen_ranking,
+                y=alt.Y('Club', sort='-x'),
+                text=chosen_ranking
+            )
+
+            # Combinaison des deux
+            chart = (bars + text)
+
+            st.altair_chart(chart, use_container_width=True)
 
             csv = df.to_csv(index=False, sep='|')
             st.download_button(

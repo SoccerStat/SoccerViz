@@ -184,10 +184,16 @@ TEAM_RANKINGS = [
     "Red Cards",
     "Incl. 2 Yellow Cards",
     "Fouls",
+
     "Shots For",
     "Shots on Target For",
     "Shots Against",
     "Shots on Target Against",
+
+    "Shots Conversion Rate For",
+    "Shots Conversion Rate Against",
+    "Shots on Target Conversion Rate For",
+    "Shots on Target Conversion Rate Against"
 ]
 
 DUAL_STATS = [
