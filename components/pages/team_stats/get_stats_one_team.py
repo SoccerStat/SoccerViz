@@ -129,7 +129,8 @@ def get_stats_one_team(db_conn):
             label="Side",
             options=["Home", "Both", "Away"],
             horizontal=True,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            index=1
         )
 
         team_stats = get_stats_of_team(

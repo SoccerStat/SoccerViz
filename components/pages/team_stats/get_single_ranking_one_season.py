@@ -154,20 +154,20 @@ def get_single_ranking_one_season(db_conn):
 
             bars = alt.Chart(df).mark_bar().encode(
                 x=chosen_ranking,
-                y=alt.Y('Club', sort='-x')
+                y=alt.Y('Club', sort='-x'),
+                tooltip=["Club", chosen_ranking, "Ranking"]
             )
 
             text = alt.Chart(df).mark_text(
                 align='left',
                 baseline='middle',
-                dx=3  # décalage horizontal
+                dx=3
             ).encode(
                 x=chosen_ranking,
                 y=alt.Y('Club', sort='-x'),
                 text=chosen_ranking
             )
 
-            # Combinaison des deux
             chart = (bars + text)
 
             st.altair_chart(chart, use_container_width=True)

@@ -83,6 +83,24 @@ def get_global_ranking_many_seasons(db_conn):
                 height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
             )
 
+            weeks_per_season = (
+                df[df["Ranking"].notnull()].groupby('Season')['Club']
+                .nunique()
+                .reset_index(name='NumClubs')
+            )
+            weeks_per_season["Weeks"] = 2*(weeks_per_season["NumClubs"]-1)
+            weeks_per_season['MaxPoints'] = weeks_per_season['Weeks'] * 3
+            max_points_df = weeks_per_season[['Season', 'MaxPoints']]
+
+            max_line = alt.Chart(max_points_df).mark_line(
+                strokeDash=[6, 4],
+                color='gray'
+            ).encode(
+                x=alt.X('Season:O'),
+                y=alt.Y('MaxPoints:Q'),
+                tooltip=['Season', 'MaxPoints']
+            )
+
             line_text = line_chart.mark_text(
                 align='center',
                 baseline='bottom',
@@ -95,6 +113,7 @@ def get_global_ranking_many_seasons(db_conn):
 
             chart = alt.layer(
                 line_chart,
+                max_line,
                 line_text
             )
 

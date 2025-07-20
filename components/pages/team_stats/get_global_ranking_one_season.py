@@ -73,7 +73,6 @@ def get_global_ranking_one_season(db_conn):
 
         if chosen_teams:
             with st.spinner("Data loading..."):
-
                 if kind_of_comp == KIND_CHP:
                     n_weeks = 2 * (n_teams - 1)
                     df = ranking_by_chp_week(
@@ -93,21 +92,7 @@ def get_global_ranking_one_season(db_conn):
                         chosen_season=chosen_season
                     )
 
-                df = df.sort_values(by=["Week", "Points"], ascending=[True, False])
-
-                filtered_df = df[df["Club"].isin(chosen_teams)]
-
-                line_chart = alt.Chart(filtered_df).mark_line(point=True).encode(
-                    x=alt.X('Week:O', title='Week'),
-                    y=alt.Y('Points:Q', title=f'Points'),
-                    color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
-                    tooltip=['Club', 'Week', "Points", "Points", "Ranking"]
-                ).properties(
-                    title=f"Evolution of points - {chosen_comp} ({chosen_season})",
-                    height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
-                )
-
-                st.altair_chart(line_chart, use_container_width=True)
+                set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams)
 
                 csv = df.to_csv(index=False, sep='|')
                 st.download_button(
@@ -117,4 +102,62 @@ def get_global_ranking_one_season(db_conn):
                     mime="text/csv"
                 )
 
-                # TODO: enable dataframe export for analyzes.
+
+def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams):
+    df = df.sort_values(by=["Week", "Points"], ascending=[True, False])
+
+    filtered_df = df[df["Club"].isin(chosen_teams)]
+
+    base = alt.Chart(filtered_df).mark_line(point=True).encode(
+        x=alt.X('Week:O', title='Week'),
+        color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000))
+    )
+
+    points_chart = base.encode(
+        y=alt.Y('Points:Q', title=f'Points'),
+        tooltip=['Club', 'Week', "Points", "Ranking"]
+    ).properties(
+        title=f"Evolution of points - {chosen_comp} ({chosen_season})",
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
+    )
+
+    weeks = sorted(filtered_df['Week'].unique())
+    ref_df = pd.DataFrame({
+        'Week': weeks,
+        'y': [3 * int(w) for w in weeks],
+        'label': 'Max Possible'
+    })
+
+    max_points_line = alt.Chart(ref_df).mark_line(
+        color="gray",
+        strokeDash=[6, 4],
+    ).encode(
+        x=alt.X('Week:O'),
+        y=alt.Y('y:Q')
+    )
+
+    cumulative_chart = alt.layer(points_chart, max_points_line)
+
+    actual_per_match_chart = base.encode(
+        y=alt.Y('Points/Match:Q'),
+        strokeDash=alt.value([1, 0]),
+        tooltip=['Club', 'Week', "Points/Match", "Ranking"]
+    )
+
+    # expected_per_match_chart = base.encode(
+    #     y=alt.Y('xPoints/Match:Q'),
+    #     strokeDash=alt.value([4, 4]),
+    #     tooltip=['Club', 'Week', "xPoints/Match", "Ranking"]
+    # )
+
+    # per_match_chart = alt.layer(actual_per_match_chart, expected_per_match_chart).encode(
+    # y=alt.Y(shorthand='Points/Match:Q', axis=alt.Axis(title="Actual and Expected Points per Match"))
+    # ).properties(
+    #     title=f"Actual and Expected evolution of points per match - {chosen_comp} ({chosen_season})",
+    #     height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
+    # )
+
+    # TODO: implémenter expected points
+
+    st.altair_chart(cumulative_chart, use_container_width=True)
+    st.altair_chart(actual_per_match_chart, use_container_width=True)

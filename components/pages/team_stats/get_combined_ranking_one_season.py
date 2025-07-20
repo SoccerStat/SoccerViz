@@ -156,9 +156,18 @@ def get_combined_ranking_one_season(db_conn):
             df['Shots Against'] = -df['Shots Against']
             df['Shots on Target Against'] = -df['Shots on Target Against']
             df['Goals Against'] = -df['Goals Against']
+            df['Ranking'] = df['Ranking'].astype(int)
+
+            chosen_sorting = st.selectbox(
+                key="combined_ranking_one_season__sorting",
+                label="Sort by...",
+                options=["Ranking", "Shots For", "Shots on Target For", "Shots Against", "Shots on Target Against"]
+            )
+
+            club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
             df_melted = df.melt(
-                id_vars='Club',
+                id_vars=['Club'],
                 value_vars=[
                     'Shots For', 'Shots Against',
                     'Shots on Target For', 'Shots on Target Against',
@@ -182,7 +191,7 @@ def get_combined_ranking_one_season(db_conn):
 
             bars = alt.Chart(bars_data).mark_bar().encode(
                 x=alt.X('Shots:Q', title=None),
-                y=alt.Y('Club:N', sort=alt.EncodingSortField(field='Ranking', order='descending')),
+                y=alt.Y('Club:N', sort=club_order),
                 color=alt.Color(
                     'Category:N',
                     scale=alt.Scale(
@@ -196,7 +205,7 @@ def get_combined_ranking_one_season(db_conn):
 
             goals = alt.Chart(goals_data).mark_bar().encode(
                 x=alt.X('Shots:Q', title=None),
-                y=alt.Y('Club:N', sort=alt.EncodingSortField(field='Ranking', order='descending')),
+                y=alt.Y('Club:N', sort=club_order),
                 color=alt.Color('Category:N', scale=alt.Scale(scheme='tableau10')),
                 tooltip=['Club', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
                 order=alt.Order('Category', sort='descending')
@@ -206,8 +215,10 @@ def get_combined_ranking_one_season(db_conn):
                 x=alt.datum(0)
             )
 
-            final_chart = (bars + goals + rule).properties(
-                title="Shots, Shots on Target (barres), Goals (tick) — For vs Against",
+            final_chart = (bars + goals + rule).resolve_scale(
+                y='shared'
+            ).properties(
+                title="Shots, Shots on Target, Goals — For vs Against",
                 width=600
             )
 
