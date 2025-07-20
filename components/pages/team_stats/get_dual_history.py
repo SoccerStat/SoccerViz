@@ -22,6 +22,19 @@ def get_history(_db_conn, teamA, teamB, all_comps, all_seasons, side):
     return execute_query(_db_conn, sql_file)
 
 
+@st.cache_data(show_spinner=False)
+def get_history_matches(_db_conn, teamA, teamB, all_comps, all_seasons, side):
+    sql_file = read_sql_file(
+        "components/queries/team_stats/get_dual_history_matches.sql",
+        teamA=teamA,
+        teamB=teamB,
+        comps=', '.join([f"'{comp}'" for comp in all_comps]),
+        seasons=', '.join([f"'{season[7:]}'" for season in all_seasons]),
+        side=side
+    )
+    return execute_query(_db_conn, sql_file)
+
+
 def get_dual_history(db_conn):
     all_comps, all_seasons, all_teams = list(get_all_teams(db_conn))
 
@@ -62,3 +75,6 @@ def get_dual_history(db_conn):
             }, inplace=True)
 
         st.dataframe(df, hide_index=True)
+
+        df_matches = get_history_matches(db_conn, teamA, teamB, all_comps, all_seasons, side)
+        st.dataframe(df_matches)

@@ -1,5 +1,6 @@
 with teamA as (
     SELECT
+        "Competition",
         "Team" as "Club",
         "Opponent",
         "Matches",
@@ -18,6 +19,7 @@ with teamA as (
 ),
 teamB as (
     SELECT
+        "Competition",
         "Team" as "Club",
         "Opponent",
         "Matches",
@@ -43,6 +45,7 @@ all_selected_matches as (
     from teamB
     {% else %}
     select
+        a."Competition",
         a."Club" || ' - ' || b."Club"         as "Face-to-Face",
         a."Matches"       + b."Matches"       as "Matches",
         a."Wins"          + b."Loses"         as "Wins_A",
@@ -54,6 +57,7 @@ all_selected_matches as (
     join teamB b
     on a."Club" = b."Opponent"
     and a."Opponent" = b."Club"
+    and a."Competition" = b."Competition"
     {% endif %}
 )
 select *

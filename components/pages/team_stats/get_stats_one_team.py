@@ -4,6 +4,7 @@ from streamlit_searchbox import st_searchbox
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.commons.search_for_item import make_search_function
+from components.commons.set_titles import set_sub_sub_sub_title
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -24,6 +25,32 @@ def get_stats_of_team(
 ):
     sql_file = read_sql_file(
         "components/queries/team_stats/get_stats_one_team.sql",
+        name_team=chosen_team,
+        name_comp=chosen_comp,
+        season=chosen_season,
+        in_side=side.lower(),
+        first_week=first_week,
+        last_week=last_week,
+        first_date=first_date,
+        last_date=last_date
+    )
+    return execute_query(_db_conn, sql_file)
+
+
+@st.cache_data(show_spinner=False)
+def get_matches_of_team(
+        _db_conn,
+        chosen_team,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date
+):
+    sql_file = read_sql_file(
+        "components/queries/team_stats/get_matches_one_team.sql",
         name_team=chosen_team,
         name_comp=chosen_comp,
         season=chosen_season,
@@ -60,10 +87,16 @@ def get_stats_one_team(db_conn):
 
     search_function = make_search_function(all_teams_of_comp_of_season)
 
-    chosen_team = st_searchbox(
-        search_function=search_function,
+    # chosen_team = st_searchbox(
+    #     search_function=search_function,
+    #     key="stats_one_team__team",
+    #     placeholder="Choose Team A",
+    # )
+
+    chosen_team = st.selectbox(
         key="stats_one_team__team",
-        placeholder="Choose Team A",
+        label="Choose a team...",
+        options=[""] + all_teams_of_comp_of_season
     )
 
     if chosen_team:
@@ -133,6 +166,8 @@ def get_stats_one_team(db_conn):
             index=1
         )
 
+        set_sub_sub_sub_title("Basic Stats")
+
         team_stats = get_stats_of_team(
             db_conn,
             chosen_team,
@@ -146,4 +181,20 @@ def get_stats_one_team(db_conn):
         )
 
         st.dataframe(team_stats, hide_index=True)
+
+        set_sub_sub_sub_title("Selected matches")
+
+        team_matches = get_matches_of_team(
+            db_conn,
+            chosen_team,
+            chosen_comp,
+            chosen_season,
+            side,
+            first_week,
+            last_week,
+            first_date,
+            last_date
+        )
+
+        st.dataframe(team_matches, hide_index=True)
 
