@@ -47,7 +47,8 @@ def get_dual_history(db_conn):
             label="Side",
             options=[f"{teamA} home", "Both", f"{teamB} home"],
             horizontal=True,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            index=1
         )
 
         df = get_history(db_conn, teamA, teamB, all_comps, all_seasons, side)

@@ -72,9 +72,10 @@ def get_team_performance_against_top_and_bottom(db_conn):
 
         side = st.radio(
             label="Side",
-            options=["Home", "Away", "Both"],
+            options=["Home", "Both", "Away"],
             horizontal=True,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            index=1
         )
 
         top_teams = get_top_teams(db_conn, chosen_comp, chosen_season)
