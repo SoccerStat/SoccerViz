@@ -9,6 +9,17 @@ SELECT
     "Shots Against",
     "Shots on Target For",
     "Shots on Target Against"
+    {% elif combined_ranking == 'xg' %}
+    ,
+    "xG For",
+    "xG Against",
+    "Goals For",
+    "Goals Against"
+    {% elif combined_ranking == 'outcomes' %}
+    ,
+    "Wins",
+    "Draws",
+    "Loses"
     {% endif %}
 FROM analytics.all_teams_rankings(
     in_comp    := '{{ name_comp }}',
