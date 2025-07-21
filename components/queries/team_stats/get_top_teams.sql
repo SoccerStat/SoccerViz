@@ -10,4 +10,4 @@ with global_teams_ranking as (
 )
 select "Club"
 from global_teams_ranking
-where cast("Ranking" as int) <= (select count(distinct "Club") from global_teams_ranking)-14
+where cast("Ranking" as int) <= 6

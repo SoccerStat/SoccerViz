@@ -68,7 +68,7 @@ def get_global_ranking_by_season(db_conn):
         n_teams = len(teams)
 
         chosen_teams = st.multiselect(
-            key="global_ranking_by_season__mteams",
+            key="global_ranking_by_season__teams",
             label="Choose teams...",
             options=teams
         )
@@ -87,8 +87,8 @@ def get_global_ranking_by_season(db_conn):
                 filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
 
                 line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
-                    x=alt.X('Week:O', title='Weeks'),
-                    y=alt.Y('Points:Q', title=f'Points'),
+                    x=alt.X('Week:O'),
+                    y=alt.Y('Points:Q'),
                     color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
                     tooltip=['Club', 'Season', "Points", "Ranking"]
                 ).properties(
@@ -113,7 +113,7 @@ def get_global_ranking_by_season(db_conn):
 
                 st.altair_chart(chart, use_container_width=True)
 
-                csv = df.to_csv(index=False, sep='|')
+                csv = df.to_csv(index=False, sep='|', decimal=',')
                 st.download_button(
                     label="📥 Download CSV",
                     data=csv,
