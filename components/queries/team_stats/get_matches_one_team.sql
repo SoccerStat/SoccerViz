@@ -34,8 +34,10 @@ AND season = '{{ season }}'
 AND cast(week as int) between {{ first_week }} and {{ last_week }}
 AND date between '{{ first_date }}' and '{{ last_date }}'
 AND CASE
-    WHEN '{{ side }}' = 'home' THEN played_home
-    WHEN '{{ side }}' = 'away' THEN not played_home
+    WHEN '{{ in_side }}' = 'home' THEN played_home and (round is null or round != 'Final')
+    WHEN '{{ in_side }}' = 'away' THEN not played_home and (round is null or round != 'Final')
+    WHEN '{{ in_side }}' = 'both' THEN (round is null or round != 'Final')
+    WHEN '{{ in_side }}' = 'neutral' THEN round = 'Final'
     ELSE TRUE
 END
 ORDER BY date;

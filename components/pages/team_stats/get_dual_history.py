@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit_searchbox import st_searchbox
+import numpy as np
 
 from components.commons.search_for_item import make_search_function
 from components.commons.get_all_teams import get_all_teams
@@ -58,7 +59,7 @@ def get_dual_history(db_conn):
 
         side = st.radio(
             label="Side",
-            options=[f"{teamA} home", "Both", f"{teamB} home"],
+            options=[f"{teamA} home", "Both", f"{teamB} home", "Neutral", "All"],
             horizontal=True,
             label_visibility="collapsed",
             index=1
@@ -66,7 +67,7 @@ def get_dual_history(db_conn):
 
         df = get_history(db_conn, teamA, teamB, all_comps, all_seasons, side)
 
-        if side == "Both":
+        if side in ["Both", "Neutral", "All"]:
             df.rename(columns={
                 "Wins_A": f"Wins {teamA}",
                 "Wins_B": f"Wins {teamB}",
@@ -77,4 +78,5 @@ def get_dual_history(db_conn):
         st.dataframe(df, hide_index=True)
 
         df_matches = get_history_matches(db_conn, teamA, teamB, all_comps, all_seasons, side)
+        df_matches.index = np.arange(1, len(df_matches) + 1)
         st.dataframe(df_matches)

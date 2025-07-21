@@ -123,10 +123,11 @@ def get_single_ranking_one_season(db_conn):
                     value=first_date
                 )
 
+        sides = ["Home", "Both", "Away", "Neutral", "All"] if comps_and_kind[chosen_comp] == KIND_C_CUP else ["Home", "Both", "Away"]
         side = st.radio(
             key='single_ranking_one_season__side',
             label="Side",
-            options=[f"Home", "Both", f"Away"],
+            options=sides,
             horizontal=True,
             label_visibility="collapsed",
             index=1

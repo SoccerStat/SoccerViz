@@ -8,7 +8,7 @@ from components.commons.set_titles import set_sub_sub_sub_title
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
-from config import COMPETITIONS
+from config import COMPETITIONS, KIND_C_CUP
 
 
 @st.cache_data(show_spinner=False)
@@ -157,10 +157,11 @@ def get_stats_one_team(db_conn):
                     value=first_date
                 )
 
+        sides = ["Home", "Both", "Away", "Neutral", "All"] if comps_and_kind[chosen_comp] == KIND_C_CUP else ["Home", "Both", "Away"]
         side = st.radio(
             key='stats_one_team__side',
             label="Side",
-            options=["Home", "Both", "Away"],
+            options=sides,
             horizontal=True,
             label_visibility="collapsed",
             index=1
