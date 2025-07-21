@@ -1,4 +1,5 @@
 SELECT
+    round as "Round",
     week as "Week",
     date as "Date",
     CASE
@@ -31,7 +32,13 @@ JOIN upper.club opponent
 ON stp.id_opponent = stp.id_comp || '_' || opponent.id
 WHERE competition = '{{ name_comp }}'
 AND season = '{{ season }}'
-AND cast(week as int) between {{ first_week }} and {{ last_week }}
+AND (
+    {% if kind_comp == 'C_CUP' %}
+    week is null
+    or
+    {% endif %}
+    cast(week as int) between {{ first_week }} and {{ last_week }}
+)
 AND date between '{{ first_date }}' and '{{ last_date }}'
 AND CASE
     WHEN '{{ in_side }}' = 'home' THEN played_home and (round is null or round != 'Final')

@@ -3,6 +3,7 @@ from streamlit_searchbox import st_searchbox
 import numpy as np
 
 from components.commons.search_for_item import make_search_function
+from components.commons.set_titles import set_sub_sub_sub_title
 from components.commons.get_all_teams import get_all_teams
 from components.queries.execute_query import execute_query
 
@@ -65,6 +66,8 @@ def get_dual_history(db_conn):
             index=1
         )
 
+        set_sub_sub_sub_title("Basic Stats")
+
         df = get_history(db_conn, teamA, teamB, all_comps, all_seasons, side)
 
         if side in ["Both", "Neutral", "All"]:
@@ -76,6 +79,8 @@ def get_dual_history(db_conn):
             }, inplace=True)
 
         st.dataframe(df, hide_index=True)
+
+        set_sub_sub_sub_title("Selected matches")
 
         df_matches = get_history_matches(db_conn, teamA, teamB, all_comps, all_seasons, side)
         df_matches.index = np.arange(1, len(df_matches) + 1)

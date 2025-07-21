@@ -8,7 +8,7 @@ from components.commons.set_titles import set_sub_sub_sub_title
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
-from config import COMPETITIONS, KIND_C_CUP
+from config import COMPETITIONS, KIND_C_CUP, KIND_CHP
 
 
 @st.cache_data(show_spinner=False)
@@ -47,7 +47,8 @@ def get_matches_of_team(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        kind_comp
 ):
     sql_file = read_sql_file(
         "components/queries/team_stats/get_matches_one_team.sql",
@@ -58,7 +59,8 @@ def get_matches_of_team(
         first_week=first_week,
         last_week=last_week,
         first_date=first_date,
-        last_date=last_date
+        last_date=last_date,
+        kind_comp=kind_comp
     )
     return execute_query(_db_conn, sql_file)
 
@@ -105,35 +107,37 @@ def get_stats_one_team(db_conn):
         first_date = '1970-01-01'
         last_date = '2099-12-31'
 
-        filter_weeks= st.checkbox(
-            key='stats_one_team__filter_weeks',
-            label='Filter by week'
-        )
+        if comps_and_kind[chosen_comp] == KIND_CHP:
 
-        if filter_weeks:
-            col1, col2 = st.columns(2)
-            max_week = 2 * (n_teams - 1)
+            filter_weeks= st.checkbox(
+                key='stats_one_team__filter_weeks',
+                label='Filter by week'
+            )
 
-            with col1:
-                first_week = st.slider(
-                    key='stats_one_team__first_week',
-                    label="First week",
-                    min_value=1,
-                    max_value=max_week,
-                    value=1
-                )
+            if filter_weeks:
+                col1, col2 = st.columns(2)
+                max_week = 2 * (n_teams - 1)
 
-            if first_week == max_week:
-                last_week = max_week
-            else:
-                with col2:
-                    last_week = st.slider(
-                        key='stats_one_team__last_week',
-                        label="Last week",
-                        min_value=first_week,
+                with col1:
+                    first_week = st.slider(
+                        key='stats_one_team__first_week',
+                        label="First week",
+                        min_value=1,
                         max_value=max_week,
-                        value=first_week
+                        value=1
                     )
+
+                if first_week == max_week:
+                    last_week = max_week
+                else:
+                    with col2:
+                        last_week = st.slider(
+                            key='stats_one_team__last_week',
+                            label="Last week",
+                            min_value=first_week,
+                            max_value=max_week,
+                            value=first_week
+                        )
 
         filter_dates = st.checkbox(
             key='stats_one_team__filter_dates',
@@ -194,8 +198,12 @@ def get_stats_one_team(db_conn):
             first_week,
             last_week,
             first_date,
-            last_date
+            last_date,
+            comps_and_kind[chosen_comp]
         )
+
+        if comps_and_kind[chosen_comp] == KIND_CHP:
+            team_matches = team_matches.drop("Round", axis=1)
 
         st.dataframe(team_matches, hide_index=True)
 
