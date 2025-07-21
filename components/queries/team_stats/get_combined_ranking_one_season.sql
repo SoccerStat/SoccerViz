@@ -20,6 +20,11 @@ SELECT
     "Wins",
     "Draws",
     "Loses"
+    {% elif combined_ranking == 'passes' %}
+    ,
+    "Succ Passes",
+    "Att Passes",
+    "Succ Passes Rate"
     {% endif %}
 FROM analytics.all_teams_rankings(
     in_comp    := '{{ name_comp }}',
@@ -28,5 +33,6 @@ FROM analytics.all_teams_rankings(
     last_week  := {{ last_week }},
     first_date := '{{ first_date }}',
     last_date  := '{{ last_date }}',
-    side       := '{{ in_side }}'
+    side       := '{{ in_side }}',
+    r          := 2
 );

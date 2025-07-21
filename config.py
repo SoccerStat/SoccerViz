@@ -190,6 +190,10 @@ TEAM_RANKINGS = [
     "Shots Against",
     "Shots on Target Against",
 
+    "Succ Passes",
+    "Att Passes",
+    "Succ Passes Rate",
+
     "Shots Conversion Rate For",
     "Shots Conversion Rate Against",
     "Shots on Target Conversion Rate For",

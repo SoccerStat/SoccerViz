@@ -7,6 +7,7 @@ SELECT
     "Goals For" as "GF",
     "Goals Against" as "GA",
     "Goals Diff" as "GD",
+    "Succ Passes Rate" as "% Succ Passes",
     "Shots Conversion Rate For" as "Shots For CR",
     "Shots Conversion Rate Against" as "Shots Against CR",
     "Shots on Target Conversion Rate For" as "On Target For CR",

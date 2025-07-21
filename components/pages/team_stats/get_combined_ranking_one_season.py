@@ -136,7 +136,7 @@ def get_combined_ranking_one_season(db_conn):
         combined_ranking = st.selectbox(
             key="combined_ranking_one_season__ranking",
             label="Choose combined ranking...",
-            options=["", "Shots", "Passes", "Outcomes", "Fouls", "xG"],
+            options=["", "Shots", "Passes", "Outcomes", "xG"],
             index=0
         )
 
@@ -148,8 +148,6 @@ def get_combined_ranking_one_season(db_conn):
                 df = get_combined_passes(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
             elif combined_ranking == "Outcomes":
                 df = get_combined_outcomes(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
-            elif combined_ranking == "Fouls":
-                df = get_combined_fouls(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
             elif combined_ranking == "xG":
                 df = get_combined_xgs(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
             else:
@@ -284,6 +282,48 @@ def get_combined_passes(
         last_date
     )
 
+    df['Ranking'] = df['Ranking'].astype(int)
+
+    chosen_sorting = st.selectbox(
+        key="combined_ranking_one_season__sorting",
+        label="Sort by...",
+        options=["Ranking", "Succ Passes", "Att Passes", "Succ Passes Rate"]
+    )
+
+    club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
+
+    att = alt.Chart(df).mark_bar(color='orange').encode(
+        x=alt.X('Att Passes:Q'),
+        y=alt.Y('Club:N', sort=club_order),
+        tooltip=["Club", "Att Passes", "Ranking"]
+    )
+
+    succ = alt.Chart(df).mark_bar(color='steelblue').encode(
+        x=alt.X('Succ Passes:Q'),
+        y=alt.Y('Club:N', sort=club_order),
+        tooltip=["Club", "Succ Passes", "Ranking"]
+    )
+
+    rate = alt.Chart(df).mark_text(
+        align='left',
+        baseline='middle',
+        fontSize=12,
+        dx=4,
+        color='black'
+    ).encode(
+        x=alt.X('Att Passes:Q'),
+        y=alt.Y('Club:N', sort=club_order),
+        text=alt.Text('Succ Passes Rate:Q', format='.1%')
+    )
+
+    # Combine them
+    chart = alt.layer(att, succ, rate).properties(
+        title="Successful vs Attempted Passes",
+        width=600
+    )
+
+    st.altair_chart(chart, use_container_width=True)
+
     return df
 
 
@@ -350,32 +390,6 @@ def get_combined_outcomes(
 
     return df
 
-
-def get_combined_fouls(
-        db_conn,
-        chosen_comp,
-        chosen_season,
-        combined_ranking,
-        side,
-        first_week,
-        last_week,
-        first_date,
-        last_date
-):
-    df = get_combined_ranking(
-        db_conn,
-        chosen_comp,
-        chosen_season,
-        combined_ranking,
-        side,
-        first_week,
-        last_week,
-        first_date,
-        last_date
-    )
-
-    return df
-
 def get_combined_xgs(
         db_conn,
         chosen_comp,
@@ -425,17 +439,7 @@ def get_combined_xgs(
     xg_data = df_melted[df_melted['Category'] == 'xG']
     goals_data = df_melted[df_melted['Category'] == 'Goals']
 
-    goals = alt.Chart(goals_data).mark_bar(opacity=0.8).encode(
-        x=alt.X('Value:Q'),
-        y=alt.Y('Club:N', sort=club_order),
-        color=alt.Color('Side:N',
-            scale=alt.Scale(domain=["For", "Against"], range=['steelblue', 'orange']),
-            legend=alt.Legend(title="xG")
-        ),
-        tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='Goals'), "Ranking"]
-    )
-
-    expected = alt.Chart(xg_data).mark_tick(thickness=4, size=20).encode(
+    goals = alt.Chart(goals_data).mark_bar().encode(
         x=alt.X('Value:Q'),
         y=alt.Y('Club:N', sort=club_order),
         color=alt.Color('Side:N',
@@ -443,6 +447,13 @@ def get_combined_xgs(
             legend=alt.Legend(title="Goals")
         ),
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='Goals'), "Ranking"]
+    )
+
+    expected = alt.Chart(xg_data).mark_tick(thickness=4, size=20, color="black").encode(
+        x=alt.X('Value:Q'),
+        y=alt.Y('Club:N', sort=club_order),
+
+        tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
     )
 
     rule = alt.Chart(df_melted).mark_rule(color='white', strokeWidth=3).encode(
