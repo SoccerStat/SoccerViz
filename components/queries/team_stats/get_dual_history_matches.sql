@@ -7,13 +7,18 @@ with team_a as (
         date as "Date",
         club.name AS "Home Team",
         case
-            when home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+            when extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+            then home_score || '-' || away_score || ' (ET)'
+            when not extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
             then home_score || '-' || away_score
-            else home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
+            when home_penalty_shootout_scored is not null and away_penalty_shootout_scored is not null
+            then home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
         end AS "Score",
         opponent.name AS "Away Team",
         CASE
-            WHEN home_score > away_score THEN 'W'
+            WHEN home_penalty_shootout_scored is null
+                and away_penalty_shootout_scored is null
+                and home_score > away_score THEN 'W'
             WHEN home_penalty_shootout_scored is not null
                 and away_penalty_shootout_scored is not null
                 and home_penalty_shootout_scored > away_penalty_shootout_scored THEN 'W'
@@ -38,9 +43,12 @@ team_b as (
         date as "Date",
         club.name AS "Home Team",
         case
-            when home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+            when extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+            then home_score || '-' || away_score || '( ET)'
+            when not extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
             then home_score || '-' || away_score
-            else home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
+            when home_penalty_shootout_scored is not null and away_penalty_shootout_scored is not null
+            then home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
         end AS "Score",
         opponent.name AS "Away Team",
         CASE
@@ -69,13 +77,18 @@ neutral as (
         date as "Date",
         club.name AS "Home Team",
         case
-            when home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+            when extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+            then home_score || '-' || away_score || ' (ET)'
+            when not extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
             then home_score || '-' || away_score
-            else home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
+            when home_penalty_shootout_scored is not null and away_penalty_shootout_scored is not null
+            then home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
         end AS "Score",
         opponent.name AS "Away Team",
         CASE
-            WHEN home_score > away_score THEN 'W'
+            WHEN home_penalty_shootout_scored is null
+                and away_penalty_shootout_scored is null
+                and home_score > away_score THEN 'W'
             WHEN home_penalty_shootout_scored is not null
                 and away_penalty_shootout_scored is not null
                 and home_penalty_shootout_scored > away_penalty_shootout_scored THEN 'W'

@@ -3,25 +3,43 @@ SELECT
     week as "Week",
     date as "Date",
     CASE
+        WHEN played_home THEN club.name
+        ELSE opponent.name
+    END AS "Home Team",
+    CASE
+        WHEN extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+        THEN home_score || '-' || away_score || ' (ET)'
+        WHEN not extra_time and home_penalty_shootout_scored is null and away_penalty_shootout_scored is null
+        THEN home_score || '-' || away_score
+        WHEN home_penalty_shootout_scored is not null and away_penalty_shootout_scored is not null
+        THEN home_score || '-' || away_score || ' (' || home_penalty_shootout_scored || '-' || away_penalty_shootout_scored || ')'
+    END AS "Score",
+    CASE
         WHEN played_home THEN opponent.name
         ELSE club.name
-    END AS "Home Team",
-    home_score || '-' || away_score AS "Score",
-    CASE
-        WHEN not played_home THEN club.name
-        ELSE opponent.name
     END AS "Away Team",
     CASE
+        WHEN home_penalty_shootout_scored is null
+            and away_penalty_shootout_scored is null
+            and home_score = away_score THEN 'D'
         WHEN played_home THEN
             CASE
-                WHEN home_score > away_score THEN 'W'
-                WHEN home_score = away_score THEN 'D'
+                WHEN home_penalty_shootout_scored is null
+                    and away_penalty_shootout_scored is null
+                    and home_score > away_score THEN 'W'
+                WHEN home_penalty_shootout_scored is not null
+                    and away_penalty_shootout_scored is not null
+                    and home_penalty_shootout_scored > away_penalty_shootout_scored THEN 'W'
                 ELSE 'L'
             END
-        ELSE
+        WHEN not played_home THEN
             CASE
-                WHEN home_score < away_score THEN 'L'
-                WHEN home_score = away_score THEN 'D'
+                WHEN home_penalty_shootout_scored is null
+                    and away_penalty_shootout_scored is null
+                    and home_score > away_score THEN 'L'
+                WHEN home_penalty_shootout_scored is not null
+                    and away_penalty_shootout_scored is not null
+                    and home_penalty_shootout_scored > away_penalty_shootout_scored THEN 'L'
                 ELSE 'W'
             END
     END AS "Outcome"

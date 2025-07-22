@@ -23,8 +23,12 @@ class TeamStatsPage(BasePage):
         self.set_sub_title("Get Stats of one Team")
         get_stats_one_team(db_conn)
 
+        st.divider()
+
         self.set_sub_title("Single stat ranking by competition by season")
         get_single_ranking_one_season(db_conn)
+
+        st.divider()
 
         self.set_sub_title("Combined stat ranking by competition by season")
         get_combined_ranking_one_season(db_conn)
@@ -50,8 +54,11 @@ class TeamStatsPage(BasePage):
         get_team_performance_against_top_and_bottom(db_conn)
 
         st.divider()
+
         self.set_sub_title("Dual history")
         get_dual_history(db_conn)
+
+        st.divider()
 
         self.set_sub_title("Home / Away Balance")
         get_home_away_outcomes(db_conn)
