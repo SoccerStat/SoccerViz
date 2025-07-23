@@ -12,5 +12,4 @@ left join season_{{ season }}.team t
 on tp.team = t.id
 left join upper.club c
 on t.club = c.id
-where extract(month from birth_date) = extract(month from current_date)
-and extract(day from birth_date) = extract(day from current_date);
+where to_char(p.birth_date, 'MM-DD') = to_char(DATE '{{ date }}', 'MM-DD');
