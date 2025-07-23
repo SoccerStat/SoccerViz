@@ -10,36 +10,58 @@ from config import COMPETITIONS, DUAL_STATS
 
 
 @st.cache_data(show_spinner=False)
-def get_outcomes(_db_conn):
-    sql_file = read_sql_file("components/queries/team_stats/get_home_away_outcomes.sql",)
+def get_balance(_db_conn):
+    sql_file = read_sql_file("components/queries/team_stats/get_home_away_balance.sql",)
     return execute_query(_db_conn, sql_file)
 
-
 def get_home_away_outcomes(db_conn):
-    df = get_outcomes(db_conn)
+    df = get_balance(db_conn)
 
-    df_melt = df.melt(
-        id_vars="Competition",
+    df_outcomes_melt = df.melt(
+        id_vars=["Competition", "Matches"],
         value_vars=["Home Wins", "Draws", "Away Wins"],
-        var_name="Outcome",
+        var_name="Side",
         value_name="Count"
     )
+    df_outcomes_melt['Side Light'] = df_outcomes_melt['Side'].str.replace(' Wins', '')
+    df_outcomes_melt['Ratio'] = (df_outcomes_melt['Count'] / df_outcomes_melt['Matches']) * 100
 
-    chart = alt.Chart(df_melt).mark_bar().encode(
+    df_goals_melt = df.melt(
+        id_vars=["Competition", "Matches"],
+        value_vars=["Home Goals", "Draws Goals", "Away Goals"],
+        var_name="Side",
+        value_name="Count"
+    )
+    df_goals_melt['Side Light'] = df_goals_melt['Side'].str.replace(' Goals', '')
+    df_goals_melt['Avg'] = (df_goals_melt['Count'] / df_goals_melt['Matches'])
+
+    outcome_chart = alt.Chart(df_outcomes_melt).mark_bar().encode(
         x=alt.X("Competition:N"),
         y=alt.Y('Count:Q', title='#'),
-        xOffset=alt.XOffset('Outcome:N', sort=['Home Wins', 'Draws', 'Away Wins']),
+        xOffset=alt.XOffset('Side Light:N', sort=['Home', 'Draws', 'Away']),
         color=alt.Color(
-            "Outcome:N",
+            "Side Light:N",
             scale=alt.Scale(
-                domain=["Home Wins", "Draws", "Away Wins"],
+                domain=["Home", "Draws", "Away"],
                 range=['#1f77b4', '#aec7e8', '#1f77b4']
             ),
-            sort=['Home Wins', 'Draws', 'Away Wins'],
+            sort=['Home', 'Draws', 'Away'],
             legend=alt.Legend(title='Outcome')
-        )
-    ).properties(
-        title="Match Outcomes by Competition in the 21th century"
+        ),
+        tooltip=["Competition", "Side", "Count:Q", alt.Tooltip("Ratio:Q", format=".2f", title="Ratio (%)")]
+    )
+
+    goals_chart = alt.Chart(df_goals_melt).mark_bar().encode(
+        x=alt.X("Competition:N"),
+        y=alt.Y('Count:Q', title='#'),
+        xOffset=alt.XOffset('Side Light:N', sort=['Home', 'Draws', 'Away']),
+        color=alt.value("orange"),
+        tooltip=["Competition", "Side", "Count:Q", alt.Tooltip("Avg:Q", format=".2f", title="Per match")]
+    )
+
+    chart = (goals_chart + outcome_chart).properties(
+        title="Match Outcomes and Goals by Competition in the 21th century",
+        height=600
     )
 
     st.altair_chart(chart, use_container_width=True)
