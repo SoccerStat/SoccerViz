@@ -40,13 +40,13 @@ def get_home_away_outcomes(db_conn):
         y=alt.Y('Count:Q', title='#'),
         xOffset=alt.XOffset('Side Light:N', sort=['Home', 'Draws', 'Away']),
         color=alt.Color(
-            "Side Light:N",
+            "Side:N",
             scale=alt.Scale(
-                domain=["Home", "Draws", "Away"],
-                range=['#1f77b4', '#aec7e8', '#1f77b4']
+                domain=["Home Wins", "Draws", "Away Wins", "Home Goals", "Away Goals"],
+                range=['#1f77b4', '#aec7e8', '#1f77b4', 'orange', 'orange']
             ),
-            sort=['Home', 'Draws', 'Away'],
-            legend=alt.Legend(title='Outcome')
+            sort=['Home Wins', 'Draws', 'Away Wins', "Home Goals", "Away Goals"],
+            legend=alt.Legend(title='Outcome and Goals')
         ),
         tooltip=["Competition", "Side", "Count:Q", alt.Tooltip("Ratio:Q", format=".2f", title="Ratio (%)")]
     )
@@ -55,7 +55,13 @@ def get_home_away_outcomes(db_conn):
         x=alt.X("Competition:N"),
         y=alt.Y('Count:Q', title='#'),
         xOffset=alt.XOffset('Side Light:N', sort=['Home', 'Draws', 'Away']),
-        color=alt.value("orange"),
+        color=alt.Color(
+            "Side:N",
+            scale=alt.Scale(
+                domain=["Home Wins", "Draws", "Away Wins", "Home Goals", "Away Goals"],
+                range=['#1f77b4', '#aec7e8', '#1f77b4', 'orange', 'orange']
+            )
+        ),
         tooltip=["Competition", "Side", "Count:Q", alt.Tooltip("Avg:Q", format=".2f", title="Per match")]
     )
 
