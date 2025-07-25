@@ -195,13 +195,18 @@ def get_combined_shots(
     chosen_sorting = st.selectbox(
         key="combined_ranking_one_season__sorting",
         label="Sort by...",
-        options=["Ranking", "Shots For", "Shots on Target For", "Shots Against", "Shots on Target Against"]
+        options=[
+            "Ranking",
+            "Shots For", "Shots on Target For",
+            "Shots Against", "Shots on Target Against",
+            "Goals For", "Goals Against"
+        ]
     )
 
     club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
     df_melted = df.melt(
-        id_vars=['Club'],
+        id_vars=['Club', 'Ranking'],
         value_vars=[
             'Shots For', 'Shots Against',
             'Shots on Target For', 'Shots on Target Against',
@@ -233,7 +238,7 @@ def get_combined_shots(
                 range=['steelblue', 'orange', 'firebrick']
             )
         ),
-        tooltip=['Club', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
+        tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
         order=alt.Order('Category', sort='descending')
     )
 
@@ -241,7 +246,7 @@ def get_combined_shots(
         x=alt.X('Shots:Q'),
         y=alt.Y('Club:N', sort=club_order),
         color=alt.Color('Category:N', scale=alt.Scale(scheme='tableau10')),
-        tooltip=['Club', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
+        tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
         order=alt.Order('Category', sort='descending')
     )
 
@@ -285,25 +290,36 @@ def get_combined_passes(
     )
 
     df['Ranking'] = df['Ranking'].astype(int)
+    df["Failed Passes"] = df["Att Passes"] - df["Succ Passes"]
 
     chosen_sorting = st.selectbox(
         key="combined_ranking_one_season__sorting",
         label="Sort by...",
-        options=["Ranking", "Succ Passes", "Att Passes", "Succ Passes Rate"]
+        options=["Ranking", "Succ Passes", "Att Passes", "Total Passes", "Succ Passes Rate"]
     )
 
     club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
-    att = alt.Chart(df).mark_bar(color='orange').encode(
-        x=alt.X('Att Passes:Q'),
-        y=alt.Y('Club:N', sort=club_order),
-        tooltip=["Club", "Att Passes", "Ranking"]
+    df_melted = df.melt(
+        id_vars=["Club", "Att Passes"],
+        value_vars=["Succ Passes", "Failed Passes"],
+        var_name="Kind",
+        value_name="Count"
     )
 
-    succ = alt.Chart(df).mark_bar(color='steelblue').encode(
-        x=alt.X('Succ Passes:Q'),
+    chart = alt.Chart(df_melted).mark_bar().encode(
+        x=alt.X('Count:Q', title="Number of passes"),
         y=alt.Y('Club:N', sort=club_order),
-        tooltip=["Club", "Succ Passes", "Ranking"]
+        color=alt.Color(
+            'Kind:N',
+            title="Passes",
+            scale=alt.Scale(
+                domain=['Succ Passes', 'Failed Passes'],
+                range=['steelblue', 'orange']
+            )
+        ),
+        order=alt.Order("Kind:N", sort='descending'),
+        tooltip=['Club:N', 'Att Passes:Q', 'Kind:N', 'Count:Q']
     )
 
     rate = alt.Chart(df).mark_text(
@@ -313,13 +329,13 @@ def get_combined_passes(
         dx=4,
         color='black'
     ).encode(
-        x=alt.X('Att Passes:Q'),
         y=alt.Y('Club:N', sort=club_order),
-        text=alt.Text('Succ Passes Rate:Q', format='.1%')
+        x=alt.X('Att Passes:Q', title="Number of passes"),
+        text=alt.Text('Succ Passes Rate:Q', format='.0%'),
+        tooltip=["Club:N", "Att Passes:Q", alt.Text('Succ Passes Rate:Q', format='.0%')]
     )
 
-    # Combine them
-    chart = alt.layer(att, succ, rate).properties(
+    chart = alt.layer(chart, rate).properties(
         title="Successful vs Attempted Passes",
         width=600
     )
@@ -369,8 +385,12 @@ def get_combined_outcomes(
         value_name='Count'
     )
 
-    outcome_order = {'Wins': 0, 'Draws': 1, 'Loses': 2}
-    df_melted['OutcomeOrder'] = df_melted['Outcome'].map(outcome_order)
+    if chosen_sorting == "Draws":
+        draws_order = {'Draws': 0, 'Wins': 1, 'Loses': 2}
+        df_melted['OutcomeOrder'] = df_melted['Outcome'].map(draws_order)
+    else:
+        outcome_order = {'Wins': 0, 'Draws': 1, 'Loses': 2}
+        df_melted['OutcomeOrder'] = df_melted['Outcome'].map(outcome_order)
 
     chart = alt.Chart(df_melted).mark_bar().encode(
         x=alt.X('Count:Q', stack='zero'),
