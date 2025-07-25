@@ -2,7 +2,6 @@ import streamlit as st
 import altair as alt
 
 from components.commons.search_for_item import make_search_function
-from components.commons.get_all_teams import get_all_teams
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file

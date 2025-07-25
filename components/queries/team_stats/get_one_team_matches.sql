@@ -21,26 +21,26 @@ SELECT
     CASE
         WHEN home_penalty_shootout_scored is null
             and away_penalty_shootout_scored is null
-            and home_score = away_score THEN 'D'
+            and home_score = away_score THEN '⚫️'
         WHEN played_home THEN
             CASE
                 WHEN home_penalty_shootout_scored is null
                     and away_penalty_shootout_scored is null
-                    and home_score > away_score THEN 'W'
+                    and home_score > away_score THEN '🟢'
                 WHEN home_penalty_shootout_scored is not null
                     and away_penalty_shootout_scored is not null
-                    and home_penalty_shootout_scored > away_penalty_shootout_scored THEN 'W'
-                ELSE 'L'
+                    and home_penalty_shootout_scored > away_penalty_shootout_scored THEN '🟢'
+                ELSE '🔴'
             END
         WHEN not played_home THEN
             CASE
                 WHEN home_penalty_shootout_scored is null
                     and away_penalty_shootout_scored is null
-                    and home_score > away_score THEN 'L'
+                    and home_score > away_score THEN '🔴'
                 WHEN home_penalty_shootout_scored is not null
                     and away_penalty_shootout_scored is not null
-                    and home_penalty_shootout_scored > away_penalty_shootout_scored THEN 'L'
-                ELSE 'W'
+                    and home_penalty_shootout_scored > away_penalty_shootout_scored THEN '🔴'
+                ELSE '🟢'
             END
     END AS "Outcome"
 FROM analytics.staging_teams_performance stp

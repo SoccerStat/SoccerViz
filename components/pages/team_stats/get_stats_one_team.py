@@ -24,7 +24,7 @@ def get_stats_of_team(
         last_date
 ):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_stats_one_team.sql",
+        "components/queries/team_stats/get_one_team_stats.sql",
         name_team=chosen_team,
         name_comp=chosen_comp,
         season=chosen_season,
@@ -51,7 +51,7 @@ def get_matches_of_team(
         kind_comp
 ):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_matches_one_team.sql",
+        "components/queries/team_stats/get_one_team_matches.sql",
         name_team=chosen_team,
         name_comp=chosen_comp,
         season=chosen_season,

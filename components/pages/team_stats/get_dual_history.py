@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_searchbox import st_searchbox
 import numpy as np
 
+from components.commons.get_seasons import get_all_seasons
 from components.commons.search_for_item import make_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
 from components.commons.get_all_teams import get_all_teams
@@ -38,7 +39,9 @@ def get_history_matches(_db_conn, teamA, teamB, all_comps, all_seasons, side):
 
 
 def get_dual_history(db_conn):
-    all_comps, all_seasons, all_teams = list(get_all_teams(db_conn))
+    all_comps = [comp["label"] for comp in COMPETITIONS.values()]
+    all_seasons = get_all_seasons(db_conn)
+    all_teams = list(get_all_teams(db_conn))
 
     search_function = make_search_function(all_teams)
 
@@ -56,7 +59,7 @@ def get_dual_history(db_conn):
         placeholder="Choose Team B",
     )
 
-    if teamA and teamB:
+    if teamA and teamB and teamA != teamB:
 
         side = st.radio(
             label="Side",
