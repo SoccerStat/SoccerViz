@@ -3,8 +3,7 @@ SELECT
     {{ week }} as "Week",
     "Ranking",
     "Stat" as "{{ ranking }}",
-    round("Stat"::numeric / {{ week }}::numeric, 2) as "{{ ranking }}/Match",
-    round("Stat"::numeric*2 / {{ week }}::numeric, 2) as "x{{ ranking }}/Match"
+    round("Stat"::numeric / {{ week }}::numeric, 2) as "{{ ranking }}/Match"
 FROM analytics.one_teams_ranking(
     in_ranking := '{{ ranking }}',
     in_comp    := '{{ name_comp }}',

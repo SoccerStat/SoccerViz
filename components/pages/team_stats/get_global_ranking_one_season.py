@@ -60,6 +60,30 @@ def get_global_ranking_one_season(db_conn):
         teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
         n_teams = len(teams)
 
+        with st.spinner("Data loading..."):
+            if kind_of_comp == KIND_CHP:
+                n_weeks = 2 * (n_teams - 1)
+                df = ranking_by_chp_week(
+                    _db_conn=db_conn,
+                    chosen_ranking="Points",
+                    chosen_comp=chosen_comp,
+                    chosen_season=chosen_season,
+                    nb_chp_weeks=n_weeks
+                )
+
+                final_df = df
+
+            elif kind_of_comp == KIND_C_CUP:
+                # n_weeks = 100
+                df = ranking_by_c_cup_week(
+                    _db_conn=db_conn,
+                    chosen_ranking="Points",
+                    chosen_comp=chosen_comp,
+                    chosen_season=chosen_season
+                )
+
+                final_df = df
+
         st.multiselect(
             key="global_ranking_one_season__teams",
             label="Choose teams...",
@@ -72,56 +96,40 @@ def get_global_ranking_one_season(db_conn):
             chosen_teams = teams
 
         if chosen_teams:
-            with st.spinner("Data loading..."):
-                if kind_of_comp == KIND_CHP:
-                    n_weeks = 2 * (n_teams - 1)
-                    df = ranking_by_chp_week(
-                        _db_conn=db_conn,
-                        chosen_ranking="Points",
-                        chosen_comp=chosen_comp,
-                        chosen_season=chosen_season,
-                        nb_chp_weeks=n_weeks
-                    )
+            set_plots(final_df, n_teams, chosen_comp, chosen_season, chosen_teams)
 
-                elif kind_of_comp == KIND_C_CUP:
-                    # n_weeks = 100
-                    df = ranking_by_c_cup_week(
-                        _db_conn=db_conn,
-                        chosen_ranking="Points",
-                        chosen_comp=chosen_comp,
-                        chosen_season=chosen_season
-                    )
-
-                set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams)
-
-                csv = df.to_csv(index=False, sep='|')
-                st.download_button(
-                    label="📥 Download CSV",
-                    data=csv,
-                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_global_ranking_one_season.csv",
-                    mime="text/csv"
-                )
+            csv = df.to_csv(index=False, sep='|')
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_global_ranking_one_season.csv",
+                mime="text/csv"
+            )
 
 
 def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams):
     df = df.sort_values(by=["Week", "Points"], ascending=[True, False])
 
-    filtered_df = df[df["Club"].isin(chosen_teams)]
+    filtered_df = final_df[final_df["Club"].isin(chosen_teams)]
 
-    base = alt.Chart(filtered_df).mark_line(point=True).encode(
+    base_chart = alt.Chart(filtered_df).mark_line(point=True).encode(
         x=alt.X('Week:O', title='Week'),
         color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000))
-    )
-
-    points_chart = base.encode(
-        y=alt.Y('Points:Q', title=f'Points'),
-        tooltip=['Club', 'Week', "Points", "Ranking"]
     ).properties(
-        title=f"Evolution of points - {chosen_comp} ({chosen_season})",
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
     )
 
-    weeks = sorted(filtered_df['Week'].unique())
+    set_plot_cumulative_points(base_chart, df, chosen_comp, chosen_season)
+    set_plot_cumulative_points_per_match(base_chart, df)
+
+
+def set_plot_cumulative_points(base_chart, df, chosen_comp, chosen_season):
+    points_chart = base_chart.encode(
+        y=alt.Y('Points:Q', title=f'Points'),
+        tooltip=['Club', 'Week', "Points", "Ranking"]
+    )
+
+    weeks = sorted(df['Week'].unique())
     ref_df = pd.DataFrame({
         'Week': weeks,
         'y': [3 * int(w) for w in weeks],
@@ -136,28 +144,26 @@ def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams):
         y=alt.Y('y:Q')
     )
 
-    cumulative_chart = alt.layer(points_chart, max_points_line)
+    cumulative_chart = alt.layer(points_chart, max_points_line).properties(
+        title=f"Evolution of points - {chosen_comp} ({chosen_season})"
+    )
+    st.altair_chart(cumulative_chart, use_container_width=True)
 
-    actual_per_match_chart = base.encode(
+
+def set_plot_cumulative_points_per_match(base_chart):
+    actual_per_match_chart = base_chart.encode(
         y=alt.Y('Points/Match:Q'),
         strokeDash=alt.value([1, 0]),
         tooltip=['Club', 'Week', "Points/Match", "Ranking"]
     )
 
-    # expected_per_match_chart = base.encode(
-    #     y=alt.Y('xPoints/Match:Q'),
-    #     strokeDash=alt.value([4, 4]),
-    #     tooltip=['Club', 'Week', "xPoints/Match", "Ranking"]
-    # )
-
-    # per_match_chart = alt.layer(actual_per_match_chart, expected_per_match_chart).encode(
-    # y=alt.Y(shorthand='Points/Match:Q', axis=alt.Axis(title="Actual and Expected Points per Match"))
-    # ).properties(
-    #     title=f"Actual and Expected evolution of points per match - {chosen_comp} ({chosen_season})",
-    #     height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
-    # )
+    per_match_chart = actual_per_match_chart.encode(
+    y=alt.Y(shorthand='Points/Match:Q', axis=alt.Axis(title="Actual and Expected Points per Match"))
+    ).properties(
+        title=f"Actual and Expected evolution of points per match - {chosen_comp} ({chosen_season})",
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
+    )
 
     # TODO: implémenter expected points
 
-    st.altair_chart(cumulative_chart, use_container_width=True)
-    st.altair_chart(actual_per_match_chart, use_container_width=True)
+    st.altair_chart(per_match_chart, use_container_width=True)
