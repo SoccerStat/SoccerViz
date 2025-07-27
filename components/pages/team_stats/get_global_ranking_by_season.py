@@ -64,6 +64,14 @@ def get_global_ranking_by_season(db_conn):
     if chosen_seasons:
         # n_seasons = len(seasons_by_comp)
 
+        with st.spinner("Data loading..."):
+            df = ranking_by_chp_by_week_by_season(
+                _db_conn=db_conn,
+                chosen_ranking="Points",
+                chosen_comp=chosen_comp,
+                chosen_seasons=chosen_seasons,
+            )
+
         teams = get_teams_by_comp_by_season(db_conn, chosen_comp, chosen_seasons)
         n_teams = len(teams)
 
@@ -74,51 +82,41 @@ def get_global_ranking_by_season(db_conn):
         )
 
         if chosen_teams:
-            with st.spinner("Data loading..."):
 
-                df = ranking_by_chp_by_week_by_season(
-                    _db_conn=db_conn,
-                    chosen_ranking="Points",
-                    chosen_comp=chosen_comp,
-                    chosen_seasons=chosen_seasons,
-                )
+            filtered_df = df[df["Club"].isin(chosen_teams)]
+            filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
 
-                filtered_df = df[df["Club"].isin(chosen_teams)]
-                filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
+            line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
+                x=alt.X('Week:O'),
+                y=alt.Y('Points:Q'),
+                color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
+                tooltip=['Club', 'Season', "Points", "Ranking"]
+            ).properties(
+                title=f"Number of points over weeks by season - {chosen_comp}",
+                height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
+            )
 
-                line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
-                    x=alt.X('Week:O'),
-                    y=alt.Y('Points:Q'),
-                    color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
-                    tooltip=['Club', 'Season', "Points", "Ranking"]
-                ).properties(
-                    title=f"Number of points over weeks by season - {chosen_comp}",
-                    height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
-                )
+            line_text = line_chart.mark_text(
+                align='center',
+                baseline='bottom',
+                fontSize=12,
+                dy=-2,
+                color='black'
+            ).encode(
+                text=alt.Text('Ranking:Q')
+            )
 
-                line_text = line_chart.mark_text(
-                    align='center',
-                    baseline='bottom',
-                    fontSize=12,
-                    dy=-2,
-                    color='black'
-                ).encode(
-                    text=alt.Text('Ranking:Q')
-                )
+            chart = alt.layer(
+                line_chart,
+                line_text
+            )
 
-                chart = alt.layer(
-                    line_chart,
-                    line_text
-                )
+            st.altair_chart(chart, use_container_width=True)
 
-                st.altair_chart(chart, use_container_width=True)
-
-                csv = df.to_csv(index=False, sep='|', decimal=',')
-                st.download_button(
-                    label="📥 Download CSV",
-                    data=csv,
-                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_by_season.csv",
-                    mime="text/csv"
-                )
-
-                # TODO: enable dataframe export for analyzes.
+            csv = df.to_csv(index=False, sep='|', decimal=',')
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_by_season.csv",
+                mime="text/csv"
+            )

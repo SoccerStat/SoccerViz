@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from scipy.stats import bernoulli
 
-i = 0
 
 def simulate_by_side(teams: pd.DataFrame, played_home: bool, n_sim: int):
     xgs = teams.loc[teams["played_home"] == played_home, 'xg_shot']
@@ -13,7 +12,7 @@ def simulate_by_side(teams: pd.DataFrame, played_home: bool, n_sim: int):
     return teams[(teams["played_home"] == played_home) & (teams["outcome"] == "goal")].shape[0]
 
 # Average number of points per simulation
-def sum_and_round(xp, r):
+def mean_and_round(xp, r):
     return round(np.mean(xp), r)
 
 def simulate_matches(
@@ -39,11 +38,8 @@ def simulate_matches(
     )
     away_xp_by_simulation = np.where(home_xp_by_simulation == 1, 1, 3 - home_xp_by_simulation)
 
-    home_xp = round(np.mean(home_xp_by_simulation), r)
-    away_xp = round(np.mean(away_xp_by_simulation), r)
-
-    # st.write(f"Match n° {i}: {both_teams_shots['match'].unique().tolist()}, xP: {home_xp} - {away_xp}")
-    i=i+1
+    home_xp = mean_and_round(home_xp_by_simulation, r)
+    away_xp = mean_and_round(away_xp_by_simulation, r)
 
     home_subset = both_teams_shots.loc[both_teams_shots['played_home'], 'Club']
     away_subset = both_teams_shots.loc[~both_teams_shots['played_home'], 'Club']
@@ -55,7 +51,7 @@ def simulate_matches(
         'xP': [home_xp, away_xp]
     })
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def build_expected_performance_ranking(
         expected_team_stats: pd.DataFrame,
         side: str = 'both',
@@ -100,8 +96,6 @@ def merge_rankings(
         left_on=['Club', 'Week'],
         right_on=['Club', 'Partition']
     )
-
-    st.dataframe(merged_ranking)
 
     merged_ranking['xP/Match'] = \
         round(merged_ranking['xP'] / merged_ranking['Partition'], r)
