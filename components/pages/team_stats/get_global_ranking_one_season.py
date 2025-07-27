@@ -137,6 +137,7 @@ def get_global_ranking_one_season(db_conn):
         if chosen_teams:
             set_plots(final_df, n_teams, chosen_comp, chosen_season, chosen_teams, get_expected_points)
 
+
             csv = df.to_csv(index=False, sep='|')
             st.download_button(
                 label="📥 Download CSV",
@@ -231,3 +232,7 @@ def set_plot_cumulative_points_per_match(df, chosen_comp, chosen_season, get_exp
         ),
         use_container_width=True
     )
+
+    if get_expected_points:
+        st.write("**Note**: The expected Points are based on what Fbref provides. "
+                 "The figures are different from the pioneer xG source: Understat.com. **However, the trends are similar.**")
