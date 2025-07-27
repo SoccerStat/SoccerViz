@@ -21,7 +21,6 @@ def simulate_matches(
         n_sim: int,
         r: int
 ) -> pd.DataFrame:
-    global i
     both_teams_shots = teams_shots.copy()
 
     home_theoretical_goals = simulate_by_side(both_teams_shots, True, n_sim)

@@ -27,7 +27,7 @@ def get_home_away_outcomes(db_conn):
 
     df_goals_melt = df.melt(
         id_vars=["Competition", "Matches"],
-        value_vars=["Home Goals", "Draws Goals", "Away Goals"],
+        value_vars=["Home Goals", "Total Goals", "Away Goals"],
         var_name="Side",
         value_name="Count"
     )
@@ -41,10 +41,10 @@ def get_home_away_outcomes(db_conn):
         color=alt.Color(
             "Side:N",
             scale=alt.Scale(
-                domain=["Home Wins", "Draws", "Away Wins", "Home Goals", "Away Goals"],
-                range=['#1f77b4', '#aec7e8', '#1f77b4', 'orange', 'orange']
+                domain=["Home Wins", "Draws", "Away Wins", "Home Goals", "Total Goals", "Away Goals"],
+                range=['#1f77b4', '#aec7e8', '#1f77b4', 'orange', 'firebrick', 'orange']
             ),
-            sort=['Home Wins', 'Draws', 'Away Wins', "Home Goals", "Away Goals"],
+            sort=['Home Wins', 'Draws', 'Away Wins', "Home Goals", "Total Goals", "Away Goals"],
             legend=alt.Legend(title='Outcome and Goals')
         ),
         tooltip=["Competition", "Side", "Count:Q", alt.Tooltip("Ratio:Q", format=".2f", title="Ratio (%)")]
@@ -57,8 +57,8 @@ def get_home_away_outcomes(db_conn):
         color=alt.Color(
             "Side:N",
             scale=alt.Scale(
-                domain=["Home Wins", "Draws", "Away Wins", "Home Goals", "Away Goals"],
-                range=['#1f77b4', '#aec7e8', '#1f77b4', 'orange', 'orange']
+                domain=["Home Wins", "Draws", "Away Wins", "Home Goals", "Total Goals", "Away Goals"],
+                range=['#1f77b4', '#aec7e8', '#1f77b4', 'orange', 'firebrick', 'orange']
             )
         ),
         tooltip=["Competition", "Side", "Count:Q", alt.Tooltip("Avg:Q", format=".2f", title="Per match")]

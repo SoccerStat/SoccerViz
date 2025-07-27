@@ -37,7 +37,7 @@ class TeamStatsPage(BasePage):
 
         st.divider()
 
-        self.set_sub_sub_title("Moving Ranking") # Moyennes mobiles
+        self.set_sub_sub_title("Moving Ranking")
 
         st.divider()
 
