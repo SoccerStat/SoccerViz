@@ -37,6 +37,10 @@ class TeamStatsPage(BasePage):
 
         st.divider()
 
+        self.set_sub_sub_title("Moving Ranking") # Moyennes mobiles
+
+        st.divider()
+
         self.set_sub_sub_title("Global ranking over the season")
         get_global_ranking_one_season(db_conn)
 
