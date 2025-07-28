@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import matplotlib.pyplot as plt
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -80,7 +81,7 @@ def get_global_ranking_one_season(db_conn):
 
         get_expected_points = st.checkbox(
             key="global_ranking_one_season__xp",
-            label="Calculate Expected Points ?",
+            label="Calculate Expected Points",
             value=False
         )
 
@@ -157,9 +158,7 @@ def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams, get_expecte
 
 
 def set_plot_cumulative_points(df, chosen_comp, chosen_season, n_teams, get_expected_points):
-    df_copy = df.copy()
-
-    weeks = sorted(df_copy['Week'].unique())
+    weeks = sorted(df['Week'].unique())
     ref_df = pd.DataFrame({
         'Week': weeks,
         'y': [3 * int(w) for w in weeks],
@@ -174,7 +173,9 @@ def set_plot_cumulative_points(df, chosen_comp, chosen_season, n_teams, get_expe
         y=alt.Y('y:Q')
     )
 
-    df_actual = df_copy[["Ranking", "Club", "Week", "Points"]].drop_duplicates()
+    df_actual = df[["Ranking", "Club", "Week", "Points"]].drop_duplicates()
+
+    # TODO .mark_line(interpolate = 'step-after', point=True) for stairs plot
 
     actual_chart = alt.Chart(df_actual).mark_line(point=True).encode(
         x=alt.X('Week:O', title='Week'),
@@ -184,7 +185,7 @@ def set_plot_cumulative_points(df, chosen_comp, chosen_season, n_teams, get_expe
     )
 
     if get_expected_points:
-        df_expected = df_copy[df_copy["Partition"].notna()]
+        df_expected = df[df["Partition"].notna()]
         df_expected["Week"] = df_expected["Partition"]
 
         expected_chart = alt.Chart(df_expected).mark_line(point=True).encode(
@@ -209,9 +210,7 @@ def set_plot_cumulative_points(df, chosen_comp, chosen_season, n_teams, get_expe
 
 
 def set_plot_cumulative_points_per_match(df, chosen_comp, chosen_season, get_expected_points, n_teams):
-    df_copy = df.copy()
-
-    df_actual = df_copy[["Ranking", "Club", "Week", "Points/Match"]].drop_duplicates()
+    df_actual = df[["Ranking", "Club", "Week", "Points/Match"]].drop_duplicates()
 
     actual_per_match_chart = alt.Chart(df_actual).mark_line(point=True).encode(
         x=alt.X('Week:O', title='Week'),
@@ -222,7 +221,7 @@ def set_plot_cumulative_points_per_match(df, chosen_comp, chosen_season, get_exp
     )
 
     if get_expected_points:
-        df_expected = df_copy[df_copy["Partition"].notna()]
+        df_expected = df[df["Partition"].notna()]
         df_expected["Week"] = df_expected["Partition"]
 
         expected_per_match_chart = alt.Chart(df_expected).mark_line(point=True).encode(
