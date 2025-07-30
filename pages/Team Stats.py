@@ -2,7 +2,7 @@ import streamlit as st
 
 from components.connection import get_connection
 
-from components.pages.team_stats.get_home_away_outcomes import get_home_away_outcomes
+from components.pages.team_stats.get_home_away_outcomes import get_home_away_outcomes_plotly
 from components.pages.team_stats.get_combined_ranking_one_season import get_combined_ranking_one_season
 from components.pages.team_stats.get_dual_history import get_dual_history
 from components.pages.team_stats.get_global_ranking_one_season import get_global_ranking_one_season
@@ -69,7 +69,7 @@ class TeamStatsPage(BasePage):
         st.divider()
 
         self.set_sub_sub_title("Home / Away Balance")
-        get_home_away_outcomes(db_conn)
+        get_home_away_outcomes_plotly(db_conn)
 
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGE)

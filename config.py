@@ -177,9 +177,13 @@ TEAM_RANKINGS = [
     "Goals Diff",
     "Clean Sheets",
     "xG For",
+    "xG For (soccerstat)",
     "xG For/Match",
+    "xG For/Match (soccerstat)",
     "xG Against",
+    "xG Against (soccerstat)",
     "xG Against/Match",
+    "xG Against/Match (soccerstat)",
     "Yellow Cards",
     "Red Cards",
     "Incl. 2 Yellow Cards",
@@ -211,5 +215,9 @@ DUAL_STATS = [
 
 C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
     "Points",
-    "Points/Match"
+    "Points/Match",
+    "xG For",
+    "xG For/Match",
+    "xG Against",
+    "xG Against/Match"
 ]

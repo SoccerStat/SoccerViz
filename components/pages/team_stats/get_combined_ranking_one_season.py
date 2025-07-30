@@ -436,29 +436,31 @@ def get_combined_xgs(
     )
 
     df["xG Against"] = -df["xG Against"]
+    df["xG Against (soccerstat)"] = -df["xG Against (soccerstat)"]
     df["Goals Against"] = -df["Goals Against"]
     df["Ranking"] = df["Ranking"].astype(int)
 
     chosen_sorting = st.selectbox(
         key="combined_ranking_one_season__sorting",
         label="Sort by...",
-        options=["Ranking", "Goals For", "Goals Against", "xG For", "xG Against"]
+        options=["Ranking", "Goals For", "Goals Against", "xG For", "xG For (soccerstat)", "xG Against", "xG Against (soccerstat)"]
     )
 
     club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
     df_melted = df.melt(
         id_vars=["Club", "Ranking"],
-        value_vars=["xG For", "xG Against", "Goals For", "Goals Against"],
+        value_vars=["xG For", "xG For (soccerstat)", "xG Against", "xG Against (soccerstat)", "Goals For", "Goals Against"],
         var_name="Side",
         value_name="Value"
     )
 
     df_melted['Value_abs'] = df_melted['Value'].abs()
-    df_melted['Category'] = df_melted['Side'].apply(lambda x: 'xG' if 'xG' in x else 'Goals')
+    df_melted['Category'] = df_melted['Side'].apply(lambda x: 'xG (soccerstat)' if 'soccerstat' in x else 'xG' if 'xG' in x else 'Goals')
     df_melted['Side'] = df_melted['Side'].apply(lambda x: 'For' if 'For' in x else 'Against')
 
     xg_data = df_melted[df_melted['Category'] == 'xG']
+    xg_soccerstat_data = df_melted[df_melted['Category'] == 'xG (soccerstat)']
     goals_data = df_melted[df_melted['Category'] == 'Goals']
 
     goals = alt.Chart(goals_data).mark_bar().encode(
@@ -478,11 +480,18 @@ def get_combined_xgs(
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
     )
 
+    expected_soccerstat = alt.Chart(xg_soccerstat_data).mark_tick(thickness=4, size=20, color="green").encode(
+        x=alt.X('Value:Q'),
+        y=alt.Y('Club:N', sort=club_order),
+
+        tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
+    )
+
     rule = alt.Chart(df_melted).mark_rule(color='white', strokeWidth=3).encode(
         x=alt.datum(0)
     )
 
-    final_chart = (goals + expected + rule).resolve_scale(
+    final_chart = (goals + expected + expected_soccerstat + rule).resolve_scale(
         y='shared'
     ).properties(
         title="xG — For vs Against",

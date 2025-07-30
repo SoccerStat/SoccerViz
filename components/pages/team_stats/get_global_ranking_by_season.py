@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import plotly.graph_objects as go
+import plotly.express as px
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -83,35 +85,8 @@ def get_global_ranking_by_season(db_conn):
 
         if chosen_teams:
 
-            filtered_df = df[df["Club"].isin(chosen_teams)]
-            filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
-
-            line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
-                x=alt.X('Week:O'),
-                y=alt.Y('Points:Q'),
-                color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
-                tooltip=['Club', 'Season', "Points", "Ranking"]
-            ).properties(
-                title=f"Number of points over weeks by season - {chosen_comp}",
-                height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
-            )
-
-            line_text = line_chart.mark_text(
-                align='center',
-                baseline='bottom',
-                fontSize=12,
-                dy=-2,
-                color='black'
-            ).encode(
-                text=alt.Text('Ranking:Q')
-            )
-
-            chart = alt.layer(
-                line_chart,
-                line_text
-            )
-
-            st.altair_chart(chart, use_container_width=True)
+            set_plot(df, chosen_comp, chosen_teams, n_teams)
+            set_plot_plotly(df, chosen_comp, chosen_teams, n_teams)
 
             csv = df.to_csv(index=False, sep='|', decimal=',')
             st.download_button(
@@ -120,3 +95,79 @@ def get_global_ranking_by_season(db_conn):
                 file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_by_season.csv",
                 mime="text/csv"
             )
+
+def set_plot(df, chosen_comp, chosen_teams, n_teams):
+    filtered_df = df[df["Club"].isin(chosen_teams)]
+    filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
+
+    line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
+        x=alt.X('Week:O'),
+        y=alt.Y('Points:Q'),
+        color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
+        tooltip=['Club', 'Season', "Points", "Ranking"]
+    ).properties(
+        title=f"Number of points over weeks by season - {chosen_comp}",
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
+    )
+
+    line_text = line_chart.mark_text(
+        align='center',
+        baseline='bottom',
+        fontSize=12,
+        dy=-2,
+        color='black'
+    ).encode(
+        text=alt.Text('Ranking:Q')
+    )
+
+    chart = alt.layer(
+        line_chart,
+        line_text
+    )
+
+    st.altair_chart(chart, use_container_width=True)
+
+def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
+    filtered_df = df[df["Club"].isin(chosen_teams)].copy()
+    filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"].astype(str)
+
+    club_seasons = sorted(filtered_df['Club_Season'].unique())
+    colors = px.colors.qualitative.D3  # palette moderne
+    club_colors = {cs: colors[i % len(colors)] for i, cs in enumerate(club_seasons)}
+
+    traces = []
+    for cs in club_seasons:
+        df_cs = filtered_df[filtered_df['Club_Season'] == cs].sort_values('Week')
+        traces.append(
+            go.Scatter(
+                x=df_cs['Week'],
+                y=df_cs['Points'],
+                mode='lines+markers+text',
+                name=cs,
+                line=dict(color=club_colors[cs]),
+                marker=dict(color=club_colors[cs]),
+                text=df_cs['Ranking'].astype(str),
+                textposition='top center',
+                textfont=dict(color=club_colors[cs]),
+                hovertemplate=(
+                    f"<b>{cs}</b><br>" +
+                    "Week: %{x}<br>" +
+                    "Points: %{y}<br>" +
+                    "Ranking: %{text}<extra></extra>"
+                ),
+                showlegend=True,
+            )
+        )
+
+    layout = go.Layout(
+        title=f"Number of points over weeks by season - {chosen_comp}",
+        xaxis=dict(title='Week', type='category', tickmode='linear'),
+        yaxis=dict(title='Points'),
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,
+        width=2000,
+        legend=dict(title='Club - Season', y=1, yanchor='top', x=1.05, xanchor='left'),
+        margin=dict(l=50, r=180, t=80, b=80)
+    )
+
+    fig = go.Figure(data=traces, layout=layout)
+    st.plotly_chart(fig, use_container_width=True)

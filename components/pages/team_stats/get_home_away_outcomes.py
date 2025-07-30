@@ -1,11 +1,9 @@
-import streamlit as st
 import altair as alt
+import plotly.express as px
+import streamlit as st
 
-from components.commons.search_for_item import make_search_function
 from components.queries.execute_query import execute_query
-
 from utils.file_helper.reader import read_sql_file
-from config import COMPETITIONS, DUAL_STATS
 
 
 @st.cache_data(show_spinner=False)
@@ -70,3 +68,67 @@ def get_home_away_outcomes(db_conn):
     )
 
     st.altair_chart(chart, use_container_width=True)
+
+def get_home_away_outcomes_plotly(db_conn):
+    df = get_balance(db_conn)
+
+    # Préparations comme avant
+    df_outcomes_melt = df.melt(
+        id_vars=["Competition", "Matches"],
+        value_vars=["Home Wins", "Draws", "Away Wins"],
+        var_name="Side",
+        value_name="Count"
+    )
+    df_outcomes_melt['Ratio'] = (df_outcomes_melt['Count'] / df_outcomes_melt['Matches']) * 100
+
+    df_goals_melt = df.melt(
+        id_vars=["Competition", "Matches"],
+        value_vars=["Home Goals", "Total Goals", "Away Goals"],
+        var_name="Side",
+        value_name="Count"
+    )
+    df_goals_melt['Avg'] = (df_goals_melt['Count'] / df_goals_melt['Matches'])
+
+    color_map_outcomes = {
+        "Home Wins": '#1f77b4',
+        "Draws": '#aec7e8',
+        "Away Wins": '#1f77b4'
+    }
+    color_map_goals = {
+        "Home Goals": 'orange',
+        "Total Goals": 'firebrick',
+        "Away Goals": 'orange'
+    }
+
+    # Graphique outcomes
+    fig_outcomes = px.bar(
+        df_outcomes_melt,
+        x='Competition',
+        y='Count',
+        color='Side',
+        color_discrete_map=color_map_outcomes,
+        barmode='group',
+        title='Match Outcomes',
+        hover_data={'Ratio': ':.2f'}
+    )
+    fig_outcomes.update_yaxes(title_text="Number of Matches")
+
+    # Graphique goals
+    fig_goals = px.bar(
+        df_goals_melt,
+        x='Competition',
+        y='Count',
+        color='Side',
+        color_discrete_map=color_map_goals,
+        barmode='group',
+        title='Goals',
+        hover_data={'Avg': ':.2f'}
+    )
+    fig_goals.update_yaxes(title_text="Number of Goals")
+
+    # Affichage côte à côte dans Streamlit
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(fig_outcomes, use_container_width=True)
+    with col2:
+        st.plotly_chart(fig_goals, use_container_width=True)

@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import altair as alt
-import matplotlib.pyplot as plt
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -153,8 +154,101 @@ def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_teams, get_expecte
     df = df.sort_values(by=["Week", "Points"], ascending=[True, False])
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
-    set_plot_cumulative_points(filtered_df, chosen_comp, chosen_season, n_teams, get_expected_points)
-    set_plot_cumulative_points_per_match(filtered_df, chosen_comp, chosen_season, get_expected_points, n_teams)
+    # set_plot_cumulative_points(filtered_df, chosen_comp, chosen_season, n_teams, get_expected_points)
+    set_plot_cumulative_points_plotly(filtered_df, chosen_comp, chosen_season, n_teams, get_expected_points)
+    # set_plot_cumulative_points_per_match(filtered_df, chosen_comp, chosen_season, get_expected_points, n_teams)
+    set_plot_cumulative_points_per_match_plotly(filtered_df, chosen_comp, chosen_season, get_expected_points, n_teams)
+
+
+def set_plot_cumulative_points_plotly(df, chosen_comp, chosen_season, n_teams, get_expected_points):
+    weeks = sorted(df['Week'].unique())
+    max_points = [3 * int(w) for w in weeks]
+
+    # Ligne Max Possible
+    max_line = go.Scatter(
+        x=weeks,
+        y=max_points,
+        mode='lines',
+        line=dict(color='gray', dash='dash'),
+        name='Max Possible',
+        hoverinfo='skip',
+        showlegend=True
+    )
+
+    # Points réels
+    df_actual = df[["Ranking", "Club", "Week", "Points"]].drop_duplicates()
+    clubs = sorted(df_actual['Club'].unique())
+    colors = px.colors.qualitative.D3  # palette qualitative de Plotly
+
+    # Map club -> color
+    club_colors = {club: colors[i % len(colors)] for i, club in enumerate(clubs)}
+
+    actual_traces = []
+    for club in clubs:
+        df_club = df_actual[df_actual['Club'] == club].sort_values('Week')
+        actual_traces.append(
+            go.Scatter(
+                x=df_club['Week'],
+                y=df_club['Points'],
+                mode='lines+markers',
+                name=club,
+                hovertemplate=(
+                    f"<b>{club}</b><br>" +
+                    "Week: %{x}<br>" +
+                    "Points: %{y}<br>" +
+                    "Ranking: %{customdata[0]}<extra></extra>"
+                ),
+                customdata=df_club[['Ranking']],
+                line=dict(color=club_colors[club]),
+                marker=dict(color=club_colors[club]),
+                showlegend=True,
+            )
+        )
+
+    data = [max_line] + actual_traces
+
+    if get_expected_points:
+        df_expected = df[df["Partition"].notna()].copy()
+        df_expected["Week"] = df_expected["Partition"]
+
+        expected_traces = []
+        for club in clubs:
+            df_club_exp = df_expected[df_expected['Club'] == club].sort_values('Week')
+            if df_club_exp.empty:
+                continue
+            expected_traces.append(
+                go.Scatter(
+                    x=df_club_exp['Week'],
+                    y=df_club_exp['xP'],
+                    mode='lines+markers',
+                    name=f"{club} (Expected)",
+                    line=dict(dash='dot'),
+                    hovertemplate=(
+                        f"<b>{club} (Expected)</b><br>" +
+                        "Week: %{x}<br>" +
+                        "xP: %{y}<br>" +
+                        "Diff Points: %{customdata[0]}<br>" +
+                        "Ranking: %{customdata[1]}<extra></extra>"
+                    ),
+                    customdata=df_club_exp[['Diff Points', 'Ranking']],
+                    showlegend=True
+                )
+            )
+        data += expected_traces
+
+    # Layout
+    layout = go.Layout(
+        title=f"Evolution of points - {chosen_comp} ({chosen_season})",
+        xaxis=dict(title='Week', type='category'),
+        yaxis=dict(title='Points'),
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,
+        legend=dict(title='Clubs', y=1, yanchor='top', x=1.05, xanchor='left'),
+        margin=dict(l=50, r=150, t=80, b=50)
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def set_plot_cumulative_points(df, chosen_comp, chosen_season, n_teams, get_expected_points):
@@ -207,6 +301,90 @@ def set_plot_cumulative_points(df, chosen_comp, chosen_season, n_teams, get_expe
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
     )
     st.altair_chart(cumulative_chart, use_container_width=True)
+
+
+def set_plot_cumulative_points_per_match_plotly(df, chosen_comp, chosen_season, get_expected_points, n_teams):
+    df_actual = df[["Ranking", "Club", "Week", "Points/Match"]].drop_duplicates()
+
+    weeks = sorted(df['Week'].unique())
+    # Ticks toutes les 2 semaines (ex: impaires)
+    tickvals = [w for w in weeks if int(w) % 2 == 1]
+    clubs = sorted(df_actual['Club'].unique())
+    colors = px.colors.qualitative.D3  # palette qualitative de Plotly
+
+    # Map club -> color
+    club_colors = {club: colors[i % len(colors)] for i, club in enumerate(clubs)}
+
+    actual_traces = []
+    for club in clubs:
+        df_club = df_actual[df_actual['Club'] == club].sort_values('Week')
+        actual_traces.append(
+            go.Scatter(
+                x=df_club['Week'],
+                y=df_club['Points/Match'],
+                mode='lines+markers',
+                name=club,
+                hovertemplate=(
+                    f"<b>{club}</b><br>" +
+                    "Week: %{x}<br>" +
+                    "Points/Match: %{y:.2f}<br>" +
+                    "Ranking: %{customdata[0]}<extra></extra>"
+                ),
+                customdata=df_club[['Ranking']],
+                line=dict(color=club_colors[club]),
+                marker=dict(color=club_colors[club]),
+                showlegend=True
+            )
+        )
+
+    data = actual_traces
+
+    if get_expected_points:
+        df_expected = df[df["Partition"].notna()].copy()
+        df_expected["Week"] = df_expected["Partition"]
+
+        expected_traces = []
+        for club in clubs:
+            df_club_exp = df_expected[df_expected['Club'] == club].sort_values('Week')
+            if df_club_exp.empty:
+                continue
+            expected_traces.append(
+                go.Scatter(
+                    x=df_club_exp['Week'],
+                    y=df_club_exp['xP/Match'],
+                    mode='lines+markers',
+                    name=f"{club} (Expected)",
+                    line=dict(dash='dot'),
+                    hovertemplate=(
+                        f"<b>{club} (Expected)</b><br>" +
+                        "Week: %{x}<br>" +
+                        "xP/Match: %{y:.2f}<br>" +
+                        "Diff Points: %{customdata[0]}<br>" +
+                        "Ranking: %{customdata[1]}<extra></extra>"
+                    ),
+                    customdata=df_club_exp[['Diff Points', 'Ranking']],
+                    showlegend=True
+                )
+            )
+        data += expected_traces
+
+    layout = go.Layout(
+        title=f"Actual and Expected evolution of points per match - {chosen_comp} ({chosen_season})",
+        xaxis=dict(
+            title='Week',
+            type='category',
+            tickmode='array',
+            tickvals=tickvals,
+            ticktext=[str(w) for w in tickvals],
+        ),
+        yaxis=dict(title='Points per Match'),
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,
+        legend=dict(title='Clubs', y=1, yanchor='top', x=1.05, xanchor='left'),
+        margin=dict(l=50, r=150, t=80, b=50),
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def set_plot_cumulative_points_per_match(df, chosen_comp, chosen_season, get_expected_points, n_teams):
