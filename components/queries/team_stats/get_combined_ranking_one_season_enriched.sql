@@ -3,10 +3,10 @@ SELECT
     "Ranking"
     {% if combined_ranking == 'xg' %}
     ,
-    "xG For (soccerstat)",
-    "xG Against (soccerstat)",
-    "xG For",
-    "xG Against",
+    "xG For (fbref)",
+    "xG For (understat)",
+    "xG Against (fbref)",
+    "xG Against (understat)",
     "Goals For",
     "Goals Against"
     {% endif %}
