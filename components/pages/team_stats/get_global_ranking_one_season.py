@@ -222,12 +222,13 @@ def set_plot_cumulative_points_plotly(df, chosen_comp, chosen_season, n_teams, g
                     y=df_club_exp['xP'],
                     mode='lines+markers',
                     name=f"{club} (Expected)",
-                    line=dict(dash='dot'),
+                    line=dict(color=club_colors[club], dash='dot'),
+                    marker=dict(color=club_colors[club]),
                     hovertemplate=(
                         f"<b>{club} (Expected)</b><br>" +
                         "Week: %{x}<br>" +
                         "xP: %{y}<br>" +
-                        "Diff Points: %{customdata[0]}<br>" +
+                        "Diff Points: %{customdata[0]:.2f}<br>" +
                         "Ranking: %{customdata[1]}<extra></extra>"
                     ),
                     customdata=df_club_exp[['Diff Points', 'Ranking']],
@@ -354,12 +355,13 @@ def set_plot_cumulative_points_per_match_plotly(df, chosen_comp, chosen_season, 
                     y=df_club_exp['xP/Match'],
                     mode='lines+markers',
                     name=f"{club} (Expected)",
-                    line=dict(dash='dot'),
+                    line=dict(color=club_colors[club], dash='dot'),
+                    marker=dict(color=club_colors[club]),
                     hovertemplate=(
                         f"<b>{club} (Expected)</b><br>" +
                         "Week: %{x}<br>" +
                         "xP/Match: %{y:.2f}<br>" +
-                        "Diff Points: %{customdata[0]}<br>" +
+                        "Diff Points: %{customdata[0]:.2f}<br>" +
                         "Ranking: %{customdata[1]}<extra></extra>"
                     ),
                     customdata=df_club_exp[['Diff Points', 'Ranking']],
