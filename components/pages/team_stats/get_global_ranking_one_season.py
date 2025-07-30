@@ -80,11 +80,12 @@ def get_global_ranking_one_season(db_conn):
 
     if chosen_season:
 
-        get_expected_points = st.checkbox(
-            key="global_ranking_one_season__xp",
-            label="Calculate Expected Points",
-            value=False
-        )
+        # get_expected_points = st.checkbox(
+        #     key="global_ranking_one_season__xp",
+        #     label="Calculate Expected Points",
+        #     value=False
+        # )
+        get_expected_points = None
 
         teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
         n_teams = len(teams)
@@ -340,35 +341,35 @@ def set_plot_cumulative_points_per_match_plotly(df, chosen_comp, chosen_season, 
 
     data = actual_traces
 
-    if get_expected_points:
-        df_expected = df[df["Partition"].notna()].copy()
-        df_expected["Week"] = df_expected["Partition"]
+    # if get_expected_points:
+    #     df_expected = df[df["Partition"].notna()].copy()
+    #     df_expected["Week"] = df_expected["Partition"]
 
-        expected_traces = []
-        for club in clubs:
-            df_club_exp = df_expected[df_expected['Club'] == club].sort_values('Week')
-            if df_club_exp.empty:
-                continue
-            expected_traces.append(
-                go.Scatter(
-                    x=df_club_exp['Week'],
-                    y=df_club_exp['xP/Match'],
-                    mode='lines+markers',
-                    name=f"{club} (Expected)",
-                    line=dict(color=club_colors[club], dash='dot'),
-                    marker=dict(color=club_colors[club]),
-                    hovertemplate=(
-                        f"<b>{club} (Expected)</b><br>" +
-                        "Week: %{x}<br>" +
-                        "xP/Match: %{y:.2f}<br>" +
-                        "Diff Points: %{customdata[0]:.2f}<br>" +
-                        "Ranking: %{customdata[1]}<extra></extra>"
-                    ),
-                    customdata=df_club_exp[['Diff Points', 'Ranking']],
-                    showlegend=True
-                )
-            )
-        data += expected_traces
+    #     expected_traces = []
+    #     for club in clubs:
+    #         df_club_exp = df_expected[df_expected['Club'] == club].sort_values('Week')
+    #         if df_club_exp.empty:
+    #             continue
+    #         expected_traces.append(
+    #             go.Scatter(
+    #                 x=df_club_exp['Week'],
+    #                 y=df_club_exp['xP/Match'],
+    #                 mode='lines+markers',
+    #                 name=f"{club} (Expected)",
+    #                 line=dict(color=club_colors[club], dash='dot'),
+    #                 marker=dict(color=club_colors[club]),
+    #                 hovertemplate=(
+    #                     f"<b>{club} (Expected)</b><br>" +
+    #                     "Week: %{x}<br>" +
+    #                     "xP/Match: %{y:.2f}<br>" +
+    #                     "Diff Points: %{customdata[0]:.2f}<br>" +
+    #                     "Ranking: %{customdata[1]}<extra></extra>"
+    #                 ),
+    #                 customdata=df_club_exp[['Diff Points', 'Ranking']],
+    #                 showlegend=True
+    #             )
+    #         )
+    #     data += expected_traces
 
     layout = go.Layout(
         title=f"Actual and Expected evolution of points per match - {chosen_comp} ({chosen_season})",
