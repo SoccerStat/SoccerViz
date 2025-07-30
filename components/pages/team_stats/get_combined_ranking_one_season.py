@@ -1,6 +1,6 @@
 import streamlit as st
-import altair as alt
 import pandas as pd
+import altair as alt
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -35,6 +35,33 @@ def get_combined_ranking(
     )
 
     return execute_query(_db_conn, sql_file)
+
+@st.cache_data(show_spinner=False)
+def get_combined_ranking_enriched(
+        _db_conn,
+        chosen_comp,
+        chosen_season,
+        combined_ranking,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date
+):
+    sql_file = read_sql_file(
+        file_name="components/queries/team_stats/get_combined_ranking_one_season_enriched.sql",
+        name_comp=chosen_comp,
+        season=chosen_season,
+        combined_ranking=combined_ranking.lower(),
+        first_week=first_week,
+        last_week=last_week,
+        first_date=first_date,
+        last_date=last_date,
+        in_side=side.lower()
+    )
+
+    return execute_query(_db_conn, sql_file)
+
 
 def get_combined_ranking_one_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
@@ -152,6 +179,7 @@ def get_combined_ranking_one_season(db_conn):
                 df = get_combined_outcomes(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
             elif combined_ranking == "xG":
                 df = get_combined_xgs(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
+
             else:
                 df = pd.DataFrame()
 
@@ -423,7 +451,7 @@ def get_combined_xgs(
         first_date,
         last_date
 ):
-    df = get_combined_ranking(
+    df = get_combined_ranking_enriched(
         db_conn,
         chosen_comp,
         chosen_season,

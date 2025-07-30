@@ -9,14 +9,6 @@ SELECT
     "Shots Against",
     "Shots on Target For",
     "Shots on Target Against"
-    {% elif combined_ranking == 'xg' %}
-    ,
-    "xG For (soccerstat)",
-    "xG Against (soccerstat)",
-    "xG For",
-    "xG Against",
-    "Goals For",
-    "Goals Against"
     {% elif combined_ranking == 'outcomes' %}
     ,
     "Wins",
@@ -28,7 +20,7 @@ SELECT
     "Att Passes",
     "Succ Passes Rate"
     {% endif %}
-FROM analytics.all_teams_rankings_enriched(
+FROM analytics.all_teams_rankings(
     in_comp    := '{{ name_comp }}',
     in_seasons := ARRAY['{{ season }}'],
     first_week := {{ first_week }},
