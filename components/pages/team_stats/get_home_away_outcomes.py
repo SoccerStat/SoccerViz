@@ -108,7 +108,7 @@ def get_home_away_outcomes_plotly(db_conn):
         color='Side',
         color_discrete_map=color_map_outcomes,
         barmode='group',
-        title='Match Outcomes',
+        title='Outcomes',
         hover_data={'Ratio': ':.2f'}
     )
     fig_outcomes.update_yaxes(title_text="Number of Matches")
