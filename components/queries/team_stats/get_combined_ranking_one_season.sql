@@ -18,6 +18,7 @@ SELECT
     ,
     "Succ Passes",
     "Att Passes",
+    "Succ Passes" + "Att Passes" as "Total Passes",
     "Succ Passes Rate"
     {% endif %}
 FROM analytics.all_teams_rankings(

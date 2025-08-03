@@ -501,17 +501,23 @@ def get_combined_xgs(
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='Goals'), "Ranking"]
     )
 
-    expected_fbref = alt.Chart(xg_fbref_data).mark_tick(thickness=4, size=20, color="green").encode(
+    expected_fbref = alt.Chart(xg_fbref_data).mark_tick(thickness=4, size=20).encode(
         x=alt.X('Value:Q'),
         y=alt.Y('Club:N', sort=club_order),
-
+        color=alt.Color('Category:N',
+            scale=alt.Scale(domain=["xG (fbref)", "xG (understat)"], range=['green', 'black']),
+            legend=alt.Legend(title="xG Source")
+        ),
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
     )
 
-    expected_understat = alt.Chart(xg_understat_data).mark_tick(thickness=4, size=20, color="black").encode(
+    expected_understat = alt.Chart(xg_understat_data).mark_tick(thickness=4, size=20).encode(
         x=alt.X('Value:Q'),
         y=alt.Y('Club:N', sort=club_order),
-
+        color=alt.Color('Category:N',
+            scale=alt.Scale(domain=["xG (fbref)", "xG (understat)"], range=['green', 'black']),
+            legend=None
+        ),
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
     )
 
@@ -520,6 +526,9 @@ def get_combined_xgs(
     )
 
     final_chart = (goals + expected_fbref + expected_understat + rule).resolve_scale(
+        y='shared'
+    ).resolve_scale(
+        color='independent',
         y='shared'
     ).properties(
         title="xG — For vs Against",
