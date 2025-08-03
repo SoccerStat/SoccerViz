@@ -11,6 +11,14 @@ def get_balance(_db_conn):
     sql_file = read_sql_file("components/queries/team_stats/get_home_away_balance.sql",)
     return execute_query(_db_conn, sql_file)
 
+def compute_ratio(row):
+    if row["Side"] == "Home Goals":
+        return row["% Home Goals"]
+    elif row["Side"] == "Away Goals":
+        return row["% Away Goals"]
+    else:
+        return 1
+
 def get_home_away_outcomes(db_conn):
     df = get_balance(db_conn)
 
@@ -82,12 +90,14 @@ def get_home_away_outcomes_plotly(db_conn):
     df_outcomes_melt['Ratio'] = (df_outcomes_melt['Count'] / df_outcomes_melt['Matches']) * 100
 
     df_goals_melt = df.melt(
-        id_vars=["Competition", "Matches"],
+        id_vars=["Competition", "Matches", "% Home Goals", "% Away Goals"],
         value_vars=["Home Goals", "Total Goals", "Away Goals"],
         var_name="Side",
         value_name="Count"
     )
     df_goals_melt['Avg'] = (df_goals_melt['Count'] / df_goals_melt['Matches'])
+    df_goals_melt['Ratio'] = df_goals_melt.apply(compute_ratio, axis=1)
+    st.dataframe(df_goals_melt)
 
     color_map_outcomes = {
         "Home Wins": '#1f77b4',
@@ -122,7 +132,7 @@ def get_home_away_outcomes_plotly(db_conn):
         color_discrete_map=color_map_goals,
         barmode='group',
         title='Goals',
-        hover_data={'Avg': ':.2f'}
+        hover_data={'Avg': ':.2f', 'Ratio': ':.2f'}
     )
     fig_goals.update_yaxes(title_text="Number of Goals")
 

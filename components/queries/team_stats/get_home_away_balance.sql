@@ -16,7 +16,9 @@ select
     "Draws",
     "Away Wins",
     "Home Goals",
+    "Home Goals" / ("Home Goals" + "Away Goals")::numeric as "% Home Goals",
     "Home Goals" + "Away Goals" as "Total Goals",
+    "Away Goals" / ("Home Goals" + "Away Goals")::numeric as "% Away Goals",
     "Away Goals",
     "Matches"
 from sums
