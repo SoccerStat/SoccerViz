@@ -7,6 +7,12 @@ with total_minutes_of_team as (
     )
     where "Club" = '{{ name_team }}'
 ),
+players_performance as (
+    select id_comp, id_team, id_player, home_match, away_match, home_minutes, away_minutes, round
+    from analytics.staging_players_performance
+    where competition = '{{ chosen_comp }}'
+    and season = '{{ chosen_season }}'
+),
 club as (
     select id
     from upper.club
@@ -15,15 +21,18 @@ club as (
 player_stats as (
     select
         p.name,
-        analytics.set_bigint_stat(sum(home_minutes), sum(away_minutes), '{{ in_side }}') as "Minutes",
-        analytics.set_bigint_stat(sum(home_match), sum(home_match), '{{ in_side }}') as "Matches"
-    from analytics.staging_players_performance pp
+        analytics.set_bigint_stat(sum(home_match), sum(away_match), '{{ in_side }}') as "Matches",
+        analytics.set_bigint_stat(sum(home_minutes), sum(away_minutes), '{{ in_side }}') as "Minutes"
+    from players_performance pp
     join upper.player p
     on pp.id_player = p.id
     join club c
     on pp.id_team = pp.id_comp || '_' || c.id
-    where competition = '{{ chosen_comp }}'
-    and season = '{{ chosen_season }}'
+    where case
+        when '{{ in_side }}' = 'neutral' then (round = 'Final')
+        when '{{ in_side }}' in ('home', 'away', 'both') then (round is null or round != 'Final')
+        else true
+    end
     group by p.name
 ),
 total_players as (
@@ -32,9 +41,10 @@ total_players as (
 )
 select
     ps.name as "Player",
+    ps."Matches",
     ps."Minutes",
-    "Matches",
-    round(ps."Minutes"::numeric/tmot."Minutes"::numeric, 3) as "% of minutes played",
+    round(ps."Minutes"::numeric / 90.0, {{ r }}) as "90s",
+    round(ps."Minutes"::numeric / tmot."Minutes"::numeric, {{ r }}) as "% of minutes played",
     tp."Total number of players used"
 from player_stats ps
 join total_minutes_of_team tmot

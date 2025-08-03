@@ -10,14 +10,15 @@ from utils.file_helper.reader import read_sql_file
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP
 
 @st.cache_data(show_spinner=False)
-def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, chosen_side):
+def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, chosen_side, round=3):
     sql_file = read_sql_file(
         file_name="components/queries/team_stats/get_players_with_given_rate_minutes.sql",
         chosen_comp=chosen_comp,
         chosen_season=chosen_season,
         name_team=chosen_team,
         rate=chosen_rate,
-        in_side=chosen_side.lower()
+        in_side=chosen_side.lower(),
+        r=round
     )
 
     return execute_query(_db_conn, sql_file)
