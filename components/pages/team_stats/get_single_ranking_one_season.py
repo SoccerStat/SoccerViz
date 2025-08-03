@@ -153,23 +153,44 @@ def get_single_ranking_one_season(db_conn):
                 last_date
             )
 
+            ordered_clubs = df.sort_values(by=f"{chosen_ranking} Ranking", ascending=True)['Club'].tolist()
+
+            if chosen_ranking == "Points":
+                tooltip = ["Club", chosen_ranking, "Global Ranking"]
+            else:
+                tooltip = ["Club", chosen_ranking, "Global Ranking", f"{chosen_ranking} Ranking"]
+
             bars = alt.Chart(df).mark_bar().encode(
                 x=chosen_ranking,
-                y=alt.Y('Club', sort='-x'),
-                tooltip=["Club", chosen_ranking, "Ranking"]
+                y=alt.Y('Club', sort=ordered_clubs),
+                tooltip=tooltip
             )
 
-            text = alt.Chart(df).mark_text(
+            text_pos = alt.Chart(df).mark_text(
                 align='left',
                 baseline='middle',
                 dx=3
             ).encode(
                 x=chosen_ranking,
-                y=alt.Y('Club', sort='-x'),
+                y=alt.Y('Club', sort=ordered_clubs),
                 text=chosen_ranking
+            ).transform_filter(
+                alt.datum[chosen_ranking] >= 0
             )
 
-            chart = (bars + text)
+            text_neg = alt.Chart(df).mark_text(
+                align='right',
+                baseline='middle',
+                dx=-3
+            ).encode(
+                x=chosen_ranking,
+                y=alt.Y('Club', sort=ordered_clubs),
+                text=chosen_ranking
+            ).transform_filter(
+                alt.datum[chosen_ranking] < 0
+            )
+
+            chart = alt.layer(bars, text_pos, text_neg)
 
             st.altair_chart(chart, use_container_width=True)
 

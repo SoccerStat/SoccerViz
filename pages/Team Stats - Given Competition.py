@@ -5,6 +5,7 @@ from components.pages.team_stats.get_combined_ranking_one_season import get_comb
 from components.pages.team_stats.get_global_ranking_by_season import get_global_ranking_by_season
 from components.pages.team_stats.get_global_ranking_many_seasons import get_global_ranking_many_seasons
 from components.pages.team_stats.get_global_ranking_one_season import get_global_ranking_one_season
+from components.pages.team_stats.get_ranking_one_season import get_ranking_one_season
 from components.pages.team_stats.get_single_ranking_one_season import get_single_ranking_one_season
 from components.pages.team_stats.get_stats_one_team import get_stats_one_team
 from components.pages.team_stats.get_team_performance_against_top_and_bottom import get_team_performance_against_top_and_bottom
@@ -35,10 +36,15 @@ class TeamStatsPage(BasePage):
 
         self.set_sub_sub_title("Moving Ranking")
 
+        # st.divider()
+
+        # self.set_sub_sub_title("Global ranking over the season")
+        # get_global_ranking_one_season(db_conn)
+
         st.divider()
 
-        self.set_sub_sub_title("Global ranking over the season")
-        get_global_ranking_one_season(db_conn)
+        self.set_sub_sub_title("Ranking over the season")
+        get_ranking_one_season(db_conn)
 
         st.divider()
         

@@ -209,6 +209,15 @@ TEAM_RANKINGS = [
  	"onTarget/Goals Conversion Rate Against",
 ]
 
+TEAM_STATS_RANKINGS_PLOTTABLE = [
+    "Attendance",
+    "Points",
+    "Goals For",
+    "Goals Against",
+    "Goals Diff",
+    "Clean Sheets",
+]
+
 DUAL_STATS = [
     "Matches",
     "Wins",
