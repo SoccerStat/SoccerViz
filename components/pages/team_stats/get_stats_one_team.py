@@ -1,5 +1,4 @@
 import streamlit as st
-from streamlit_searchbox import st_searchbox
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -10,6 +9,18 @@ from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP
 
+@st.cache_data(show_spinner=False)
+def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, chosen_side):
+    sql_file = read_sql_file(
+        file_name="components/queries/team_stats/get_players_with_given_rate_minutes.sql",
+        chosen_comp=chosen_comp,
+        chosen_season=chosen_season,
+        name_team=chosen_team,
+        rate=chosen_rate,
+        in_side=chosen_side.lower()
+    )
+
+    return execute_query(_db_conn, sql_file)
 
 @st.cache_data(show_spinner=False)
 def get_stats_of_team(
@@ -195,6 +206,27 @@ def get_stats_one_team(db_conn):
         st.dataframe(team_stats_third_row, hide_index=True)
         st.dataframe(team_stats_fourth_row, hide_index=True)
 
+        set_sub_sub_sub_title("% of players used")
+
+        col, _ = st.columns(2)
+        with col:
+            chosen_rate = st.slider(
+                key="rate_players_one_season__rate",
+                label="% of minutes played",
+                min_value=0,
+                max_value=100,
+                value=100
+            )
+
+        df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, side)
+        st.dataframe(df.drop("Total number of players used", axis=1))
+        if not df.empty:
+            n_players = df.shape[0]
+            n_players_of_team = int(df["Total number of players used"].iloc[0])
+
+            st.write(f"{n_players} players that have played at least {int(chosen_rate)}%"
+                     f" of the possible minutes played (or {round(100 * n_players / n_players_of_team, 2)}%)")
+
         set_sub_sub_sub_title("Selected matches")
 
         team_matches = get_matches_of_team(
@@ -215,4 +247,3 @@ def get_stats_one_team(db_conn):
                 team_matches = team_matches.drop("Round", axis=1)
 
         st.dataframe(team_matches, hide_index=True)
-

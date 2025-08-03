@@ -4,7 +4,6 @@ from components.connection import get_connection
 from components.pages.team_stats.get_combined_ranking_one_season import get_combined_ranking_one_season
 from components.pages.team_stats.get_global_ranking_by_season import get_global_ranking_by_season
 from components.pages.team_stats.get_global_ranking_many_seasons import get_global_ranking_many_seasons
-from components.pages.team_stats.get_global_ranking_one_season import get_global_ranking_one_season
 from components.pages.team_stats.get_ranking_one_season import get_ranking_one_season
 from components.pages.team_stats.get_single_ranking_one_season import get_single_ranking_one_season
 from components.pages.team_stats.get_stats_one_team import get_stats_one_team
@@ -43,6 +42,11 @@ class TeamStatsPage(BasePage):
 
         st.divider()
 
+        self.set_sub_sub_title("Teams Performance against Top/Bottom teams")
+        get_team_performance_against_top_and_bottom(db_conn)
+
+        st.divider()
+
         self.set_sub_sub_title("Ranking over the season")
         get_ranking_one_season(db_conn)
 
@@ -55,11 +59,6 @@ class TeamStatsPage(BasePage):
 
         self.set_sub_sub_title("Global ranking over each season")
         get_global_ranking_by_season(db_conn)
-
-        st.divider()
-
-        self.set_sub_sub_title("Teams Performance against Top/Bottom teams")
-        get_team_performance_against_top_and_bottom(db_conn)
 
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGES)
