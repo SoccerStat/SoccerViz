@@ -2,6 +2,7 @@ SELECT
     round as "Round",
     week as "Week",
     date as "Date",
+    TO_CHAR(time::time, 'HH24:MI') as "Time",
     CASE
         WHEN played_home THEN club.name
         ELSE opponent.name
