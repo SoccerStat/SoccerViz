@@ -200,10 +200,12 @@ TEAM_RANKINGS = [
     "Att Passes",
     "Succ Passes Rate",
 
-    "Shots Conversion Rate For",
-    "Shots Conversion Rate Against",
-    "Shots on Target Conversion Rate For",
-    "Shots on Target Conversion Rate Against"
+    "Shots/onTarget Conversion Rate For",
+ 	"Shots/onTarget Conversion Rate Against",
+ 	"Shots/Goals Conversion Rate For",
+ 	"Shots/Goals Conversion Rate Against",
+ 	"onTarget/Goals Conversion Rate For",
+ 	"onTarget/Goals Conversion Rate Against",
 ]
 
 DUAL_STATS = [

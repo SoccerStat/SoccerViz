@@ -8,10 +8,12 @@ SELECT
     "Goals Against" as "GA",
     "Goals Diff" as "GD",
     "Succ Passes Rate" as "% Succ Passes",
-    "Shots Conversion Rate For" as "Shots For CR",
-    "Shots Conversion Rate Against" as "Shots Against CR",
-    "Shots on Target Conversion Rate For" as "On Target For CR",
-    "Shots on Target Conversion Rate Against" as "On Target Against CR"
+    "Shots/onTarget Conversion Rate For" as "Shots/onTarget For CR",
+ 	"Shots/onTarget Conversion Rate Against" as "Shots/onTarget Against CR",
+ 	"Shots/Goals Conversion Rate For" as "Shots/Goals For CR",
+ 	"Shots/Goals Conversion Rate Against" as "Shots/Goals Against CR",
+ 	"onTarget/Goals Conversion Rate For" as "onTarget/Goals For CR",
+ 	"onTarget/Goals Conversion Rate Against" as "onTarget/Goals Against CR"
 FROM analytics.all_teams_rankings(
     in_comp := '{{ name_comp }}',
     in_seasons := array['{{ season }}'],
