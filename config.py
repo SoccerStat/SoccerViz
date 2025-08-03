@@ -10,6 +10,7 @@ HOME_PAGE = PREFIX_PAGE
 BASIC_STATS_PAGE = "Basic Stats"
 MONITORING_PAGE = "Monitoring"
 ANOMALY_DETECTION_PAGE = "Anomaly Detection"
+TEAM_STATS_PAGES = "Team Stats"
 TEAM_STATS_ALL_PAGE = "Team Stats - All Competitions"
 TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competitions"
 PLAYER_STATS_PAGE = "Player Stats"

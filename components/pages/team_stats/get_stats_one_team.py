@@ -211,7 +211,8 @@ def get_stats_one_team(db_conn):
         )
 
         if comps_and_kind[chosen_comp] == KIND_CHP:
-            team_matches = team_matches.drop("Round", axis=1)
+            if not team_matches.empty:
+                team_matches = team_matches.drop("Round", axis=1)
 
         st.dataframe(team_matches, hide_index=True)
 
