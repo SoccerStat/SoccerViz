@@ -18,7 +18,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/over_complete_seasons/get_ranking_many_seasons.sql",
+            file_name="components/queries/team_stats/by_competition/over_complete_seasons/get_ranking_many_seasons.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -177,7 +177,7 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
                 marker=dict(color=club_colors[club]),
                 text=df_club['Ranking'].astype(str),
                 textposition='top center',
-                textfont=dict(color=club_colors[club]),  # <- couleur texte identique aux points
+                textfont=dict(color=club_colors[club]),
                 hovertemplate=(
                         f"<b>{club}</b><br>" +
                         "Season: %{x}<br>" +
@@ -189,7 +189,7 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
         )
 
     layout = go.Layout(
-        title=f"Number of points over seasons - {chosen_comp}",
+        title=f"Number of points over seasons - {chosen_comp}<br><sup>With global ranking</sup>",
         xaxis=dict(title='Season', type='category', tickangle=270),
         yaxis=dict(title='Points'),
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,

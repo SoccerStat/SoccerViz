@@ -22,7 +22,7 @@ def get_one_ranking(
         last_date
 ):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/single/get_single_ranking_one_season.sql",
+        file_name="components/queries/team_stats/by_competition/single/get_single_ranking_one_season.sql",
         name_comp=chosen_comp,
         season=chosen_season,
         ranking=chosen_ranking,

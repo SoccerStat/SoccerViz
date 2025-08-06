@@ -13,13 +13,13 @@ class TeamStatsPage(BasePage):
 
         self.set_sub_title("All competitions and seasons")
 
-        self.set_sub_sub_title("Dual history")
-        get_dual_history(db_conn)
+        with self.set_expander("Dual history"):
+            self.set_sub_sub_title("Dual history")
+            get_dual_history(db_conn)
 
-        st.divider()
-
-        self.set_sub_sub_title("Home / Away Balance")
-        get_home_away_outcomes_plotly(db_conn)
+        with self.set_expander("Home / Away Balance"):
+            self.set_sub_sub_title("Home / Away Balance")
+            get_home_away_outcomes_plotly(db_conn)
 
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGES)

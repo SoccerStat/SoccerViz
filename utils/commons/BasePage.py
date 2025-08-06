@@ -22,6 +22,9 @@ class BasePage(ABC):
     def set_page_title(self):
         set_main_title(self.page_title)
 
+    def set_expander(self, label):
+        return st.expander(f"**{label}**")
+
     def set_sub_title(self, name):
         set_sub_title(name)
 

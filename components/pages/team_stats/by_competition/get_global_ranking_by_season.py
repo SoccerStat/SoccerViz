@@ -20,7 +20,7 @@ def ranking_by_chp_by_week_of_season(_db_conn, chosen_ranking, chosen_comp, seas
     nb_weeks = 2 * (len(teams) - 1)
     for week in range(1, nb_weeks + 1):
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/over_many_seasons/get_ranking_by_season.sql",
+            file_name="components/queries/team_stats/by_competition/over_many_seasons/get_ranking_by_season.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -85,7 +85,7 @@ def get_global_ranking_by_season(db_conn):
 
         if chosen_teams:
 
-            set_plot(df, chosen_comp, chosen_teams, n_teams)
+            # set_plot(df, chosen_comp, chosen_teams, n_teams)
             set_plot_plotly(df, chosen_comp, chosen_teams, n_teams)
 
             csv = df.to_csv(index=False, sep='|', decimal=',')
@@ -160,7 +160,7 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
         )
 
     layout = go.Layout(
-        title=f"Number of points over weeks by season - {chosen_comp}",
+        title=f"Number of points over weeks by season - {chosen_comp}<br><sup>With global ranking</sup>",
         xaxis=dict(title='Week', type='category', tickmode='linear'),
         yaxis=dict(title='Points'),
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,

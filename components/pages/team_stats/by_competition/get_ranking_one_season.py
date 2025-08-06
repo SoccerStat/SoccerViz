@@ -18,7 +18,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
     
     for j in range(1, nb_chp_weeks + 1):
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/over_one_season/get_cumulative_ranking_one_season.sql",
+            file_name="components/queries/team_stats/by_competition/over_one_season/get_cumulative_ranking_one_season.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=chosen_season,
@@ -154,12 +154,15 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
             go.Scatter(
                 x=df_club['Week'],
                 y=df_club[chosen_ranking],
-                mode='lines+markers',
+                mode='lines+markers+text',
                 name=club,
+                text=df_club['Global Ranking'].astype(str),
+                textposition='top center',
+                textfont=dict(color=club_colors[club]),
                 hovertemplate=(
                     f"<b>{club}</b><br>" +
-                    "Week: %{x}<br>" +
-                    "Global Ranking: %{customdata[0]}<br><br>" +
+                    "Week: %{x}<br><br>" +
+                    # "Global Ranking: %{customdata[0]}<br><br>" +
                     f"{chosen_ranking}: %{{y}}<br>" +
                     f"{chosen_ranking} Ranking: %{{customdata[1]}}<extra></extra>"
                 ),
@@ -174,7 +177,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
 
     # Layout
     layout = go.Layout(
-        title=f"Evolution of {chosen_ranking} - {chosen_comp} ({chosen_season})",
+        title=f"Evolution of {chosen_ranking} - {chosen_comp} ({chosen_season})<br><sup>With global ranking</sup>",
         xaxis=dict(title='Week', type='category'),
         yaxis=dict(title=chosen_ranking),
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,
@@ -206,12 +209,15 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_season, chosen
             go.Scatter(
                 x=df_club['Week'],
                 y=df_club[f'{chosen_ranking}/Match'],
-                mode='lines+markers',
+                mode='lines+markers+text',
                 name=club,
+                text=df_club['Global Ranking'].astype(str),
+                textposition='top center',
+                textfont=dict(color=club_colors[club]),
                 hovertemplate=(
                     f"<b>{club}</b><br>" +
-                    "Week: %{x}<br>" +
-                    "Global Ranking: %{customdata[0]}<br><br>" +
+                    "Week: %{x}<br><br>" +
+                    # "Global Ranking: %{customdata[0]}<br><br>" +
                     f"{chosen_ranking}/Match: %{{y:.2f}}<br>" +
                     f"{chosen_ranking} Ranking: %{{customdata[1]}}<extra></extra>"
                 ),
@@ -225,7 +231,7 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_season, chosen
     data = actual_traces
 
     layout = go.Layout(
-        title=f"Actual evolution of {chosen_ranking} per match - {chosen_comp} ({chosen_season})",
+        title=f"Actual evolution of {chosen_ranking} per match - {chosen_comp} ({chosen_season})<br><sup>With global ranking</sup>",
         xaxis=dict(
             title='Week',
             type='category',
