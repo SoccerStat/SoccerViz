@@ -15,7 +15,7 @@ from config import COMPETITIONS, DUAL_STATS
 @st.cache_data(show_spinner=False)
 def get_history(_db_conn, teamA, teamB, all_comps, all_seasons, side):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_dual_history.sql",
+        "components/queries/team_stats/all_competitions/dual/get_dual_history.sql",
         teamA=teamA,
         teamB=teamB,
         comps=', '.join([f"'{comp}'" for comp in all_comps]),
@@ -28,7 +28,7 @@ def get_history(_db_conn, teamA, teamB, all_comps, all_seasons, side):
 @st.cache_data(show_spinner=False)
 def get_history_matches(_db_conn, teamA, teamB, all_comps, all_seasons, side):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_dual_history_matches.sql",
+        "components/queries/team_stats/all_competitions/dual/get_dual_history_matches.sql",
         teamA=teamA,
         teamB=teamB,
         comps=', '.join([f"'{comp}'" for comp in all_comps]),

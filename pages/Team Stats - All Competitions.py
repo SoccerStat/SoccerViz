@@ -1,8 +1,8 @@
 import streamlit as st
 
 from components.connection import get_connection
-from components.pages.team_stats.get_dual_history import get_dual_history
-from components.pages.team_stats.get_home_away_outcomes import get_home_away_outcomes_plotly
+from components.pages.team_stats.all_competitions.get_dual_history import get_dual_history
+from components.pages.team_stats.all_competitions.get_home_away_outcomes import get_home_away_outcomes_plotly
 from config import TEAM_STATS_PAGES
 from utils.commons.BasePage import BasePage
 

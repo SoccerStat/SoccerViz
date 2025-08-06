@@ -18,7 +18,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/get_ranking_many_seasons.sql",
+            file_name="components/queries/team_stats/over_complete_seasons/get_ranking_many_seasons.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,

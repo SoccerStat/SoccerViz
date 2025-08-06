@@ -18,7 +18,7 @@ def get_all_teams(_db_conn):
 @st.cache_data(show_spinner=False)
 def get_teams_by_comp_by_season(_db_conn, name_comp, seasons):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_teams_by_comp_by_season.sql",
+        "components/queries/commons/get_teams_by_comp_by_season.sql",
         name_comp=name_comp,
         seasons=seasons,
     )

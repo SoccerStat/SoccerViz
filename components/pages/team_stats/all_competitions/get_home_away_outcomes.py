@@ -8,7 +8,7 @@ from utils.file_helper.reader import read_sql_file
 
 @st.cache_data(show_spinner=False)
 def get_balance(_db_conn):
-    sql_file = read_sql_file("components/queries/team_stats/get_home_away_balance.sql",)
+    sql_file = read_sql_file("components/queries/team_stats/all_competitions/balance/get_home_away_balance.sql",)
     return execute_query(_db_conn, sql_file)
 
 def compute_ratio(row):
@@ -97,7 +97,6 @@ def get_home_away_outcomes_plotly(db_conn):
     )
     df_goals_melt['Avg'] = (df_goals_melt['Count'] / df_goals_melt['Matches'])
     df_goals_melt['Ratio'] = df_goals_melt.apply(compute_ratio, axis=1)
-    st.dataframe(df_goals_melt)
 
     color_map_outcomes = {
         "Home Wins": '#1f77b4',

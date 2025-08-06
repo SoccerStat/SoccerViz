@@ -40,7 +40,7 @@ def expected_ranking_by_chp_week(_db_conn, chosen_comp, chosen_season, nb_chp_we
         if week > nb_chp_weeks:
             week = nb_chp_weeks
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/get_cumulative_expected_ranking_one_season.sql",
+            file_name="components/queries/team_stats/over_one_season/get_cumulative_expected_ranking_one_season.sql",
             name_comp=chosen_comp,
             season=chosen_season,
             week=week,

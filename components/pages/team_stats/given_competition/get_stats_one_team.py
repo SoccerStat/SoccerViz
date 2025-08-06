@@ -10,15 +10,15 @@ from utils.file_helper.reader import read_sql_file
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP
 
 @st.cache_data(show_spinner=False)
-def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, chosen_side, round=3):
+def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, chosen_side, r=3):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/get_players_with_given_rate_minutes.sql",
+        file_name="components/queries/team_stats/given_competition/one_team/get_players_with_given_rate_minutes.sql",
         chosen_comp=chosen_comp,
         chosen_season=chosen_season,
         name_team=chosen_team,
         rate=chosen_rate,
         in_side=chosen_side.lower(),
-        r=round
+        r=r
     )
 
     return execute_query(_db_conn, sql_file)
@@ -36,7 +36,7 @@ def get_stats_of_team(
         last_date
 ):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_one_team_stats.sql",
+        "components/queries/team_stats/given_competition/one_team/get_one_team_stats.sql",
         name_team=chosen_team,
         name_comp=chosen_comp,
         season=chosen_season,
@@ -63,7 +63,7 @@ def get_matches_of_team(
         kind_comp
 ):
     sql_file = read_sql_file(
-        "components/queries/team_stats/get_one_team_matches.sql",
+        "components/queries/team_stats/given_competition/one_team/get_one_team_matches.sql",
         name_team=chosen_team,
         name_comp=chosen_comp,
         season=chosen_season,
