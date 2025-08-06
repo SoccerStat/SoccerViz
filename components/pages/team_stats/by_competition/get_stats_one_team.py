@@ -77,7 +77,7 @@ def get_matches_of_team(
     return execute_query(_db_conn, sql_file)
 
 
-def get_stats_one_team(db_conn):
+def get_stats_and_matches_one_team(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
@@ -220,13 +220,18 @@ def get_stats_one_team(db_conn):
             )
 
         df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, side)
+        df['Age'] = df['Age'].astype(int)
         st.dataframe(df.drop("Total number of players used", axis=1))
         if not df.empty:
+            avg_age = df['Age'].mean()
+            st.write(f"Average age of the club: {int(avg_age)} years, {int((avg_age % 1) * 365)} days")
+
             n_players = df.shape[0]
             n_players_of_team = int(df["Total number of players used"].iloc[0])
 
             st.write(f"{n_players} players that have played at least {int(chosen_rate)}%"
-                     f" of the possible minutes played (or {round(100 * n_players / n_players_of_team, 2)}%)")
+                     f" of the possible minutes played "
+                     f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club that are involved in {chosen_comp})")
 
         set_sub_sub_sub_title("Selected matches")
 
