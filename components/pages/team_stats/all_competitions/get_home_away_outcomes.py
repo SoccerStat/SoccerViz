@@ -13,11 +13,11 @@ def get_balance(_db_conn):
 
 def compute_ratio(row):
     if row["Side"] == "Home Goals":
-        return row["% Home Goals"]
+        return row["% Home Goals"]*100
     elif row["Side"] == "Away Goals":
-        return row["% Away Goals"]
+        return row["% Away Goals"]*100
     else:
-        return 1
+        return 100
 
 def get_home_away_outcomes(db_conn):
     df = get_balance(db_conn)
@@ -80,24 +80,6 @@ def get_home_away_outcomes(db_conn):
 def get_home_away_outcomes_plotly(db_conn):
     df = get_balance(db_conn)
 
-    # Préparations comme avant
-    df_outcomes_melt = df.melt(
-        id_vars=["Competition", "Matches"],
-        value_vars=["Home Wins", "Draws", "Away Wins"],
-        var_name="Side",
-        value_name="Count"
-    )
-    df_outcomes_melt['Ratio'] = (df_outcomes_melt['Count'] / df_outcomes_melt['Matches']) * 100
-
-    df_goals_melt = df.melt(
-        id_vars=["Competition", "Matches", "% Home Goals", "% Away Goals"],
-        value_vars=["Home Goals", "Total Goals", "Away Goals"],
-        var_name="Side",
-        value_name="Count"
-    )
-    df_goals_melt['Avg'] = (df_goals_melt['Count'] / df_goals_melt['Matches'])
-    df_goals_melt['Ratio'] = df_goals_melt.apply(compute_ratio, axis=1)
-
     color_map_outcomes = {
         "Home Wins": '#1f77b4',
         "Draws": '#aec7e8',
@@ -109,6 +91,25 @@ def get_home_away_outcomes_plotly(db_conn):
         "Away Goals": 'orange'
     }
 
+    df_outcomes_melt = df.melt(
+        id_vars=["Competition", "Matches"],
+        value_vars=["Home Wins", "Draws", "Away Wins"],
+        var_name="Side",
+        value_name="Count"
+    )
+    df_outcomes_melt['Ratio'] = (df_outcomes_melt['Count'] / df_outcomes_melt['Matches']) * 100
+    df_outcomes_melt["Color"] = df_outcomes_melt["Side"].map(color_map_outcomes)
+
+    df_goals_melt = df.melt(
+        id_vars=["Competition", "Matches", "% Home Goals", "% Away Goals"],
+        value_vars=["Home Goals", "Total Goals", "Away Goals"],
+        var_name="Side",
+        value_name="Count"
+    )
+    df_goals_melt['Avg'] = (df_goals_melt['Count'] / df_goals_melt['Matches'])
+    df_goals_melt['Ratio'] = df_goals_melt.apply(compute_ratio, axis=1)
+    df_goals_melt["Color"] = df_goals_melt["Side"].map(color_map_goals)
+
     # Graphique outcomes
     fig_outcomes = px.bar(
         df_outcomes_melt,
@@ -118,7 +119,16 @@ def get_home_away_outcomes_plotly(db_conn):
         color_discrete_map=color_map_outcomes,
         barmode='group',
         title='Outcomes',
-        hover_data={'Ratio': ':.2f'}
+        hover_data={'Side': '', 'Ratio': ':.2f', 'Color': ''}
+    )
+
+    fig_outcomes.update_traces(
+        hovertemplate=(
+            "<b>%{x}</b><br><br>" +
+            "<span style='color:%{customdata[2]}'>⬤</span> %{customdata[0]}<br>"
+            "<b>Count</b> %{y}<br>" +
+            "<b>Ratio</b> %{customdata[1]:.2f}%<extra></extra>"
+        )
     )
     fig_outcomes.update_yaxes(title_text="Number of Matches")
 
@@ -131,7 +141,16 @@ def get_home_away_outcomes_plotly(db_conn):
         color_discrete_map=color_map_goals,
         barmode='group',
         title='Goals',
-        hover_data={'Avg': ':.2f', 'Ratio': ':.2f'}
+        hover_data={'Side': '', 'Avg': ':.2f', 'Ratio': ':.2f', 'Color': ''}
+    )
+    st.dataframe(df_goals_melt)
+    fig_goals.update_traces(
+        hovertemplate=(
+            "<b>%{x}</b><br><br>" +
+            "<span style='color:%{customdata[3]}'>⬤</span> %{customdata[0]}<br>" +
+            "<b>Avg</b> %{customdata[1]:.2f}<br>" +
+            "<b>Ratio</b> %{customdata[2]:.2f}%<extra></extra>"
+        )
     )
     fig_goals.update_yaxes(title_text="Number of Goals")
 
