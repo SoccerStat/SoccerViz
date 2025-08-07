@@ -222,6 +222,7 @@ def get_stats_and_matches_one_team(db_conn):
         df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, side)
         avg_age = df['Age'].mean()
         df['Age'] = df['Age'].astype(int)
+        df.index = range(1, len(df)+1)
         st.dataframe(df.drop("Total number of players used", axis=1))
 
         if not df.empty:

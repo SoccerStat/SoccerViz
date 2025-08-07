@@ -1,4 +1,5 @@
 import streamlit as st
+import numpy as np
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
@@ -51,6 +52,7 @@ def get_players_by_team(db_conn):
         df_team = df_team[df_team["Matches"] >= chosen_nb_matches]
         avg_age = df_team['Age'].mean()
         df_team['Age'] = df_team['Age'].astype(int)
+        df_team.index = np.arange(1, len(df_team) + 1)
 
         st.dataframe(df_team.drop(["Total number of matches", "Total number of players used"], axis=1))
 
