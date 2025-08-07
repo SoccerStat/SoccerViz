@@ -1,17 +1,16 @@
-with total_minutes_of_team as (
-    select "Minutes"
+with total_matches_of_team as (
+    select sum("Matches") as "Matches"
     from analytics.all_teams_rankings(
         in_comp := 'all',
         in_seasons := array['{{ chosen_season }}'],
-        side := '{{ in_side }}'
+        side := 'all'
     )
     where "Club" = '{{ name_team }}'
 ),
 players_performance as (
-    select id_comp, id_team, id_player, home_match, away_match, home_minutes, away_minutes, round
+    select id_comp, id_team, id_player, home_match, away_match
     from analytics.staging_players_performance
-    where competition = 'all'
-    and season = '{{ chosen_season }}'
+    where season = '{{ chosen_season }}'
 ),
 club as (
     select id
@@ -21,19 +20,32 @@ club as (
 player_stats as (
     select
         p.name,
-        analytics.set_bigint_stat(sum(home_match), sum(away_match), '{{ in_side }}') as "Matches",
-        analytics.set_bigint_stat(sum(home_minutes), sum(away_minutes), '{{ in_side }}') as "Minutes"
+        COALESCE(
+            EXTRACT(
+                EPOCH FROM AGE(
+                    CASE
+                        WHEN '{{ chosen_season }}' = (
+                          CASE
+                            WHEN current_date < TO_DATE(EXTRACT(YEAR FROM current_date)::text || '-07-01', 'YYYY-MM-DD')
+                            THEN (EXTRACT(YEAR FROM current_date) - 1)::text || '_' || EXTRACT(YEAR FROM current_date)::text
+                            ELSE EXTRACT(YEAR FROM current_date)::text || '_' || (EXTRACT(YEAR FROM current_date) + 1)::text
+                          END
+                        )
+                        THEN current_date
+                        ELSE TO_DATE(split_part('{{ chosen_season }}', '_', 2) || '-06-30', 'YYYY-MM-DD')
+                    END,
+                    p.birth_date
+                )
+            ) / (365.25 * 24 * 60 * 60),
+            0.0
+        ) as "Age",
+        sum(home_match) + sum(away_match) as "Matches"
     from players_performance pp
     join upper.player p
     on pp.id_player = p.id
     join club c
     on pp.id_team = pp.id_comp || '_' || c.id
-    where case
-        when '{{ in_side }}' = 'neutral' then (round = 'Final')
-        when '{{ in_side }}' in ('home', 'away', 'both') then (round is null or round != 'Final')
-        else true
-    end
-    group by p.name
+    group by p.name, p.birth_date
 ),
 total_players as (
     select count(*) as "Total number of players used"
@@ -41,15 +53,13 @@ total_players as (
 )
 select
     ps.name as "Player",
+    ps."Age",
     ps."Matches",
-    ps."Minutes",
-    round(ps."Minutes"::numeric / 90.0, {{ r }}) as "90s",
-    round(ps."Minutes"::numeric / tmot."Minutes"::numeric, {{ r }}) as "% of minutes played",
+    tmot."Matches" as "Total number of matches",
     tp."Total number of players used"
 from player_stats ps
-join total_minutes_of_team tmot
+join total_matches_of_team tmot
 on true
 join total_players tp
 on true
-where ps."Minutes" >= (tmot."Minutes"::numeric * {{ rate }}/100)
-order by "Minutes" desc, "Matches" desc;
+order by "Matches" desc;

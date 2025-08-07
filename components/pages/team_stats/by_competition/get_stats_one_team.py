@@ -216,14 +216,15 @@ def get_stats_and_matches_one_team(db_conn):
                 label="% of minutes played",
                 min_value=0,
                 max_value=100,
-                value=100
+                value=0
             )
 
         df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, side)
+        avg_age = df['Age'].mean()
         df['Age'] = df['Age'].astype(int)
         st.dataframe(df.drop("Total number of players used", axis=1))
+
         if not df.empty:
-            avg_age = df['Age'].mean()
             st.write(f"Average age of the club: {int(avg_age)} years, {int((avg_age % 1) * 365)} days")
 
             n_players = df.shape[0]
