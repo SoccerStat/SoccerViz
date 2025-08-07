@@ -48,8 +48,8 @@ club as (
 ),
 player_stats as (
     select
+        pp.id_player,
         p.name,
-        array_agg(distinct mpp.position) as positions,
         COALESCE(
             EXTRACT(
                 EPOCH FROM AGE(
@@ -71,13 +71,11 @@ player_stats as (
         ) as age,
         sum(home_match) + sum(away_match) as matches
     from players_performance pp
-    join most_played_positions mpp
-	on pp.id_team = pp.id_comp || '_' || mpp.id_club and pp.id_player = mpp.id_player
     join upper.player p
     on pp.id_player = p.id
     join club c
     on pp.id_team = pp.id_comp || '_' || c.id
-    group by p.name, p.birth_date
+    group by pp.id_player, p.name, p.birth_date
 ),
 total_players as (
     select count(*) as "Total number of players used"
@@ -85,14 +83,17 @@ total_players as (
 )
 select
     ps.name as "Player",
-    ps.positions as "Positions",
+    array_agg(distinct mpp.position) as "Positions",
     ps.age as "Age",
     ps.matches as "Matches",
     tmot."Matches" as "Total number of matches",
     tp."Total number of players used"
 from player_stats ps
+join most_played_positions mpp
+on ps.id_player = mpp.id_player
 join total_matches_of_team tmot
 on true
 join total_players tp
 on true
+group by ps.name, ps.age, ps.matches, tmot."Matches", tp."Total number of players used"
 order by "Matches" desc;
