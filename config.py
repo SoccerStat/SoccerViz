@@ -12,7 +12,7 @@ MONITORING_PAGE = "Monitoring"
 ANOMALY_DETECTION_PAGE = "Anomaly Detection"
 TEAM_STATS_PAGES = "Team Stats"
 TEAM_STATS_ALL_PAGE = "Team Stats - All Competitions"
-TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competitions"
+TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competition"
 PLAYER_STATS_PAGE = "Player Stats"
 
 PAGES_CONFIG = [
