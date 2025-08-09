@@ -45,12 +45,15 @@ def get_birthday_boys(db_conn):
 
     df = df
     season_club_dict = (
-        df.groupby(["Id", "Player", "Age"])
-        .apply(lambda x: x.groupby("Club")["Season"].apply(list).to_dict(), include_groups=False)
+        df.groupby(["Id", "Player", "Position", "Age"])
+        .apply(
+            lambda x: x.groupby("Club")["Season"].apply(list).to_dict(),
+            include_groups=False
+        )
     )
 
     df["Season x Club"] = (df
-                           .set_index(["Id", "Player", "Age"])
+                           .set_index(["Id", "Player", "Position", "Age"])
                            .index.map(season_club_dict)
     )
     df["Season x Club"] = df["Season x Club"].apply(format_dict)

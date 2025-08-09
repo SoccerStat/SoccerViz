@@ -1,6 +1,7 @@
 select distinct
     p.id as "Id",
     p.name as "Player",
+    p.position as "Position",
     p.birth_country as "Birth country",
     EXTRACT(YEAR FROM AGE(current_date, p.birth_date)) as "Age",
     '{{ season }}' as "Season",
