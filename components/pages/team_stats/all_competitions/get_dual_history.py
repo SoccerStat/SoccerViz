@@ -22,6 +22,7 @@ def get_history(_db_conn, teamA, teamB, all_comps, all_seasons, side):
         seasons=', '.join([f"'{season[7:]}'" for season in all_seasons]),
         side=side
     )
+
     return execute_query(_db_conn, sql_file)
 
 

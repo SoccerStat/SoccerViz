@@ -23,7 +23,12 @@ players_performance as (
         id_comp,
         id_team,
         id_player,
-        array_cat(home_positions, away_positions) as positions,
+        --array_cat(home_positions, away_positions) as positions,
+        array(
+            select distinct number
+            from unnest(ARRAY[home_number, away_number]) as number
+            where number IS NOT NULL
+        ) as numbers,
         home_match,
         away_match,
         home_minutes,
@@ -42,6 +47,9 @@ player_stats as (
     select
         pp.id_player,
         p.name,
+        array(
+            select distinct unnest(array_agg(pp.numbers))
+        ) as "Numbers",
         array(
             select distinct unnest(array_agg(tps.positions))
         ) as "Positions",
@@ -89,6 +97,7 @@ total_players as (
 )
 select
     ps.name as "Player",
+    ps."Numbers",
     ps."Positions",
     ps."Position Groups",
     ps.age as "Age",
@@ -96,12 +105,11 @@ select
     ps.minutes as "Minutes",
     round(ps.minutes::numeric / 90.0, {{ r }}) as "90s",
     round(ps.minutes::numeric / tmot."Minutes"::numeric, {{ r }}) as "% of minutes played",
+    tmot."Minutes" as "Total Minutes played by the whole team",
     tp."Total number of players used"
 from player_stats ps
 join total_minutes_of_team tmot
 on true
 join total_players tp
 on true
-where ps.minutes >= (tmot."Minutes"::numeric * {{ rate }}/100)
---group by ps.name, ps.age, ps.matches, ps.minutes, tmot."Minutes", tp."Total number of players used", ps."Positions", ps."Position Groups"
 order by "Minutes" desc, "Matches" desc;

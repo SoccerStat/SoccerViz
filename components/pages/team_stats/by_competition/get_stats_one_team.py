@@ -10,13 +10,12 @@ from utils.file_helper.reader import read_sql_file
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP
 
 @st.cache_data(show_spinner=False)
-def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, chosen_side, r=3):
+def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_side, r=3):
     sql_file = read_sql_file(
         file_name="components/queries/team_stats/by_competition/one_team/get_players_with_given_rate_minutes.sql",
         chosen_comp=chosen_comp,
         chosen_season=chosen_season,
         name_team=chosen_team,
-        rate=chosen_rate,
         in_side=chosen_side.lower(),
         r=r
     )
@@ -209,6 +208,8 @@ def get_stats_and_matches_one_team(db_conn):
 
         set_sub_sub_sub_title("% of players used")
 
+        df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, side)
+
         col, _ = st.columns(2)
         with col:
             chosen_rate = st.slider(
@@ -219,11 +220,12 @@ def get_stats_and_matches_one_team(db_conn):
                 value=0
             )
 
-        df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, chosen_rate, side)
+        df = df[df["Minutes"] >= df["Total Minutes played by the whole team"] * chosen_rate / 100]
+
         avg_age = df['Age'].mean()
         df['Age'] = df['Age'].astype(int)
         df.index = range(1, len(df)+1)
-        st.dataframe(df.drop("Total number of players used", axis=1))
+        st.dataframe(df.drop(["Total number of players used", "Total Minutes played by the whole team"], axis=1))
 
         if not df.empty:
             st.write(f"Average age of the club: {int(avg_age)} years, {int((avg_age % 1) * 365)} days")

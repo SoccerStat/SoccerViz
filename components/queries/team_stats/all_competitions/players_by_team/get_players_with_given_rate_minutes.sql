@@ -23,7 +23,12 @@ players_performance as (
         id_comp,
         id_team,
         id_player,
-        array_cat(home_positions, away_positions) as positions,
+        --array_cat(home_positions, away_positions) as positions,
+        array(
+            select distinct number
+            from unnest(ARRAY[home_number, away_number]) as number
+            where number IS NOT NULL
+        ) as numbers,
         home_match,
         away_match
     from analytics.staging_players_performance
@@ -38,6 +43,9 @@ player_stats_and_positions as (
     select
         pp.id_player,
         p.name,
+        array(
+            select distinct unnest(array_agg(pp.numbers))
+        ) as "Numbers",
         array(
             select distinct unnest(array_agg(tps.positions))
         ) as "Positions",
@@ -79,6 +87,7 @@ total_players as (
 )
 select
     ps.name as "Player",
+    ps."Numbers",
     ps."Positions",
     ps."Position Groups",
     ps.age as "Age",
@@ -90,5 +99,4 @@ join total_matches_of_team tmot
 on true
 join total_players tp
 on true
---group by ps.name, ps.age, ps.matches, tmot."Matches", tp."Total number of players used", ps."Positions", ps."Position Groups"
 order by "Matches" desc;
