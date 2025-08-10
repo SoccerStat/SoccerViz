@@ -90,5 +90,5 @@ join total_matches_of_team tmot
 on true
 join total_players tp
 on true
-group by ps.name, ps.age, ps.matches, tmot."Matches", tp."Total number of players used", ps."Positions", ps."Position Groups"
+--group by ps.name, ps.age, ps.matches, tmot."Matches", tp."Total number of players used", ps."Positions", ps."Position Groups"
 order by "Matches" desc;
