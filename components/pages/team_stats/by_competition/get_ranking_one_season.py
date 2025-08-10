@@ -140,7 +140,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
         data = data + [max_line]
 
     # Points réels
-    df_actual = df[["Global Ranking", "Club", "Week", chosen_ranking, f"{chosen_ranking} Ranking"]].drop_duplicates()
+    df_actual = df[["Global Ranking", "Club", "Week", chosen_ranking, f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]].drop_duplicates()
     clubs = sorted(df_actual['Club'].unique())
     colors = px.colors.qualitative.D3  # palette qualitative de Plotly
 
@@ -161,12 +161,15 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
                 textfont=dict(color=club_colors[club]),
                 hovertemplate=(
                     f"<b>{club}</b><br>" +
-                    "Week: %{x}<br><br>" +
+                    "Week: %{x}<br>" +
+                    "Side: %{customdata[2]}<br>" +
+                    "Result: %{customdata[3]}<br>" +
+                    "Opponent: %{customdata[4]}<br><br>" +
                     # "Global Ranking: %{customdata[0]}<br><br>" +
-                    f"{chosen_ranking}: %{{y}}<br>" +
-                    f"{chosen_ranking} Ranking: %{{customdata[1]}}<extra></extra>"
+                    f"<b>{chosen_ranking}:</b> %{{y}}<br>" +
+                    f"<b>{chosen_ranking} Ranking:</b> %{{customdata[1]}}<extra></extra>"
                 ),
-                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking"]],
+                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]],
                 line=dict(color=club_colors[club]),
                 marker=dict(color=club_colors[club]),
                 showlegend=True,
@@ -191,7 +194,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
 
 
 def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_season, chosen_ranking, n_teams):
-    df_actual = df[["Global Ranking", "Club", "Week", f"{chosen_ranking}/Match", f"{chosen_ranking} Ranking"]].drop_duplicates()
+    df_actual = df[["Global Ranking", "Club", "Week", f"{chosen_ranking}/Match", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]].drop_duplicates()
 
     weeks = sorted(df['Week'].unique())
     # Ticks toutes les 2 semaines (ex: impaires)
@@ -216,12 +219,15 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_season, chosen
                 textfont=dict(color=club_colors[club]),
                 hovertemplate=(
                     f"<b>{club}</b><br>" +
-                    "Week: %{x}<br><br>" +
+                    "Week: %{x}<br>" +
+                    "Side: %{customdata[2]}<br>" +
+                    "Result: %{customdata[3]}<br>" +
+                    "Opponent: %{customdata[4]}<br><br>" +
                     # "Global Ranking: %{customdata[0]}<br><br>" +
-                    f"{chosen_ranking}/Match: %{{y:.2f}}<br>" +
-                    f"{chosen_ranking} Ranking: %{{customdata[1]}}<extra></extra>"
+                    f"<b>{chosen_ranking}/Match:</b> %{{y:.2f}}<br>" +
+                    f"<b>{chosen_ranking} Ranking:</b> %{{customdata[1]}}<extra></extra>"
                 ),
-                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking"]],
+                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]],
                 line=dict(color=club_colors[club]),
                 marker=dict(color=club_colors[club]),
                 showlegend=True

@@ -86,7 +86,8 @@ def get_global_ranking_by_season(db_conn):
         if chosen_teams:
 
             # set_plot(df, chosen_comp, chosen_teams, n_teams)
-            set_plot_plotly(df, chosen_comp, chosen_teams, n_teams)
+            set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams)
+            set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams)
 
             csv = df.to_csv(index=False, sep='|', decimal=',')
             st.download_button(
@@ -127,7 +128,7 @@ def set_plot(df, chosen_comp, chosen_teams, n_teams):
 
     st.altair_chart(chart, use_container_width=True)
 
-def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
+def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams):
     filtered_df = df[df["Club"].isin(chosen_teams)].copy()
     filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"].astype(str)
 
@@ -152,9 +153,63 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
                 hovertemplate=(
                     f"<b>{cs}</b><br>" +
                     "Week: %{x}<br>" +
-                    "Points: %{y}<br>" +
-                    "Ranking: %{text}<extra></extra>"
+                    "Side: %{customdata[0]}<br>" +
+                    "Result: %{customdata[1]}<br>" +
+                    "Opponent: %{customdata[2]}<br><br>" +
+                    "<b>Points:</b> %{y}<br>" +
+                    "<b>Ranking:</b> %{text}<extra></extra>"
                 ),
+                customdata=df_cs[["Side", "Result", "Opponent"]],
+                showlegend=True,
+            )
+        )
+
+    layout = go.Layout(
+        title=f"Number of points over weeks by season - {chosen_comp}<br><sup>With global ranking</sup>",
+        xaxis=dict(title='Week', type='category', tickmode='linear'),
+        yaxis=dict(title='Points'),
+        height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,
+        width=2000,
+        legend=dict(title='Club - Season', y=1, yanchor='top', x=1.05, xanchor='left'),
+        margin=dict(l=50, r=180, t=80, b=80)
+    )
+
+    fig = go.Figure(data=traces, layout=layout)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams):
+    filtered_df = df[df["Club"].isin(chosen_teams)].copy()
+    filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"].astype(str)
+
+    club_seasons = sorted(filtered_df['Club_Season'].unique())
+    colors = px.colors.qualitative.D3  # palette moderne
+    club_colors = {cs: colors[i % len(colors)] for i, cs in enumerate(club_seasons)}
+
+    traces = []
+    for cs in club_seasons:
+        df_cs = filtered_df[filtered_df['Club_Season'] == cs].sort_values('Week')
+        traces.append(
+            go.Scatter(
+                x=df_cs['Week'],
+                y=df_cs['Points/Match'],
+                mode='lines+markers+text',
+                name=cs,
+                line=dict(color=club_colors[cs]),
+                marker=dict(color=club_colors[cs]),
+                text=df_cs['Ranking'].astype(str),
+                textposition='top center',
+                textfont=dict(color=club_colors[cs]),
+                hovertemplate=(
+                    f"<b>{cs}</b><br>" +
+                    "Week: %{x}<br>" +
+                    "Side: %{customdata[0]}<br>" +
+                    "Result: %{customdata[1]}<br>" +
+                    "Opponent: %{customdata[2]}<br><br>" +
+                    f"<b>Points/Match:</b> %{{y:.2f}}<br>" +
+                    "<b>Ranking:</b> %{text}<extra></extra>"
+                ),
+                customdata=df_cs[["Side", "Result", "Opponent"]],
                 showlegend=True,
             )
         )
