@@ -80,8 +80,11 @@ def get_global_ranking_by_season(db_conn):
         chosen_teams = st.multiselect(
             key="global_ranking_by_season__teams",
             label="Choose teams...",
-            options=teams
+            options=["All"] + teams
         )
+
+        if 'All' in chosen_teams:
+            chosen_teams = teams
 
         if chosen_teams:
 

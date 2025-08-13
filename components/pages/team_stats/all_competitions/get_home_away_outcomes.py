@@ -143,7 +143,7 @@ def get_home_away_outcomes_plotly(db_conn):
         title='Goals',
         hover_data={'Side': '', 'Avg': ':.2f', 'Ratio': ':.2f', 'Color': ''}
     )
-    st.dataframe(df_goals_melt)
+
     fig_goals.update_traces(
         hovertemplate=(
             "<b>%{x}</b><br><br>" +
