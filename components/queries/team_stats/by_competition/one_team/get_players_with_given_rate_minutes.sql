@@ -56,25 +56,7 @@ player_stats as (
         array(
             select distinct unnest(array_agg(tps.position_groups))
         ) as "Position Groups",
-        COALESCE(
-            EXTRACT(
-                EPOCH FROM AGE(
-                    CASE
-                        WHEN '{{ chosen_season }}' = (
-                          CASE
-                            WHEN current_date < TO_DATE(EXTRACT(YEAR FROM current_date)::text || '-07-01', 'YYYY-MM-DD')
-                            THEN (EXTRACT(YEAR FROM current_date) - 1)::text || '_' || EXTRACT(YEAR FROM current_date)::text
-                            ELSE EXTRACT(YEAR FROM current_date)::text || '_' || (EXTRACT(YEAR FROM current_date) + 1)::text
-                          END
-                        )
-                        THEN current_date
-                        ELSE TO_DATE(split_part('{{ chosen_season }}', '_', 2) || '-06-30', 'YYYY-MM-DD')
-                    END,
-                    p.birth_date
-                )
-            ) / (365.25 * 24 * 60 * 60),
-            0.0
-        ) as age,
+        analytics.get_player_age('{{ chosen_season }}', p.birth_date) as age,
         analytics.set_bigint_stat(sum(home_match), sum(away_match), '{{ in_side }}') as matches,
         analytics.set_bigint_stat(sum(home_minutes), sum(away_minutes), '{{ in_side }}') as minutes
     from players_performance pp
