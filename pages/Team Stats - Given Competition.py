@@ -1,5 +1,3 @@
-import streamlit as st
-
 from components.connection import get_connection
 from components.pages.team_stats.by_competition.get_combined_ranking_one_season import get_combined_ranking_one_season
 from components.pages.team_stats.by_competition.get_global_ranking_by_season import get_global_ranking_by_season
@@ -23,7 +21,6 @@ class TeamStatsPage(BasePage):
             get_stats_and_matches_one_team(db_conn)
 
         with self.set_expander("Single Stat ranking"):
-            self.set_sub_sub_title("Single Stat ranking")
             get_single_ranking_one_season(db_conn)
 
         with self.set_expander("Combined Stat ranking"):
