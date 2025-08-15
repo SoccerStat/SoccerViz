@@ -49,19 +49,31 @@ def get_one_ranking(
 
 
 def get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season):
+    players_stats_and_age = get_players_age_by_team(db_conn, chosen_comp, chosen_season)
+
     col, _ = st.columns(2)
     with col:
+        chosen_slider = st.radio(
+            key="rate_players_one_season__slider",
+            label="Slider",
+            options=["Minutes", "Matches"],
+            horizontal=True,
+            label_visibility="collapsed",
+            index=0
+        )
+
         chosen_rate = st.slider(
             key="rate_players_one_season__rate",
-            label="% of minutes played",
+            label="% played",
             min_value=0,
             max_value=100,
             value=0
         )
 
-    players_stats_and_age = get_players_age_by_team(db_conn, chosen_comp, chosen_season)
-
-    filtered_players = players_stats_and_age[players_stats_and_age["% of minutes played"] >= chosen_rate / 100]
+        if chosen_slider == "Minutes":
+            filtered_players = players_stats_and_age[players_stats_and_age["% of minutes played"] >= chosen_rate / 100]
+        else:
+            filtered_players = players_stats_and_age[players_stats_and_age["% of matches played"] >= chosen_rate / 100]
 
     avg_age_of_squads = (
         filtered_players
