@@ -214,7 +214,7 @@ def get_stats_and_matches_one_team(db_conn):
         with col:
             chosen_rate = st.slider(
                 key="rate_players_one_season__rate",
-                label="% of minutes played",
+                label="Minimum % of minutes played",
                 min_value=0,
                 max_value=100,
                 value=0

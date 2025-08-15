@@ -64,7 +64,7 @@ def get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season):
 
         chosen_rate = st.slider(
             key="rate_players_one_season__rate",
-            label="% played",
+            label="Minimum % played",
             min_value=0,
             max_value=100,
             value=0

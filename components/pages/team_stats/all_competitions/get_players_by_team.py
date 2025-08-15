@@ -43,7 +43,7 @@ def get_players_by_team(db_conn):
             max_nb_matches = int(df_team["Total number of matches"].unique())
             chosen_nb_matches = st.slider(
                 key="all_comps_players_by_team__nb_matches",
-                label="Number of matches played",
+                label="Minimum number of matches played",
                 min_value=0,
                 max_value=max_nb_matches,
                 value=0
