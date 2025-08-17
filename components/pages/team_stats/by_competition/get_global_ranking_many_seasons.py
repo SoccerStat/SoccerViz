@@ -196,7 +196,7 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
                         f"<b>{club}</b><br>" +
                         "<b>Season: </b>%{x}<br><br>" +
                         f"<b>{chosen_ranking}: </b>%{{y}}<br>" +
-                        f"<b>{chosen_ranking} Ranking: </b>%{{text}}<br><br>" +
+                        f"<b>{chosen_ranking} Ranking: </b>%{{text}}<br>" +
                         "Global Ranking: %{customdata[0]}<extra></extra>"
                 ),
                 showlegend=True
