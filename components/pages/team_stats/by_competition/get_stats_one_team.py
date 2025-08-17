@@ -228,7 +228,7 @@ def get_stats_and_matches_one_team(db_conn):
         st.dataframe(df.drop(["Total number of players used", "Total Minutes played by the whole team"], axis=1))
 
         if not df.empty:
-            st.write(f"Average age of the club: {int(avg_age)} years, {int((avg_age % 1) * 365)} days")
+            st.write(f"Average age of the club: **{int(avg_age)} years, {int((avg_age % 1) * 365)} days**")
 
             n_players = df.shape[0]
             n_players_of_team = int(df["Total number of players used"].iloc[0])
