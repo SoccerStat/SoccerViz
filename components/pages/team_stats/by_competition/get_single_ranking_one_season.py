@@ -54,7 +54,7 @@ def get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season):
     col, _ = st.columns(2)
     with col:
         chosen_slider = st.radio(
-            key="rate_players_one_season__slider",
+            key="single_ranking_one_season__slider",
             label="Slider",
             options=["Minutes", "Matches"],
             horizontal=True,
@@ -63,7 +63,7 @@ def get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season):
         )
 
         chosen_rate = st.slider(
-            key="rate_players_one_season__rate",
+            key="single_ranking_one_season__rate",
             label="Minimum % played",
             min_value=0,
             max_value=100,

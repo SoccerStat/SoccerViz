@@ -1,15 +1,14 @@
-import streamlit as st
-import pandas as pd
 import altair as alt
-import plotly.graph_objects as go
+import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
-
+from config import TEAM_STATS_RANKINGS_PLOTTABLE, COMPETITIONS
 from utils.file_helper.reader import read_sql_file
-from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
 
 
 @st.cache_data(show_spinner=False)
@@ -36,32 +35,29 @@ def get_global_ranking_many_seasons(db_conn):
     chosen_comp = st.selectbox(
         key="global_ranking_many_seasons__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    # kind_of_comp = comps_and_kind[chosen_comp]
-
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
-    # n_seasons = len(seasons_by_comp)
-
-    teams = get_teams_by_comp_by_season(db_conn, chosen_comp, seasons_by_comp)
-    n_teams = len(teams)
-
-    chosen_teams = st.multiselect(
-        key="global_ranking_many_seasons__teams",
-        label="Choose teams...",
-        options=["All"] + teams,
-    )
-
-    if 'All' in chosen_teams:
-        chosen_teams = teams
-
-    if chosen_teams:
+    if chosen_comp:
         with st.spinner("Data loading..."):
+            # kind_of_comp = comps_and_kind[chosen_comp]
+
+            seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+            # n_seasons = len(seasons_by_comp)
+
+            teams = get_teams_by_comp_by_season(db_conn, chosen_comp, seasons_by_comp)
+            n_teams = len(teams)
+
+            chosen_ranking = st.selectbox(
+                key="ranking_many_seasons__ranking",
+                label="Choose ranking...",
+                options=TEAM_STATS_RANKINGS_PLOTTABLE,
+                index=1
+            )
 
             df = ranking_by_chp_week(
                 _db_conn=db_conn,
-                chosen_ranking="Points",
+                chosen_ranking=chosen_ranking,
                 chosen_comp=chosen_comp,
                 chosen_seasons=seasons_by_comp,
             )
@@ -73,8 +69,18 @@ def get_global_ranking_many_seasons(db_conn):
 
             df = pd.merge(all_combinations, df, how='left', on=['Club', 'Season'])
 
+        chosen_teams = st.multiselect(
+            key="global_ranking_many_seasons__teams",
+            label="Choose teams...",
+            options=["All"] + teams,
+        )
+
+        if 'All' in chosen_teams:
+            chosen_teams = teams
+
+        if chosen_teams:
             # set_plot(df, chosen_comp, chosen_teams, n_teams)
-            set_plot_plotly(df, chosen_comp, chosen_teams, n_teams)
+            set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams)
 
             csv = df.to_csv(index=False, sep='|')
             st.download_button(
@@ -84,14 +90,14 @@ def get_global_ranking_many_seasons(db_conn):
                 mime="text/csv"
             )
 
-def set_plot(df, chosen_comp, chosen_teams, n_teams):
+def set_plot(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
     line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
         x=alt.X('Season:O', title='Season'),
-        y=alt.Y('Points:Q', title=f'Points'),
+        y=alt.Y(f'chosen_ranking:Q', title=chosen_ranking),
         color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
-        tooltip=['Club', 'Season', "Points", "Ranking"]
+        tooltip=['Club', 'Season', chosen_ranking, "Ranking"]
     ).properties(
         title=f"Number of points over seasons - {chosen_comp}",
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600
@@ -106,15 +112,6 @@ def set_plot(df, chosen_comp, chosen_teams, n_teams):
     weeks_per_season['MaxPoints'] = weeks_per_season['Weeks'] * 3
     max_points_df = weeks_per_season[['Season', 'MaxPoints']]
 
-    max_line = alt.Chart(max_points_df).mark_line(
-        strokeDash=[6, 4],
-        color='gray'
-    ).encode(
-        x=alt.X('Season:O'),
-        y=alt.Y('MaxPoints:Q'),
-        tooltip=['Season', 'MaxPoints']
-    )
-
     line_text = line_chart.mark_text(
         align='center',
         baseline='bottom',
@@ -125,16 +122,31 @@ def set_plot(df, chosen_comp, chosen_teams, n_teams):
         text=alt.Text('Ranking:Q')
     )
 
-    chart = alt.layer(
-        line_chart,
-        max_line,
-        line_text
-    )
+    if chosen_ranking == "Points":
+        max_line = alt.Chart(max_points_df).mark_line(
+            strokeDash=[6, 4],
+            color='gray'
+        ).encode(
+            x=alt.X('Season:O'),
+            y=alt.Y('MaxPoints:Q'),
+            tooltip=['Season', 'MaxPoints']
+        )
+
+        chart = alt.layer(
+            line_chart,
+            max_line,
+            line_text
+        )
+    else:
+        chart = alt.layer(
+            line_chart,
+            line_text
+        )
 
     st.altair_chart(chart, use_container_width=True)
 
 
-def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
+def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
     clubs = sorted(filtered_df['Club'].unique())
@@ -143,55 +155,58 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
 
     traces = []
 
-    weeks_per_season = (
-        df[df["Ranking"].notnull()].groupby('Season')['Club']
-        .nunique()
-        .reset_index(name='NumClubs')
-    )
-    weeks_per_season["Weeks"] = 2 * (weeks_per_season["NumClubs"] - 1)
-    weeks_per_season['MaxPoints'] = weeks_per_season['Weeks'] * 3
+    if chosen_ranking == "Points":
+        weeks_per_season = (
+            df[df["Global Ranking"].notnull()].groupby('Season')['Club']
+            .nunique()
+            .reset_index(name='NumClubs')
+        )
+        weeks_per_season["Weeks"] = 2 * (weeks_per_season["NumClubs"] - 1)
+        weeks_per_season['MaxPoints'] = weeks_per_season['Weeks'] * 3
 
-    max_points_df = weeks_per_season[['Season', 'MaxPoints']].sort_values('Season')
+        max_points_df = weeks_per_season[['Season', 'MaxPoints']].sort_values('Season')
 
-    max_line = go.Scatter(
-        x=max_points_df['Season'],
-        y=max_points_df['MaxPoints'],
-        mode='lines',
-        name='Max Possible',
-        line=dict(color='gray', dash='dash'),
-        hovertemplate='Season: %{x}<br>Max Points: %{y}<extra></extra>',
-        showlegend=True
-    )
+        max_line = go.Scatter(
+            x=max_points_df['Season'],
+            y=max_points_df['MaxPoints'],
+            mode='lines',
+            name='Max Possible',
+            line=dict(color='gray', dash='dash'),
+            hovertemplate='Season: %{x}<br>Max Points: %{y}<extra></extra>',
+            showlegend=True
+        )
 
-    traces.append(max_line)
+        traces.append(max_line)
 
     for club in clubs:
         df_club = filtered_df[filtered_df['Club'] == club].sort_values('Season')
         traces.append(
             go.Scatter(
                 x=df_club['Season'],
-                y=df_club['Points'],
+                y=df_club[chosen_ranking],
                 mode='lines+markers+text',
                 name=club,
                 line=dict(color=club_colors[club]),
                 marker=dict(color=club_colors[club]),
-                text=df_club['Ranking'].astype(str),
+                text=df_club[f"{chosen_ranking} Ranking"].astype(str),
                 textposition='top center',
                 textfont=dict(color=club_colors[club]),
+                customdata=df_club[["Global Ranking"]],
                 hovertemplate=(
                         f"<b>{club}</b><br>" +
-                        "Season: %{x}<br>" +
-                        "Points: %{y}<br>" +
-                        "Ranking: %{text}<extra></extra>"
+                        "<b>Season: </b>%{x}<br><br>" +
+                        f"<b>{chosen_ranking}: </b>%{{y}}<br>" +
+                        f"<b>{chosen_ranking} Ranking: </b>%{{text}}<br><br>" +
+                        "Global Ranking: %{customdata[0]}<extra></extra>"
                 ),
                 showlegend=True
             )
         )
 
     layout = go.Layout(
-        title=f"Number of points over seasons - {chosen_comp}<br><sup>With global ranking</sup>",
+        title=f"Number of {chosen_ranking} over seasons - {chosen_comp}<br><sup>With global ranking</sup>",
         xaxis=dict(title='Season', type='category', tickangle=270),
-        yaxis=dict(title='Points'),
+        yaxis=dict(title=chosen_ranking),
         height=510 if n_teams == 20 else 460 if n_teams == 18 else 600,
         legend=dict(title='Clubs', y=1, yanchor='top', x=1.05, xanchor='left'),
         margin=dict(l=50, r=150, t=80, b=50)

@@ -1,6 +1,7 @@
 SELECT
     "Club",
     "Matches" as "M",
+    "Points" as "P",
     "Wins" as "W",
     "Draws" as "D",
     "Loses" as "L",
@@ -8,6 +9,7 @@ SELECT
     "Goals Against" as "GA",
     "Goals Diff" as "GD",
     "Succ Passes Rate" as "% Succ Passes",
+    "Points/Match",
     "Shots/onTarget Conversion Rate For" as "Shots/onTarget For CR",
  	"Shots/onTarget Conversion Rate Against" as "Shots/onTarget Against CR",
  	"Shots/Goals Conversion Rate For" as "Shots/Goals For CR",
