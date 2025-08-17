@@ -47,9 +47,9 @@ COMPETITIONS = {
         "diminutive": "PL",
         "kind": KIND_CHP,
         "style": {
-            "bg_color": "#6200EA",
+            "bg_color": "#B388FF",
             "font_color": "#6200EA",
-            "border_color": "#B388FF"
+            "border_color": "#6200EA"
         }
     },
     "la_liga": {
@@ -57,9 +57,9 @@ COMPETITIONS = {
         "diminutive": "LL",
         "kind": KIND_CHP,
         "style": {
-             "bg_color": "#FBC02D",
+             "bg_color": "#FFF176",
             "font_color": "#FBC02D",
-            "border_color": "#FFF176"
+            "border_color": "#FBC02D"
         }
     },
     "fussball_bundesliga": {
@@ -68,9 +68,9 @@ COMPETITIONS = {
         "kind": KIND_CHP,
         "id_comp": "fussball_bundesliga",
         "style": {
-            "bg_color": "#D32F2F",
+            "bg_color": "#FF6659",
             "font_color": "#D32F2F",
-            "border_color": "#FF6659"
+            "border_color": "#D32F2F"
         }
     },
     "serie_a": {
@@ -78,9 +78,9 @@ COMPETITIONS = {
         "diminutive": "SA",
         "kind": KIND_CHP,
         "style": {
-            "bg_color": "#2E7D32",
+            "bg_color": "#81C784",
             "font_color": "#2E7D32",
-            "border_color": "#81C784"
+            "border_color": "#2E7D32"
         }
     },
     "ligue_1": {
@@ -88,9 +88,9 @@ COMPETITIONS = {
         "diminutive": "L1",
         "kind": KIND_CHP,
         "style": {
-            "bg_color": "#1976D2",
+            "bg_color": "#64B5F6",
             "font_color": "#1976D2",
-            "border_color": "#64B5F6"
+            "border_color": "#1976D2"
         }
     },
     "uefa_champions_league": {
@@ -98,9 +98,9 @@ COMPETITIONS = {
         "diminutive": "UCL",
         "kind": KIND_C_CUP,
         "style": {
-            "bg_color": "#050A30",
+            "bg_color": "#143F6B",
             "font_color": "white",
-            "border_color": "#143F6B"
+            "border_color": "#050A30"
         }
     },
     "uefa_europa_league": {
@@ -108,9 +108,9 @@ COMPETITIONS = {
         "diminutive": "UEL",
         "kind": KIND_C_CUP,
         "style": {
-            "bg_color": "#D35400",
+            "bg_color": "#ED722E",
             "font_color": "white",
-            "border_color": "#ED722E"
+            "border_color": "#D35400"
         }
     },
     "uefa_conference_league": {
@@ -118,9 +118,9 @@ COMPETITIONS = {
         "diminutive": "UECL",
         "kind": KIND_C_CUP,
         "style": {
-            "bg_color": "#2E8B57",
+            "bg_color": "#55BC39",
             "font_color": "white",
-            "border_color": "#55BC39"
+            "border_color": "#2E8B57"
         }
     }
 }

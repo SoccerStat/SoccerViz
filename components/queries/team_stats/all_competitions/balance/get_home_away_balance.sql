@@ -1,4 +1,6 @@
-with sums as (select
+with sums as (
+    select
+        case when grouping(season) = 1 then 'All' else season end as "Season",
         competition as "Competition",
         sum(home_win) as "Home Wins",
         sum(home_draw) as "Draws",
@@ -7,10 +9,11 @@ with sums as (select
         sum(case when not played_home then away_score end) as "Away Goals",
         sum(home_match) as "Matches"
     from analytics.staging_teams_performance stp
-    where date >= '2000-01-01'
-    group by "Competition"
+    where season >= '2000-2001' and (round is null or round != 'Final')
+    group by grouping sets((season, competition), (competition))
 )
 select
+    "Season",
     "Competition",
     "Home Wins",
     "Draws",

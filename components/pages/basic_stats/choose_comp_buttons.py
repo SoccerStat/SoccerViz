@@ -34,9 +34,9 @@ def choose_comp_buttons():
 
             with cols[i]:
                 key = f"btn_{comp}"
-                bg_color = comp_config["style"]["border_color"]
+                bg_color = comp_config["style"]["bg_color"]
                 font_color = comp_config["style"]["font_color"]
-                border_color = comp_config["style"]["bg_color"]
+                border_color = comp_config["style"]["border_color"]
 
                 with set_button_with_style(key, bg_color, font_color, border_color):
                     if st.button(comp_config["diminutive"], key=key, use_container_width=True):
