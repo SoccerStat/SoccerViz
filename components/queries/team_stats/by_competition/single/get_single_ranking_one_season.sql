@@ -16,7 +16,7 @@ with stats as (
 )
 SELECT *,
     dense_rank() over(
-        order by cast("{{ ranking }}" as int) desc
+        order by cast("{{ ranking }}" as numeric) desc
     ) as "{{ ranking }} Ranking"
 FROM stats
 ORDER BY "{{ ranking }}" DESC;
