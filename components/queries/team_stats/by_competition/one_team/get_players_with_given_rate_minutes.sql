@@ -11,11 +11,15 @@ team_players as (
     select
         team,
         player,
-        array_agg(distinct pos) as positions,
-        array_agg(distinct grp) as position_groups
+        numbers,
+        positions,
+        position_groups
+        --array_agg(distinct numbers)
+        --array_agg(distinct pos) as positions,
+        --array_agg(distinct grp) as position_groups
     from season_{{ chosen_season }}.team_player tp
-    CROSS JOIN LATERAL unnest(positions) AS pos
-    CROSS JOIN LATERAL unnest(position_groups) AS grp
+    --CROSS JOIN LATERAL unnest(positions) AS pos
+    --CROSS JOIN LATERAL unnest(position_groups) AS grp
     group by team, player
 ),
 players_performance as (
@@ -24,11 +28,11 @@ players_performance as (
         id_team,
         id_player,
         --array_cat(home_positions, away_positions) as positions,
-        array(
-            select distinct number
-            from unnest(ARRAY[home_number, away_number]) as number
-            where number IS NOT NULL
-        ) as numbers,
+        --array(
+        --    select distinct number
+        --    from unnest(ARRAY[home_number, away_number]) as number
+        --    where number IS NOT NULL
+        --) as numbers,
         home_match,
         away_match,
         home_minutes,
@@ -48,7 +52,7 @@ player_stats as (
         pp.id_player,
         p.name,
         array(
-            select distinct unnest(array_agg(pp.numbers))
+            select distinct unnest(array_agg(tps.numbers))
         ) as "Numbers",
         array(
             select distinct unnest(array_agg(tps.positions))
