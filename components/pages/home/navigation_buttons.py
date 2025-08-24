@@ -6,7 +6,7 @@ from config import PAGES_CONFIG
 def set_navigation_buttons():
     with st.container():
         cols = st.columns(len(PAGES_CONFIG))
-        for i, page in enumerate(PAGES_CONFIG):
+        for i, page in enumerate(sorted(PAGES_CONFIG)):
             with cols[i]:
                 key = f"nav_{page}"
                 with set_button_with_style(key):
