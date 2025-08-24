@@ -21,6 +21,11 @@ SELECT
         ELSE club.name
     END AS "Away Team",
     CASE
+        WHEN played_home
+        THEN home_manager
+        ELSE away_manager
+    END AS "Manager",
+    CASE
         WHEN home_penalty_shootout_scored is null
             and away_penalty_shootout_scored is null
             and home_score = away_score THEN '⚫️'
