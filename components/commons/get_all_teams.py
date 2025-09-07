@@ -1,10 +1,8 @@
 import streamlit as st
 
 from components.queries.execute_query import execute_query
-from components.commons.get_seasons import get_all_seasons
 
 from utils.file_helper.reader import read_sql_file
-from config import COMPETITIONS
 
 
 @st.cache_data(show_spinner=False)

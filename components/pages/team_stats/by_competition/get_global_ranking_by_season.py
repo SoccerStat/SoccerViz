@@ -1,15 +1,15 @@
-import streamlit as st
-import pandas as pd
 import altair as alt
-import plotly.graph_objects as go
+import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
-from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
+from config import COMPETITIONS
 
 
 @st.cache_data(show_spinner=False)
@@ -30,6 +30,7 @@ def ranking_by_chp_by_week_of_season(_db_conn, chosen_ranking, chosen_comp, seas
         df_season = pd.concat([df_season, df_week], ignore_index=True)
 
     return df_season
+
 
 @st.cache_data(show_spinner=False)
 def ranking_by_chp_by_week_by_season(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
@@ -100,13 +101,14 @@ def get_global_ranking_by_season(db_conn):
                 mime="text/csv"
             )
 
+
 def set_plot(df, chosen_comp, chosen_teams, n_teams):
     filtered_df = df[df["Club"].isin(chosen_teams)]
     filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"]
 
     line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
-        x=alt.X('Week:O'),
-        y=alt.Y('Points:Q'),
+        x=alt.X(shorthand='Week:O'),
+        y=alt.Y(shorthand='Points:Q'),
         color=alt.Color('Club_Season:N', legend=alt.Legend(title="Club - Season", orient="right", labelLimit=2000)),
         tooltip=['Club', 'Season', "Points", "Ranking"]
     ).properties(
@@ -130,6 +132,7 @@ def set_plot(df, chosen_comp, chosen_teams, n_teams):
     )
 
     st.altair_chart(chart, use_container_width=True)
+
 
 def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams):
     filtered_df = df[df["Club"].isin(chosen_teams)].copy()
@@ -209,7 +212,7 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams
                     "Side: %{customdata[0]}<br>" +
                     "Result: %{customdata[1]}<br>" +
                     "Opponent: %{customdata[2]}<br><br>" +
-                    f"<b>Points/Match:</b> %{{y:.2f}}<br>" +
+                    "<b>Points/Match:</b> %{y:.2f}<br>" +
                     "<b>Ranking:</b> %{text}<extra></extra>"
                 ),
                 customdata=df_cs[["Side", "Result", "Opponent"]],

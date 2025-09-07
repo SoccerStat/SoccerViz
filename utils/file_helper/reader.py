@@ -17,6 +17,7 @@ def load_css_file(file_name):
         # CSS de fallback
         st.markdown(FALLBACK_CSS, unsafe_allow_html=True)
 
+
 def read_sql_file(file_name, **params):
     with open(file_name, "r", encoding='utf-8') as f:
         template = f.read()

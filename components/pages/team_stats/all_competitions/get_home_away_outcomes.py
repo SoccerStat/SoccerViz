@@ -1,4 +1,3 @@
-import altair as alt
 import plotly.express as px
 import streamlit as st
 
@@ -23,12 +22,14 @@ def compute_goals_ratio(row):
     else:
         return 100
 
+
 def set_colors_by_comp():
     color_by_comp = {}
     for i, comp in enumerate(COMPETITIONS):
         comp_config = COMPETITIONS[comp]
         color_by_comp[comp_config["label"]] = comp_config["style"]["bg_color"]
     return color_by_comp
+
 
 def get_home_away_balance(db_conn):
     df = get_balance(db_conn)
@@ -143,6 +144,7 @@ def get_home_away_balance_all_seasons_plotly(df):
         st.plotly_chart(fig_outcomes, use_container_width=True)
     with col2:
         st.plotly_chart(fig_goals, use_container_width=True)
+
 
 def get_home_away_stats_by_season_plotly(df, stat, side, colors):
     side_stat = f"{side} {stat}" if side != 'Both' else f"Total {stat}"

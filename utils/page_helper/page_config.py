@@ -2,6 +2,7 @@ import streamlit as st
 
 from config import APP_CONFIG
 
+
 def set_page_config(page_title, hide_sidebar=True):
     st.set_page_config(
         page_title=page_title,

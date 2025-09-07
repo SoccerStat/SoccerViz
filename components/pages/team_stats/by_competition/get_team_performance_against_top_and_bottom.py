@@ -1,13 +1,12 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
-from components.commons.set_titles import set_sub_sub_title
 from components.commons.get_seasons import get_seasons_by_comp
+from components.commons.set_titles import set_sub_sub_title
 from components.queries.execute_query import execute_query
-
+from config import COMPETITIONS, KIND_CHP
 from utils.file_helper.reader import read_sql_file
-from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP
 
 
 @st.cache_data(show_spinner=False)
@@ -20,6 +19,7 @@ def get_top_teams(_db_conn, chosen_comp, chosen_season):
 
     return execute_query(_db_conn, sql_file)["Club"].tolist()
 
+
 @st.cache_data(show_spinner=False)
 def get_bottom_teams(_db_conn, chosen_comp, chosen_season):
     sql_file = read_sql_file(
@@ -29,6 +29,7 @@ def get_bottom_teams(_db_conn, chosen_comp, chosen_season):
     )
 
     return execute_query(_db_conn, sql_file)["Club"].tolist()
+
 
 @st.cache_data(show_spinner=False)
 def get_teams_performance_against_teams(_db_conn, chosen_comp, chosen_season, opponents, side):

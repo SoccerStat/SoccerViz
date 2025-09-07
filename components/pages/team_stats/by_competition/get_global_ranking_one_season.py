@@ -1,21 +1,20 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
-
-from utils.file_helper.reader import read_sql_file
-from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP, KIND_CHP, \
+from config import COMPETITIONS, KIND_C_CUP, KIND_CHP, \
     TEAM_STATS_RANKINGS_PLOTTABLE
+from utils.file_helper.reader import read_sql_file
 
 
 @st.cache_data(show_spinner=False)
 def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb_chp_weeks):
     complete_df = pd.DataFrame()
-    
+
     for j in range(1, nb_chp_weeks + 1):
         sql_file = read_sql_file(
             file_name="components/queries/team_stats/by_competition/over_one_season/get_cumulative_ranking_one_season.sql",
@@ -140,7 +139,16 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
         data = data + [max_line]
 
     # Points réels
-    df_actual = df[["Global Ranking", "Club", "Week", chosen_ranking, f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]].drop_duplicates()
+    df_actual = df[[
+        "Global Ranking",
+        "Club",
+        "Week",
+        chosen_ranking,
+        f"{chosen_ranking} Ranking",
+        "Side",
+        "Result",
+        "Opponent"
+    ]].drop_duplicates()
     clubs = sorted(df_actual['Club'].unique())
     colors = px.colors.qualitative.D3  # palette qualitative de Plotly
 
@@ -194,7 +202,16 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
 
 
 def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_season, chosen_ranking, n_teams):
-    df_actual = df[["Global Ranking", "Club", "Week", f"{chosen_ranking}/Match", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]].drop_duplicates()
+    df_actual = df[[
+        "Global Ranking",
+        "Club",
+        "Week",
+        f"{chosen_ranking}/Match",
+        f"{chosen_ranking} Ranking",
+        "Side",
+        "Result",
+        "Opponent"
+    ]].drop_duplicates()
 
     weeks = sorted(df['Week'].unique())
     # Ticks toutes les 2 semaines (ex: impaires)
@@ -237,7 +254,8 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_season, chosen
     data = actual_traces
 
     layout = go.Layout(
-        title=f"Actual evolution of {chosen_ranking} per match - {chosen_comp} ({chosen_season})<br><sup>With global ranking</sup>",
+        title=f"Actual evolution of {chosen_ranking} per match - "
+              f"{chosen_comp} ({chosen_season})<br><sup>With global ranking</sup>",
         xaxis=dict(
             title='Week',
             type='category',

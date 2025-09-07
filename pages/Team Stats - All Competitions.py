@@ -24,6 +24,7 @@ class TeamStatsPage(BasePage):
             self.set_sub_sub_title("% of players used by team")
             get_players_by_team(db_conn)
 
+
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGES)
     page.render()

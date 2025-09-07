@@ -8,7 +8,7 @@ from utils.file_helper.reader import read_sql_file
 def set_all_seasons_basic_stats(db_conn):
     if db_conn:
         with st.container():
-            players, matches, clubs, seasons = st.columns([1,1,1,1])
+            players, matches, clubs, seasons = st.columns([1, 1, 1, 1])
 
             all_seasons = get_all_seasons(db_conn)
 
@@ -17,7 +17,11 @@ def set_all_seasons_basic_stats(db_conn):
                 resu = execute_query(db_conn, query)
                 if resu is not None:
                     st.markdown(
-                        f"<h3 style='text-align: center; font-weight: normal'><strong>{int(resu.iloc[0, 0])}</strong> Players</h3>",
+                        f"""
+                        <h3 style='text-align: center; font-weight: normal'>
+                            <strong>{int(resu.iloc[0, 0])}</strong> Players
+                        </h3>
+                        """,
                         unsafe_allow_html=True
                     )
 
@@ -27,7 +31,11 @@ def set_all_seasons_basic_stats(db_conn):
                 resu = execute_query(db_conn, final_query)
                 if resu is not None:
                     st.markdown(
-                        f"<h3 style='text-align: center; font-weight: normal'><strong>{int(resu.iloc[0, 0])}</strong> Matches</h3>",
+                        f"""
+                        <h3 style='text-align: center; font-weight: normal'>
+                            <strong>{int(resu.iloc[0, 0])}</strong> Matches
+                        </h3>
+                        """,
                         unsafe_allow_html=True
                     )
 
@@ -36,12 +44,20 @@ def set_all_seasons_basic_stats(db_conn):
                 resu = execute_query(db_conn, query)
                 if resu is not None:
                     st.markdown(
-                        f"<h3 style='text-align: center; font-weight: normal'><strong>{int(resu.iloc[0, 0])}</strong> Clubs</h3>",
+                        f"""
+                        <h3 style='text-align: center; font-weight: normal'>
+                            <strong>{int(resu.iloc[0, 0])}</strong> Clubs
+                        </h3>
+                        """,
                         unsafe_allow_html=True
                     )
 
             with seasons:
                 st.markdown(
-                    f"<h3 style='text-align: center; font-weight: normal'><strong>{len(all_seasons)}</strong> Seasons</h3>",
+                    f"""
+                    <h3 style='text-align: center; font-weight: normal'>
+                        <strong>{len(all_seasons)}</strong> Seasons
+                    </h3>
+                    """,
                     unsafe_allow_html=True
                 )

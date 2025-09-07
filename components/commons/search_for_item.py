@@ -1,4 +1,7 @@
-def make_search_function(all_teams: list[str], teamA = None) -> list[str]:
+from typing import Callable
+
+
+def make_search_function(all_teams: list[str], teamA=None) -> Callable[[str], list[str]]:
     teams = all_teams.copy()
     if teamA:
         teams.remove(teamA)
@@ -7,4 +10,5 @@ def make_search_function(all_teams: list[str], teamA = None) -> list[str]:
         if not term:
             return []
         return [team for team in teams if term.lower() in team.lower()]
+
     return search

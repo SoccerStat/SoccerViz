@@ -33,6 +33,7 @@ class Home(BasePage):
             with tab2:
                 visualization_interface()
 
+
 def main():
     """Fonction principale de l'application"""
 

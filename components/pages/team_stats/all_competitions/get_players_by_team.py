@@ -19,6 +19,7 @@ def get_players_with_given_rate_minutes(_db_conn, chosen_season, chosen_team, r=
 
     return execute_query(_db_conn, sql_file)
 
+
 def get_players_by_team(db_conn):
     chosen_season = st.selectbox(
         key="all_comps_players_by_team__season",
@@ -27,7 +28,7 @@ def get_players_by_team(db_conn):
     )
 
     all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, "all", [chosen_season])
-    n_teams = len(all_teams_of_comp_of_season)
+    # n_teams = len(all_teams_of_comp_of_season)
 
     chosen_team = st.selectbox(
         key="all_comps_players_by_team__team",
@@ -62,6 +63,7 @@ def get_players_by_team(db_conn):
             n_players = df_team.shape[0]
             n_players_of_team = int(df_team["Total number of players used"].iloc[0])
 
-            st.write(f"{n_players} players that have played at least {chosen_nb_matches} matche{'s' if chosen_nb_matches == 0 else ''} "
+            st.write(f"{n_players} players that have played "
+                     f"at least {chosen_nb_matches} matche{'s' if chosen_nb_matches == 0 else ''} "
                      f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
                      f"that are involved in all competitions)")

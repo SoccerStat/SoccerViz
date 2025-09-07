@@ -21,6 +21,7 @@ def get_players_age_by_team(_db_conn, chosen_comp, chosen_season):
 
     return execute_query(_db_conn, sql_file)
 
+
 @st.cache_data(show_spinner=False)
 def get_one_ranking(
             _db_conn,
@@ -204,7 +205,7 @@ def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
 
         bars = alt.Chart(df).mark_bar().encode(
             x=chosen_ranking,
-            y=alt.Y('Club', sort=ordered_clubs),
+            y=alt.Y(shorthand='Club', sort=ordered_clubs),
             tooltip=tooltip
         )
 
@@ -214,7 +215,7 @@ def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
             dx=3
         ).encode(
             x=chosen_ranking,
-            y=alt.Y('Club', sort=ordered_clubs),
+            y=alt.Y(shorthand='Club', sort=ordered_clubs),
             text=chosen_ranking
         ).transform_filter(
             alt.datum[chosen_ranking] >= 0
@@ -226,7 +227,7 @@ def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
             dx=-3
         ).encode(
             x=chosen_ranking,
-            y=alt.Y('Club', sort=ordered_clubs),
+            y=alt.Y(shorthand='Club', sort=ordered_clubs),
             text=chosen_ranking
         ).transform_filter(
             alt.datum[chosen_ranking] < 0
@@ -240,7 +241,8 @@ def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
         st.download_button(
             label="📥 Download CSV",
             data=csv,
-            file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_{chosen_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
+            file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
+                      f"{chosen_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
             mime="text/csv"
         )
 

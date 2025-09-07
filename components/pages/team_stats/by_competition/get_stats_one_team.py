@@ -2,12 +2,13 @@ import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.search_for_item import make_search_function
+# from components.commons.search_for_item import make_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP
+
 
 @st.cache_data(show_spinner=False)
 def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, chosen_team, chosen_side, r=3):
@@ -21,6 +22,7 @@ def get_players_with_given_rate_minutes(_db_conn, chosen_comp, chosen_season, ch
     )
 
     return execute_query(_db_conn, sql_file)
+
 
 @st.cache_data(show_spinner=False)
 def get_stats_of_team(
@@ -94,11 +96,10 @@ def get_stats_and_matches_one_team(db_conn):
         options=seasons_by_comp
     )
 
-
     all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
     n_teams = len(all_teams_of_comp_of_season)
 
-    search_function = make_search_function(all_teams_of_comp_of_season)
+    # search_function = make_search_function(all_teams_of_comp_of_season)
 
     # chosen_team = st_searchbox(
     #     search_function=search_function,
@@ -120,7 +121,7 @@ def get_stats_and_matches_one_team(db_conn):
 
         if comps_and_kind[chosen_comp] == KIND_CHP:
 
-            filter_weeks= st.checkbox(
+            filter_weeks = st.checkbox(
                 key='stats_one_team__filter_weeks',
                 label='Filter by week'
             )
@@ -172,7 +173,11 @@ def get_stats_and_matches_one_team(db_conn):
                     value=first_date
                 )
 
-        sides = ["Home", "Both", "Away", "Neutral", "All"] if comps_and_kind[chosen_comp] == KIND_C_CUP else ["Home", "Both", "Away"]
+        if comps_and_kind[chosen_comp] == KIND_C_CUP:
+            sides = ["Home", "Both", "Away", "Neutral", "All"]
+        else:
+            sides = ["Home", "Both", "Away"]
+
         side = st.radio(
             key='stats_one_team__side',
             label="Side",
@@ -199,7 +204,12 @@ def get_stats_and_matches_one_team(db_conn):
         team_stats_first_row = team_stats[["Club", "M", "W", "D", "L", "GF", "GA", "GD"]]
         team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
         team_stats_third_row = team_stats[["Club", "Shots/onTarget For CR", "Shots/Goals For CR", "onTarget/Goals For CR"]]
-        team_stats_fourth_row = team_stats[["Club", "Shots/onTarget Against CR", "Shots/Goals Against CR", "onTarget/Goals Against CR"]]
+        team_stats_fourth_row = team_stats[[
+            "Club",
+            "Shots/onTarget Against CR",
+            "Shots/Goals Against CR",
+            "onTarget/Goals Against CR"
+        ]]
 
         st.dataframe(team_stats_first_row, hide_index=True)
         st.dataframe(team_stats_second_row, hide_index=True)
@@ -235,7 +245,8 @@ def get_stats_and_matches_one_team(db_conn):
 
             st.write(f"{n_players} players that have played at least {int(chosen_rate)}%"
                      f" of the possible minutes played "
-                     f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club that are involved in {chosen_comp})")
+                     f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
+                     f"that are involved in {chosen_comp})")
 
         set_sub_sub_sub_title("Selected matches")
 
