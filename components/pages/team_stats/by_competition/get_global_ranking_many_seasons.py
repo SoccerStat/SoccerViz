@@ -90,13 +90,14 @@ def get_global_ranking_many_seasons(db_conn):
                 mime="text/csv"
             )
 
+
 def set_plot(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
     line_chart = alt.Chart(filtered_df).mark_line(point=True, interpolate="linear").encode(
-        x=alt.X('Season:O', title='Season'),
-        y=alt.Y(f'chosen_ranking:Q', title=chosen_ranking),
-        color=alt.Color('Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
+        x=alt.X(shorthand='Season:O', title='Season'),
+        y=alt.Y(shorthand='chosen_ranking:Q', title=chosen_ranking),
+        color=alt.Color(shorthand='Club:N', legend=alt.Legend(title="Clubs", orient="right", labelLimit=2000)),
         tooltip=['Club', 'Season', chosen_ranking, "Ranking"]
     ).properties(
         title=f"Number of points over seasons - {chosen_comp}",
@@ -127,8 +128,8 @@ def set_plot(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
             strokeDash=[6, 4],
             color='gray'
         ).encode(
-            x=alt.X('Season:O'),
-            y=alt.Y('MaxPoints:Q'),
+            x=alt.X(shorthand='Season:O'),
+            y=alt.Y(shorthand='MaxPoints:Q'),
             tooltip=['Season', 'MaxPoints']
         )
 

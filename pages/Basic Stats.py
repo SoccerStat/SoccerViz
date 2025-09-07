@@ -33,6 +33,7 @@ class BasicStats(BasePage):
         if seasons_ids:
             set_basic_stats_by_season_by_comp(db_conn, name_comp, seasons_mode, seasons_ids)
 
+
 if __name__ == "__main__" or True:
     page = BasicStats(BASIC_STATS_PAGE)
     page.render()

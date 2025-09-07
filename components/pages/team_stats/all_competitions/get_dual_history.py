@@ -9,7 +9,7 @@ from components.commons.get_all_teams import get_all_teams
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
-from config import COMPETITIONS, DUAL_STATS
+from config import COMPETITIONS
 
 
 @st.cache_data(show_spinner=False)

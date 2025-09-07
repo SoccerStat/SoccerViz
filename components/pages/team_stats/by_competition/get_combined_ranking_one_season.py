@@ -1,13 +1,13 @@
-import streamlit as st
-import pandas as pd
 import altair as alt
+import pandas as pd
+import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
-from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, KIND_C_CUP
+from config import COMPETITIONS, KIND_C_CUP
 
 
 @st.cache_data(show_spinner=False)
@@ -35,6 +35,7 @@ def get_combined_ranking(
     )
 
     return execute_query(_db_conn, sql_file)
+
 
 @st.cache_data(show_spinner=False)
 def get_combined_ranking_enriched(
@@ -82,15 +83,16 @@ def get_combined_ranking_one_season(db_conn):
     )
 
     if chosen_season:
-
         first_week = 1
         last_week = 100
         first_date = '1970-01-01'
         last_date = '2099-12-31'
 
         if comps_and_kind[chosen_comp] == KIND_C_CUP:
-            rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]
+            sides = ["Home", "Both", "Away", "Neutral", "All"]
+            # rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]
         else:
+            sides = ["Home", "Both", "Away"]
             all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
             n_teams = len(all_teams_of_comp_of_season)
 
@@ -100,7 +102,6 @@ def get_combined_ranking_one_season(db_conn):
             )
 
             if filter_weeks:
-
                 col1, col2 = st.columns(2)
                 max_week = 2 * (n_teams - 1)
 
@@ -116,7 +117,6 @@ def get_combined_ranking_one_season(db_conn):
                 if first_week == max_week:
                     last_week = max_week
                 else:
-
                     with col2:
                         last_week = st.slider(
                             key='combined_ranking_one_season__last_week',
@@ -126,7 +126,7 @@ def get_combined_ranking_one_season(db_conn):
                             value=first_week
                         )
 
-            rankings = TEAM_RANKINGS
+            # rankings = TEAM_RANKINGS
 
         filter_dates = st.checkbox(
             key='combined_ranking_one_season__filter_dates',
@@ -134,7 +134,6 @@ def get_combined_ranking_one_season(db_conn):
         )
 
         if filter_dates:
-
             col1, col2 = st.columns(2)
 
             with col1:
@@ -150,8 +149,6 @@ def get_combined_ranking_one_season(db_conn):
                     label="Last date",
                     value=first_date
                 )
-
-        sides = ["Home", "Both", "Away", "Neutral", "All"] if comps_and_kind[chosen_comp] == KIND_C_CUP else ["Home", "Both", "Away"]
 
         side = st.radio(
             key='combined_ranking_one_season__side',
@@ -170,27 +167,94 @@ def get_combined_ranking_one_season(db_conn):
         )
 
         if combined_ranking != "":
-
-            if combined_ranking == "Shots":
-                df = get_combined_shots(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
-            elif combined_ranking == "Passes":
-                df = get_combined_passes(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
-            elif combined_ranking == "Outcomes":
-                df = get_combined_outcomes(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
-            elif combined_ranking == "xG":
-                df = get_combined_xgs(db_conn,chosen_comp, chosen_season, combined_ranking, side, first_week, last_week, first_date, last_date)
-
-            else:
-                df = pd.DataFrame()
+            df = get_chosen_combined_ranking(
+                db_conn,
+                combined_ranking,
+                chosen_comp,
+                chosen_season,
+                side,
+                first_week,
+                last_week,
+                first_date,
+                last_date
+            )
 
             if not df.empty:
                 csv = df.to_csv(index=False, sep='|')
                 st.download_button(
                     label="📥 Download CSV",
                     data=csv,
-                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_{combined_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
+                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
+                              f"{combined_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
                     mime="text/csv"
                 )
+
+
+def get_chosen_combined_ranking(
+        db_conn,
+        combined_ranking,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date
+):
+    if combined_ranking == "Shots":
+        df = get_combined_shots(
+            db_conn,
+            chosen_comp,
+            chosen_season,
+            combined_ranking,
+            side,
+            first_week,
+            last_week,
+            first_date,
+            last_date
+        )
+    elif combined_ranking == "Passes":
+        df = get_combined_passes(
+            db_conn,
+            chosen_comp,
+            chosen_season,
+            combined_ranking,
+            side,
+            first_week,
+            last_week,
+            first_date,
+            last_date
+        )
+    elif combined_ranking == "Outcomes":
+        df = get_combined_outcomes(
+            db_conn,
+            chosen_comp,
+            chosen_season,
+            combined_ranking,
+            side,
+            first_week,
+            last_week,
+            first_date,
+            last_date
+        )
+    elif combined_ranking == "xG":
+        df = get_combined_xgs(
+            db_conn,
+            chosen_comp,
+            chosen_season,
+            combined_ranking,
+            side,
+            first_week,
+            last_week,
+            first_date,
+            last_date
+        )
+
+    else:
+        df = pd.DataFrame()
+
+    return df
+
 
 def get_combined_shots(
         db_conn,
@@ -257,8 +321,8 @@ def get_combined_shots(
     goals_data = df_melted[df_melted['Category'] == 'Goals']
 
     bars = alt.Chart(bars_data).mark_bar().encode(
-        x=alt.X('Shots:Q'),
-        y=alt.Y('Club:N', sort=club_order),
+        x=alt.X(shorthand='Shots:Q'),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
         color=alt.Color(
             'Category:N',
             scale=alt.Scale(
@@ -271,8 +335,8 @@ def get_combined_shots(
     )
 
     goals = alt.Chart(goals_data).mark_bar().encode(
-        x=alt.X('Shots:Q'),
-        y=alt.Y('Club:N', sort=club_order),
+        x=alt.X(shorthand='Shots:Q'),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
         color=alt.Color('Category:N', scale=alt.Scale(scheme='tableau10')),
         tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
         order=alt.Order('Category', sort='descending')
@@ -336,8 +400,8 @@ def get_combined_passes(
     )
 
     chart = alt.Chart(df_melted).mark_bar().encode(
-        x=alt.X('Count:Q', title="Number of passes"),
-        y=alt.Y('Club:N', sort=club_order),
+        x=alt.X(shorthand='Count:Q', title="Number of passes"),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
         color=alt.Color(
             'Kind:N',
             title="Passes",
@@ -357,8 +421,8 @@ def get_combined_passes(
         dx=4,
         color='black'
     ).encode(
-        y=alt.Y('Club:N', sort=club_order),
-        x=alt.X('Att Passes:Q', title="Number of passes"),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
+        x=alt.X(shorthand='Att Passes:Q', title="Number of passes"),
         text=alt.Text('Succ Passes Rate:Q', format='.0%'),
         tooltip=["Club:N", "Att Passes:Q", alt.Text('Succ Passes Rate:Q', format='.0%')]
     )
@@ -421,9 +485,10 @@ def get_combined_outcomes(
         df_melted['OutcomeOrder'] = df_melted['Outcome'].map(outcome_order)
 
     chart = alt.Chart(df_melted).mark_bar().encode(
-        x=alt.X('Count:Q', stack='zero'),
-        y=alt.Y('Club:N', sort=club_order),
-        color=alt.Color('Outcome:N',
+        x=alt.X(shorthand='Count:Q', stack='zero'),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
+        color=alt.Color(
+            shorthand='Outcome:N',
             scale=alt.Scale(
                 domain=['Wins', 'Draws', 'Loses'],
                 range=['steelblue', 'orange', 'firebrick'],
@@ -439,6 +504,7 @@ def get_combined_outcomes(
     st.altair_chart(chart, use_container_width=True)
 
     return df
+
 
 def get_combined_xgs(
         db_conn,
@@ -471,20 +537,37 @@ def get_combined_xgs(
     chosen_sorting = st.selectbox(
         key="combined_ranking_one_season__sorting",
         label="Sort by...",
-        options=["Ranking", "Goals For", "Goals Against", "xG For (fbref)", "xG For (understat)", "xG Against (fbref)", "xG Against (understat)"]
+        options=[
+            "Ranking",
+            "Goals For",
+            "Goals Against",
+            "xG For (fbref)",
+            "xG For (understat)",
+            "xG Against (fbref)",
+            "xG Against (understat)"
+        ]
     )
 
     club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
     df_melted = df.melt(
         id_vars=["Club", "Ranking"],
-        value_vars=["xG For (fbref)", "xG For (understat)", "xG Against (fbref)", "xG Against (understat)", "Goals For", "Goals Against"],
+        value_vars=[
+            "xG For (fbref)",
+            "xG For (understat)",
+            "xG Against (fbref)",
+            "xG Against (understat)",
+            "Goals For",
+            "Goals Against"
+        ],
         var_name="Side",
         value_name="Value"
     )
 
     df_melted['Value_abs'] = df_melted['Value'].abs()
-    df_melted['Category'] = df_melted['Side'].apply(lambda x: 'xG (fbref)' if 'fbref' in x else 'xG (understat)' if 'understat' in x else 'Goals')
+    df_melted['Category'] = df_melted['Side'].apply(
+        lambda x: 'xG (fbref)' if 'fbref' in x else 'xG (understat)' if 'understat' in x else 'Goals'
+    )
     df_melted['Side'] = df_melted['Side'].apply(lambda x: 'For' if 'For' in x else 'Against')
 
     xg_fbref_data = df_melted[df_melted['Category'] == 'xG (fbref)']
@@ -492,30 +575,42 @@ def get_combined_xgs(
     goals_data = df_melted[df_melted['Category'] == 'Goals']
 
     goals = alt.Chart(goals_data).mark_bar().encode(
-        x=alt.X('Value:Q'),
-        y=alt.Y('Club:N', sort=club_order),
-        color=alt.Color('Side:N',
-            scale=alt.Scale(domain=["For", "Against"], range=['steelblue', 'orange']),
+        x=alt.X(shorthand='Value:Q'),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
+        color=alt.Color(
+            shorthand='Side:N',
+            scale=alt.Scale(
+                domain=["For", "Against"],
+                range=['steelblue', 'orange']
+            ),
             legend=alt.Legend(title="Goals")
         ),
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='Goals'), "Ranking"]
     )
 
     expected_fbref = alt.Chart(xg_fbref_data).mark_tick(thickness=4, size=20).encode(
-        x=alt.X('Value:Q'),
-        y=alt.Y('Club:N', sort=club_order),
-        color=alt.Color('Category:N',
-            scale=alt.Scale(domain=["xG (fbref)", "xG (understat)"], range=['green', 'black']),
+        x=alt.X(shorthand='Value:Q'),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
+        color=alt.Color(
+            shorthand='Category:N',
+            scale=alt.Scale(
+                domain=["xG (fbref)", "xG (understat)"],
+                range=['green', 'black']
+            ),
             legend=alt.Legend(title="xG Source")
         ),
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
     )
 
     expected_understat = alt.Chart(xg_understat_data).mark_tick(thickness=4, size=20).encode(
-        x=alt.X('Value:Q'),
-        y=alt.Y('Club:N', sort=club_order),
-        color=alt.Color('Category:N',
-            scale=alt.Scale(domain=["xG (fbref)", "xG (understat)"], range=['green', 'black']),
+        x=alt.X(shorthand='Value:Q'),
+        y=alt.Y(shorthand='Club:N', sort=club_order),
+        color=alt.Color(
+            shorthand='Category:N',
+            scale=alt.Scale(
+                domain=["xG (fbref)", "xG (understat)"],
+                range=['green', 'black']
+            ),
             legend=None
         ),
         tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]

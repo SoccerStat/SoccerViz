@@ -11,9 +11,11 @@ def simulate_by_side(teams: pd.DataFrame, played_home: bool, n_sim: int):
         return simulations.sum(axis=0)
     return teams[(teams["played_home"] == played_home) & (teams["outcome"] == "goal")].shape[0]
 
+
 # Average number of points per simulation
 def mean_and_round(xp, r):
     return round(np.mean(xp), r)
+
 
 def simulate_matches(
         teams_shots: pd.DataFrame,
@@ -44,11 +46,15 @@ def simulate_matches(
     away_subset = both_teams_shots.loc[~both_teams_shots['played_home'], 'Club']
 
     return pd.DataFrame({
-        'Club': [home_subset.iloc[0] if not home_subset.empty else None, away_subset.iloc[0] if not away_subset.empty else None],
+        'Club': [
+            home_subset.iloc[0] if not home_subset.empty else None,
+            away_subset.iloc[0] if not away_subset.empty else None
+        ],
         'played_home': [True, False],
         'Partition': [partition, partition],
         'xP': [home_xp, away_xp]
     })
+
 
 @st.cache_data(show_spinner=False)
 def build_expected_performance_ranking(
@@ -81,6 +87,7 @@ def build_expected_performance_ranking(
             ).query(side_filter)[['Club', 'Partition', 'xP']].groupby(['Club', 'Partition']).sum().reset_index()
 
     return pd.DataFrame(columns=['Club', 'Partition', 'xP'])
+
 
 def merge_rankings(
     teams_ranking: pd.DataFrame,

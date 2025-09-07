@@ -5,7 +5,9 @@ from components.pages.team_stats.by_competition.get_global_ranking_many_seasons 
 from components.pages.team_stats.by_competition.get_global_ranking_one_season import get_ranking_one_season
 from components.pages.team_stats.by_competition.get_single_ranking_one_season import get_single_ranking_one_season
 from components.pages.team_stats.by_competition.get_stats_one_team import get_stats_and_matches_one_team
-from components.pages.team_stats.by_competition.get_team_performance_against_top_and_bottom import get_team_performance_against_top_and_bottom
+from components.pages.team_stats.by_competition.get_team_performance_against_top_and_bottom import (
+    get_team_performance_against_top_and_bottom
+)
 from config import TEAM_STATS_PAGES
 from utils.commons.BasePage import BasePage
 
@@ -48,6 +50,7 @@ class TeamStatsPage(BasePage):
         with self.set_expander("Global ranking over each season"):
             self.set_sub_sub_title("Global ranking over each season")
             get_global_ranking_by_season(db_conn)
+
 
 if __name__ == "__main__" or True:
     page = TeamStatsPage(TEAM_STATS_PAGES)

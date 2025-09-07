@@ -59,7 +59,7 @@ COMPETITIONS = {
         "diminutive": "LL",
         "kind": KIND_CHP,
         "style": {
-             "bg_color": "#FFF176",
+            "bg_color": "#FFF176",
             "font_color": "#FBC02D",
             "border_color": "#FBC02D"
         }
@@ -204,11 +204,11 @@ TEAM_RANKINGS = [
     "Succ Passes Rate",
 
     "Shots/onTarget Conversion Rate For",
- 	"Shots/onTarget Conversion Rate Against",
- 	"Shots/Goals Conversion Rate For",
- 	"Shots/Goals Conversion Rate Against",
- 	"onTarget/Goals Conversion Rate For",
- 	"onTarget/Goals Conversion Rate Against",
+    "Shots/onTarget Conversion Rate Against",
+    "Shots/Goals Conversion Rate For",
+    "Shots/Goals Conversion Rate Against",
+    "onTarget/Goals Conversion Rate For",
+    "onTarget/Goals Conversion Rate Against",
 ]
 
 TEAM_STATS_RANKINGS_PLOTTABLE = [

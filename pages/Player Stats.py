@@ -11,6 +11,7 @@ class PlayerStatsPage(BasePage):
         self.set_sub_title("Birthday boys")
         get_birthday_boys(db_conn)
 
+
 if __name__ == "__main__" or True:
     page = PlayerStatsPage(PLAYER_STATS_PAGE)
     page.render()

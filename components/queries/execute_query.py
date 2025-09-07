@@ -1,12 +1,13 @@
 import streamlit as st
-import pandas as pd
+from sqlalchemy import text
 
 from utils.helpers import format_query_result_info
-from sqlalchemy import text
+
 
 def execute_query(db_conn, query: str):
     """Exécute une requête SQL"""
     return db_conn.execute_query(text(query))
+
 
 def result_query(db_conn, query: str):
     with st.spinner("Running query ..."):

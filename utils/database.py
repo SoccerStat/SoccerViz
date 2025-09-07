@@ -50,6 +50,7 @@ class DatabaseConnection:
         if self.engine:
             self.engine.dispose()
 
+
 @st.cache_resource(show_spinner=False)
 def create_database_connection(host, port, user, password, database):
     """Crée et cache une connexion à la base de données"""
@@ -100,7 +101,12 @@ def restore_connection():
                 st.session_state.connection_hash = connection_hash
                 return True
 
-        except Exception as e:
+        except psycopg2.OperationalError as e:
+            st.error(f"PostgreSQL connection error: {e}")
+            clear_session()
+
+        except psycopg2.Error as e:
+            st.error(f"PostgreSQL error: {e}")
             clear_session()
     else:
         st.warning("Impossible de restaurer la connexion : mot de passe absent ou incomplet.")
@@ -128,24 +134,19 @@ def save_persistent_credentials(host, port, database, user, password):
 
     # Optionnel: Sauvegarde dans le cache navigateur (attention sécurité)
     # En production, utilisez un système de session sécurisé
-    try:
-        # Utilise les secrets Streamlit pour le chiffrement (optionnel)
-        st.session_state.persistent_connection = True
-    except Exception as e:
-        st.sidebar.warning("Session persistante non disponible")
+    # try:
+    # Utilise les secrets Streamlit pour le chiffrement (optionnel)
+    st.session_state.persistent_connection = True
+    # except:
+    # st.sidebar.warning("Session persistante non disponible")
+
 
 def clear_session():
     """Nettoie complètement la session"""
     if st.session_state.db_conn:
-        try:
-            st.session_state.db_conn.close()
-        except:
-            pass
+        st.session_state.db_conn.close()
 
     st.session_state.db_conn = None
     st.session_state.connected = False
     st.session_state.db_credentials = {}
     st.session_state.connection_hash = None
-
-    # Nettoie également le cache
-    # st.cache_resource.clear()

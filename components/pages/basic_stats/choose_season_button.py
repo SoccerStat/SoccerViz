@@ -20,15 +20,16 @@ def select_all_seasons_by_comp(db_conn, all_seasons, id_comp):
     )
     final_query = f"""
         SELECT DISTINCT season AS distinct_season
-        FROM ({union_query}) AS all_counts 
+        FROM ({union_query}) AS all_counts
         ORDER BY season;
     """
     result = execute_query(db_conn, final_query)
     return result['distinct_season'].tolist()
 
+
 def choose_season_button(db_conn, name_comp):
     if name_comp:
-        all_seasons =  get_seasons_by_comp(db_conn, name_comp)
+        all_seasons = get_seasons_by_comp(db_conn, name_comp)
 
         st.session_state.setdefault("basic_stats__seasons_selected", all_seasons)
 
@@ -58,7 +59,8 @@ def choose_season_button(db_conn, name_comp):
                         label="Max season",
                         options=[season for season in all_seasons if season >= min_season]
                     )
-                    st.session_state.basic_stats__seasons_selected = [season for season in all_seasons if min_season <= season <= max_season]
+                    st.session_state.basic_stats__seasons_selected = \
+                        [season for season in all_seasons if min_season <= season <= max_season]
 
             elif selected_mode == COMPARE_SEASONS_MODE:
                 cols = st.columns(2)

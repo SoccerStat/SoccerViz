@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.pages.basic_stats.by_season_by_comp.utils import get_stats
+from components.pages.basic_stats.by_season_by_comp.get_stats import get_stats
 
 
 def compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
@@ -23,7 +23,7 @@ def compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
     for i, season in enumerate(seasons_ids):
         with cols[i]:
             st.markdown(
-                f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{season.replace('_','-')}</h4>",
+                f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{season.replace('_', '-')}</h4>",
                 unsafe_allow_html=True
             )
             for title in titles:
@@ -31,5 +31,11 @@ def compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):
                     f"<h4 style='text-align: center; color: #1f77b4; margin-bottom: 1rem;'>{title}</h4>",
                     unsafe_allow_html=True
                 )
-                df = get_stats(_db_conn=db_conn, name_comp=name_comp, seasons_ids=[season], chosen_ranking=chosen_ranking, ranking=title.lower())
+                df = get_stats(
+                    _db_conn=db_conn,
+                    name_comp=name_comp,
+                    seasons_ids=[season],
+                    chosen_ranking=chosen_ranking,
+                    ranking=title.lower()
+                )
                 st.dataframe(df, use_container_width=True)

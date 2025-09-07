@@ -32,7 +32,13 @@ def sidebar_connection():
                     with st.spinner("Establishing database connection..."):
                         try:
                             save_persistent_credentials(host, port, database, user, password)
-                            db = create_database_connection(host=host, port=port, database=database, user=user, password=password)
+                            db = create_database_connection(
+                                host=host,
+                                port=port,
+                                database=database,
+                                user=user,
+                                password=password
+                            )
 
                             if db:
                                 st.session_state.db_conn = db
@@ -49,7 +55,10 @@ def sidebar_connection():
                 else:
                     st.sidebar.error("Please fill these fields")
 
-    # Affichage des informations de connexion
+    active_connection()
+
+
+def active_connection():
     if st.session_state.connected and st.session_state.db_conn is not None:
         st.sidebar.divider()
         st.sidebar.subheader("📋 Active Connection")
@@ -60,7 +69,6 @@ def sidebar_connection():
             st.sidebar.text(f"Database: {info.get('database', 'N/A')}")
             st.sidebar.text(f"User: {info.get('user', 'N/A')}")
 
-            # Bouton de déconnexion
             if st.sidebar.button("🔌 Disconnect"):
                 clear_session()
                 st.sidebar.success("Successfully disconnected")

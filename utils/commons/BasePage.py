@@ -50,4 +50,3 @@ class BasePage(ABC):
     @abstractmethod
     def content(self):
         pass
-

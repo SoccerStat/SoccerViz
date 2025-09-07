@@ -1,23 +1,23 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from datetime import datetime, timedelta
 
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
+
 @st.cache_data(show_spinner=False)
 def get_counts_by_item(_db_conn, column, item, frequency):
     sql_file = read_sql_file(
-        file_name=f"components/queries/monitoring/plot/upper.sql",
+        file_name="components/queries/monitoring/plot/upper.sql",
         date_column=column,
         in_tab=item,
         frequency=frequency.lower()
     )
     return execute_query(_db_conn, sql_file)
 
-def plot_upper(db_conn, column):
 
+def plot_upper(db_conn, column):
     clubs = "Clubs"
     players = "Players"
 
@@ -46,12 +46,12 @@ def plot_upper(db_conn, column):
         "player_count": players
     })
 
-   #  min_date = str(datetime.today() - timedelta(days=15))
+    # min_date = str(datetime.today() - timedelta(days=15))
     # df = df[df[column] >= min_date]
 
     chart = alt.Chart(df_melted).mark_line(point=True).encode(
-        x=alt.X(f"{column}:T", title="Date"),
-        y=alt.Y("count:Q", title=f"Number {'inserted' if column == 'inserted_at' else 'updated'}"),
+        x=alt.X(shorthand=f"{column}:T", title="Date"),
+        y=alt.Y(shorthand="count:Q", title=f"Number {'inserted' if column == 'inserted_at' else 'updated'}"),
         color=alt.Color(
             "Table:N",
             scale=alt.Scale(

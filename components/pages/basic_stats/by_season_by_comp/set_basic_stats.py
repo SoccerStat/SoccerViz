@@ -1,11 +1,9 @@
 import streamlit as st
 
-from components.queries.execute_query import execute_query
 from components.pages.basic_stats.by_season_by_comp.compare_seasons import compare_seasons
 from components.pages.basic_stats.by_season_by_comp.range_seasons import range_seasons
 
 from config import COMPARE_SEASONS_MODE
-from utils.file_helper.reader import read_sql_file
 
 
 def set_basic_stats_by_season_by_comp(db_conn, name_comp, season_mode, seasons_ids):
@@ -41,7 +39,7 @@ def set_basic_stats_by_season_by_comp(db_conn, name_comp, season_mode, seasons_i
 
     with players_or_clubs:
         st.markdown(
-            f"""
+            """
             <div style="display: flex; justify-content: center; align-items: flex-end;">
             """,
             unsafe_allow_html=True
@@ -53,7 +51,7 @@ def set_basic_stats_by_season_by_comp(db_conn, name_comp, season_mode, seasons_i
             label_visibility="collapsed"
         )
         st.markdown(
-            f"""
+            """
             </div>
             """,
             unsafe_allow_html=True
