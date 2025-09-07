@@ -5,7 +5,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 setup(
     name="soccerviz",
-    version='..-snapshot',  # quote simple !!!
+    version='0.0.0-snapshot',  # quote simple !!!
     packages=find_packages(),
     package_data={
         "soccerviz.sql": ["**/*.sql"],
