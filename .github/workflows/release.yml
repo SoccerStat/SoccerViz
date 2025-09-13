@@ -67,8 +67,7 @@ jobs:
             --base main \
             --head "$branch_name" \
             --title "Release v${{ steps.release_version.outputs.new_version }}" \
-            --body "🚀 Automatic release PR" \
-            --label "release,automated")
+            --body "🚀 Automatic release PR")
           echo "PR created: $pr_url"
         env:
           GH_TOKEN: ${{ steps.get_app_token.outputs.token }}
