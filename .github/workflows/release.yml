@@ -1,0 +1,94 @@
+name: Create Release
+
+on:
+  workflow_dispatch: # Workflow déclenché manuellement
+  pull_request:
+    types: [closed] # Sur PR fermée (merge) vers main
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate GitHub App token
+        id: get_app_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Determine release version
+        id: release_version
+        run: |
+          git fetch --tags
+          last_tag=$(git tag --list "v*" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+          if [ -z "$last_tag" ]; then
+            last_tag="v0.0.0"
+          fi
+          last_tag=${last_tag#v}
+          
+          echo "Last tag: $last_tag"
+
+          IFS='.' read -r major minor patch <<< "$last_tag"
+          patch=$((patch + 1))
+          new_version="$major.$minor.$patch"
+          tag_version="v$new_version"
+
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          echo "New version will be: $new_version"
+          echo "tag_version=$tag_version" >> $GITHUB_OUTPUT
+          echo "Tag version: $tag_version"
+
+      - name: Set Git identity
+        run: |
+          git config user.name "github-app[bot]"
+          git config user.email "github-app[bot]@users.noreply.github.com"
+
+      - name: Create release branch & PR (if workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          branch_name="release/${{ steps.release_version.outputs.new_version }}"
+          git checkout -b "$branch_name"
+          sed -i "s/version='[^']*'/version='${{ steps.release_version.outputs.new_version }}'/" setup.py
+          git add setup.py
+          git commit -m "Release: bump version to ${{ steps.release_version.outputs.new_version }}"
+          git push https://x-access-token:${{ steps.get_app_token.outputs.token }}@github.com/${{ github.repository }} HEAD:"$branch_name"
+
+          pr_url=$(gh pr create \
+            --base main \
+            --head "$branch_name" \
+            --title "Release v${{ steps.release_version.outputs.new_version }}" \
+            --body "🚀 Automatic release PR" \
+            --label "release,automated")
+          echo "PR created: $pr_url"
+        env:
+          GH_TOKEN: ${{ steps.get_app_token.outputs.token }}
+
+      - name: Create release tag (if PR merged)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull origin main
+
+          git tag "${{ steps.release_version.outputs.tag_version }}"
+          git push https://x-access-token:${{ steps.get_app_token.outputs.token }}@github.com/${{ github.repository }} --tags
+          echo "Created release tag: ${{ steps.release_version.outputs.tag_version }}"
+        env:
+          GH_TOKEN: ${{ steps.get_app_token.outputs.token }}
+
+      - name: Delete release branch (if PR merged)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        run: |
+          branch_name="release/${{ steps.release_version.outputs.new_version }}"
+          git push origin --delete "$branch_name"
+          echo "Deleted branch $branch_name"
