@@ -22,8 +22,7 @@ players_performance as (
     select
         id_comp,
         id_team,
-        id_player,
-        --array_cat(home_positions, away_positions) as positions,
+        split_part(id_player, '_', 1) as player,
         array(
             select distinct number
             from unnest(ARRAY[home_number, away_number]) as number
@@ -41,7 +40,7 @@ club as (
 ),
 player_stats_and_positions as (
     select
-        pp.id_player,
+        pp.player,
         p.name,
         array(
             select distinct unnest(array_agg(pp.numbers))
@@ -56,12 +55,12 @@ player_stats_and_positions as (
         sum(home_match) + sum(away_match) as matches
     from players_performance pp
     join upper.player p
-    on pp.id_player = p.id
+    on pp.player = p.id
     join club c
     on pp.id_team = pp.id_comp || '_' || c.id
     left join team_players tps
-    on pp.id_player = tps.player and pp.id_team = pp.id_comp || '_' || tps.id_club
-    group by pp.id_player, p.name, p.birth_date
+    on pp.player = tps.player and pp.id_team = pp.id_comp || '_' || tps.id_club
+    group by pp.player, p.name, p.birth_date
 ),
 total_players as (
     select count(*) as "Total number of players used"
