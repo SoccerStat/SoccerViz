@@ -9,30 +9,20 @@ with total_minutes_of_team as (
 ),
 team_players as (
     select
+        id,
         team,
         player,
         numbers,
         positions,
         position_groups
-        --array_agg(distinct numbers)
-        --array_agg(distinct pos) as positions,
-        --array_agg(distinct grp) as position_groups
     from season_{{ chosen_season }}.team_player tp
-    --CROSS JOIN LATERAL unnest(positions) AS pos
-    --CROSS JOIN LATERAL unnest(position_groups) AS grp
-    group by team, player
+    --group by team, player
 ),
 players_performance as (
     select
         id_comp,
         id_team,
         id_player,
-        --array_cat(home_positions, away_positions) as positions,
-        --array(
-        --    select distinct number
-        --    from unnest(ARRAY[home_number, away_number]) as number
-        --    where number IS NOT NULL
-        --) as numbers,
         home_match,
         away_match,
         home_minutes,
@@ -65,11 +55,11 @@ player_stats as (
         analytics.set_bigint_stat(sum(home_minutes), sum(away_minutes), '{{ in_side }}') as minutes
     from players_performance pp
     join upper.player p
-    on pp.id_player = p.id
+    on pp.id_player = p.id || '_' || pp.id_team
     join club c
     on pp.id_team = pp.id_comp || '_' || c.id
     left join team_players tps
-    on pp.id_player = tps.player and pp.id_team = tps.team
+    on pp.id_player = tps.id and pp.id_team = tps.team
     where case
         when '{{ in_side }}' = 'neutral' then (round = 'Final')
         when '{{ in_side }}' in ('home', 'away', 'both') then (round is null or round != 'Final')

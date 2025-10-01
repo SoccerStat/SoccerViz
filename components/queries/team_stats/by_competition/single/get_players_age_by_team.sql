@@ -16,6 +16,7 @@ with total_matches_minutes_by_team as (
 ),
 players_performance as (
     select
+        id_team,
         split_part(id_team, '_', -1) as id_club,
         id_player,
         home_match,
@@ -41,7 +42,7 @@ player_stats as (
         sum(home_minutes) + sum(away_minutes) as minutes
     from players_performance pp
     join upper.player p
-    on pp.id_player = p.id
+    on pp.id_player = p.id || '_' || pp.id_team
     join club c
     on pp.id_club = c.id
     group by c.name, pp.id_player, p.name, p.birth_date

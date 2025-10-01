@@ -243,10 +243,14 @@ def get_stats_and_matches_one_team(db_conn):
             n_players = df.shape[0]
             n_players_of_team = int(df["Total number of players used"].iloc[0])
 
-            st.write(f"{n_players} players that have played at least {int(chosen_rate)}%"
-                     f" of the possible minutes played "
+            st.write(f"{n_players} player{'s' if n_players > 1 else ''} that ha{'ve' if n_players > 1 else 's'} "
+                     f"played at least {int(chosen_rate)}% of the possible minutes played "
                      f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
-                     f"that are involved in {chosen_comp})")
+                     f"that are involved in {chosen_comp}).")
+
+            st.write("**% of minutes played** corresponds to the minutes played by the player "
+                     "divided by the playable minutes **of the the team**, "
+                     "not of the sum of minutes of the games the player has participated to.")
 
         set_sub_sub_sub_title("Selected matches")
 

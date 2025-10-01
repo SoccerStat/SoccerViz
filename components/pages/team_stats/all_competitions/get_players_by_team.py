@@ -63,7 +63,7 @@ def get_players_by_team(db_conn):
             n_players = df_team.shape[0]
             n_players_of_team = int(df_team["Total number of players used"].iloc[0])
 
-            st.write(f"{n_players} players that have played "
+            st.write(f"{n_players} player{'s' if n_players > 1 else ''} that ha{'ve' if n_players > 1 else 's'} played "
                      f"at least {chosen_nb_matches} match{'es' if chosen_nb_matches > 1 else ''} "
                      f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
-                     f"that are involved in all competitions)")
+                     f"that are involved in all competitions).")
