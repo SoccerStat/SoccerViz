@@ -16,7 +16,8 @@ def get_teams_by_competition(db_conn):
                     t.competition as "Competition",
                     COUNT(t. *) AS "Total From team",
                     COUNT(tp. *) AS "Total From team_player",
-                    COUNT(m. *) AS "Total From match"
+                    COUNT(m. *) AS "Total From match",
+                    COUNT(ts.*) AS "Total From team_stats"
                 FROM {season_schema}.team t
                 FULL OUTER JOIN (SELECT DISTINCT team FROM {season_schema}.team_player) AS tp
                 ON t.id = tp.team
@@ -25,6 +26,11 @@ def get_teams_by_competition(db_conn):
                     UNION SELECT competition, away_team as team FROM {season_schema}.match
                 ) AS m
                 ON t.id = m.team
+                FULL OUTER JOIN (
+                    SELECT team
+                    FROM {season_schema}.team_stats
+                ) AS ts
+                ON t.id = ts.team
                 GROUP BY t.competition
                 """
             for season_schema in all_season_schemas
@@ -40,7 +46,10 @@ def get_teams_by_competition(db_conn):
                 AND (
                     "Total From team" != "Total From team_player"
                     OR "Total From team" != "Total From match"
+                    OR "Total From team" != "Total From team_stats"
                     OR "Total From team_player" != "Total From match"
+                    OR "Total From team_player" != "Total From team_stats"
+                    OR "Total From match" != "Total From team_stats"
                 )
             ORDER BY "Season" desc, "Competition";
         """
