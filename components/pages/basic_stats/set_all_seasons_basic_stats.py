@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.get_seasons import get_all_seasons
+from components.commons.get_seasons import get_all_season_schemas
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
@@ -10,7 +10,7 @@ def set_all_seasons_basic_stats(db_conn):
         with st.container():
             players, matches, clubs, seasons = st.columns([1, 1, 1, 1])
 
-            all_seasons = get_all_seasons(db_conn)
+            all_season_schemas = get_all_season_schemas(db_conn)
 
             with players:
                 query = read_sql_file("components/queries/basic_stats/n_players.sql")
@@ -26,7 +26,7 @@ def set_all_seasons_basic_stats(db_conn):
                     )
 
             with matches:
-                union_query = " UNION ALL ".join([f"SELECT COUNT(*) AS c FROM {schema}.match" for schema in all_seasons])
+                union_query = " UNION ALL ".join([f"SELECT COUNT(*) AS c FROM {schema}.match" for schema in all_season_schemas])
                 final_query = f"SELECT SUM(c) AS total_matches FROM ({union_query}) AS all_counts;"
                 resu = execute_query(db_conn, final_query)
                 if resu is not None:
@@ -56,7 +56,7 @@ def set_all_seasons_basic_stats(db_conn):
                 st.markdown(
                     f"""
                     <h3 style='text-align: center; font-weight: normal'>
-                        <strong>{len(all_seasons)}</strong> Seasons
+                        <strong>{len(all_season_schemas)}</strong> Seasons
                     </h3>
                     """,
                     unsafe_allow_html=True

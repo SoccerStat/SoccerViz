@@ -6,7 +6,7 @@ from config import ALL_SEASONS_MODE, RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE
 
 
 @st.cache_data(show_spinner=False)
-def select_all_seasons_by_comp(db_conn, all_seasons, id_comp):
+def select_all_seasons_by_comp(db_conn, all_season_schemas, id_comp):
     if id_comp != "all_comps":
         condition_comp = f"WHERE competition = '{id_comp}'"
     else:
@@ -15,7 +15,7 @@ def select_all_seasons_by_comp(db_conn, all_seasons, id_comp):
     union_query = " UNION ALL ".join(
         [
             f"(SELECT '{schema[7:]}' as season FROM {schema}.match {condition_comp} LIMIT 1)"
-            for schema in all_seasons
+            for schema in all_season_schemas
         ]
     )
     final_query = f"""

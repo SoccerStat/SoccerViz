@@ -9,7 +9,7 @@ def set_button_with_style(
         font_color="black",
         border_color="black",
         width="100%",
-        height='60px',
+        height='80px',
         is_selected=False
 ):
     """

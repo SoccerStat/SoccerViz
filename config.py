@@ -9,6 +9,7 @@ PREFIX_PAGE = "SoccerStat-II"
 HOME_PAGE = PREFIX_PAGE
 BASIC_STATS_PAGE = "Basic Stats"
 MONITORING_PAGE = "Monitoring"
+CONSISTENCY_PAGE = "Consistency Checks"
 ANOMALY_DETECTION_PAGE = "Anomaly Detection"
 TEAM_STATS_PAGES = "Team Stats"
 TEAM_STATS_ALL_PAGE = "Team Stats - All Competitions"
@@ -18,6 +19,7 @@ PLAYER_X_TEAM_STATS = "Player x Team Stats"
 
 PAGES_CONFIG = [
     BASIC_STATS_PAGE,
+    CONSISTENCY_PAGE,
     MONITORING_PAGE,
     TEAM_STATS_ALL_PAGE,
     TEAM_STATS_SPECIFIC_PAGE,

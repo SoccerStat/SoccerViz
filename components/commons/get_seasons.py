@@ -4,8 +4,8 @@ from utils.file_helper.reader import read_sql_file
 
 
 @st.cache_data(show_spinner=False)
-def get_all_seasons(_db_conn):
-    sql_file = read_sql_file("components/queries/commons/all_seasons.sql")
+def get_all_season_schemas(_db_conn):
+    sql_file = read_sql_file("components/queries/commons/all_season_schemas.sql")
     result = execute_query(_db_conn, sql_file)
     return result['Schema'].to_list()
 

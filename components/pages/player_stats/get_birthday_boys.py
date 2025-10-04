@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from components.commons.get_seasons import get_all_seasons
+from components.commons.get_seasons import get_all_season_schemas
 from components.commons.set_titles import set_sub_sub_title
 from components.queries.execute_query import execute_query
 
@@ -24,7 +24,7 @@ def get_birthday_boys_by_season(_db_conn, season_schema, date):
 
 def get_birthday_boys(db_conn):
     n_seasons = 5
-    all_seasons_schema = get_all_seasons(db_conn)
+    all_seasons_schema = get_all_season_schemas(db_conn)
 
     date_input, actual_date = st.columns([2, 2])
 

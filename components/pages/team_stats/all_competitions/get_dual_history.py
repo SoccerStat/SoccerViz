@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_searchbox import st_searchbox
 import numpy as np
 
-from components.commons.get_seasons import get_all_seasons
+from components.commons.get_seasons import get_all_season_schemas
 from components.commons.search_for_item import make_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
 from components.commons.get_all_teams import get_all_teams
@@ -13,13 +13,13 @@ from config import COMPETITIONS
 
 
 @st.cache_data(show_spinner=False)
-def get_history(_db_conn, teamA, teamB, all_comps, all_seasons, side):
+def get_history(_db_conn, teamA, teamB, all_comps, all_season_schemas, side):
     sql_file = read_sql_file(
         "components/queries/team_stats/all_competitions/dual/get_dual_history.sql",
         teamA=teamA,
         teamB=teamB,
         comps=', '.join([f"'{comp}'" for comp in all_comps]),
-        seasons=', '.join([f"'{season[7:]}'" for season in all_seasons]),
+        seasons=', '.join([f"'{season_schema[7:]}'" for season_schema in all_season_schemas]),
         side=side
     )
 
@@ -27,13 +27,13 @@ def get_history(_db_conn, teamA, teamB, all_comps, all_seasons, side):
 
 
 @st.cache_data(show_spinner=False)
-def get_history_matches(_db_conn, teamA, teamB, all_comps, all_seasons, side):
+def get_history_matches(_db_conn, teamA, teamB, all_comps, all_season_schemas, side):
     sql_file = read_sql_file(
         "components/queries/team_stats/all_competitions/dual/get_dual_history_matches.sql",
         teamA=teamA,
         teamB=teamB,
         comps=', '.join([f"'{comp}'" for comp in all_comps]),
-        seasons=', '.join([f"'{season[7:]}'" for season in all_seasons]),
+        seasons=', '.join([f"'{season_schema[7:]}'" for season_schema in all_season_schemas]),
         side=side
     )
     return execute_query(_db_conn, sql_file)
@@ -41,7 +41,7 @@ def get_history_matches(_db_conn, teamA, teamB, all_comps, all_seasons, side):
 
 def get_dual_history(db_conn):
     all_comps = [comp["label"] for comp in COMPETITIONS.values()]
-    all_seasons = get_all_seasons(db_conn)
+    all_season_schemas = get_all_season_schemas(db_conn)
     all_teams = list(get_all_teams(db_conn))
 
     search_function = make_search_function(all_teams)
@@ -72,7 +72,7 @@ def get_dual_history(db_conn):
 
         set_sub_sub_sub_title("Basic Stats")
 
-        df = get_history(db_conn, teamA, teamB, all_comps, all_seasons, side)
+        df = get_history(db_conn, teamA, teamB, all_comps, all_season_schemas, side)
 
         if side in ["Both", "Neutral", "All"]:
             df.rename(columns={
@@ -86,6 +86,6 @@ def get_dual_history(db_conn):
 
         set_sub_sub_sub_title("Selected matches")
 
-        df_matches = get_history_matches(db_conn, teamA, teamB, all_comps, all_seasons, side)
+        df_matches = get_history_matches(db_conn, teamA, teamB, all_comps, all_season_schemas, side)
         df_matches.index = np.arange(1, len(df_matches) + 1)
         st.dataframe(df_matches)
