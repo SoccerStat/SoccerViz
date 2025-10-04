@@ -14,9 +14,9 @@ def get_teams_by_competition(db_conn):
                 SELECT
                     '{season_schema[7:]}' AS "Season",
                     t.competition as "Competition",
-                    COUNT(t. *) AS "Total From Team",
-                    COUNT(tp. *) AS "Total From Team Player",
-                    COUNT(m. *) AS "Total From Match"
+                    COUNT(t. *) AS "Total From team",
+                    COUNT(tp. *) AS "Total From team_player",
+                    COUNT(m. *) AS "Total From match"
                 FROM {season_schema}.team t
                 FULL OUTER JOIN (SELECT DISTINCT team FROM {season_schema}.team_player) AS tp
                 ON t.id = tp.team
@@ -38,9 +38,9 @@ def get_teams_by_competition(db_conn):
             WHERE
                 "Competition" IN (SELECT id from upper.competition WHERE kind IN ('championship', 'continental_cup'))
                 AND (
-                    "Total From Team" != "Total From Team Player"
-                    OR "Total From Team" != "Total From Match"
-                    OR "Total From Team Player" != "Total From Match"
+                    "Total From team" != "Total From team_player"
+                    OR "Total From team" != "Total From match"
+                    OR "Total From team_player" != "Total From match"
                 )
             ORDER BY "Season" desc, "Competition";
         """
@@ -51,5 +51,5 @@ def get_teams_by_competition(db_conn):
 def set_teams_by_competition_section(db_conn):
     teams_by_competition = get_teams_by_competition(db_conn)
 
-    set_sub_title("Teams by competition")
+    set_sub_title("Teams by competition in each table")
     st.write(teams_by_competition)
