@@ -41,6 +41,7 @@ def get_players_in_match_but_not_in_team(_db_conn):
 def set_unknown_players_section(db_conn):
     with st.container():
         set_sub_title("Basic consistency enforced by foreign keys")
+
         cols = st.columns([2, 3])
         with cols[0]:
             set_sub_sub_title("Unknown players")

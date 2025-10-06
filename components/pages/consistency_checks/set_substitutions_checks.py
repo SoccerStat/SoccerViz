@@ -66,17 +66,15 @@ def set_subs_with_unknown_players(_db_conn, all_season_schemas):
 
 def set_substitutions_checks_section(db_conn):
     all_season_schemas = get_all_season_schemas(db_conn)
+
     with st.container():
         set_sub_title("Substitutions")
+
         cols = st.columns([3, 5])
         with cols[0]:
-            duplicated_subs = set_duplicated_subs(db_conn, all_season_schemas)
-
             set_sub_sub_title("Duplicated substitutions")
-            st.write(duplicated_subs)
+            st.write(set_duplicated_subs(db_conn, all_season_schemas))
 
         with cols[1]:
-            subs_unknown_players = set_subs_with_unknown_players(db_conn, all_season_schemas)
-
             set_sub_sub_title("Substitutions with unknown players")
-            st.write(subs_unknown_players)
+            st.write(set_subs_with_unknown_players(db_conn, all_season_schemas))
