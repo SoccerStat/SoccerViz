@@ -138,5 +138,5 @@ def set_match_consistency_section(db_conn):
         set_sub_sub_title("Leg precedence")
         st.write(set_leg_precedence(db_conn, all_season_schemas))
 
-        set_sub_sub_title("Shots")
+        set_sub_sub_title("Team Stats")
         st.write(set_team_stats(db_conn, all_season_schemas))
