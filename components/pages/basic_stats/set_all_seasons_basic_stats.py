@@ -26,7 +26,12 @@ def set_all_seasons_basic_stats(db_conn):
                     )
 
             with matches:
-                union_query = " UNION ALL ".join([f"SELECT COUNT(*) AS c FROM {schema}.match" for schema in all_season_schemas])
+                union_query = " UNION ALL ".join(
+                    [
+                        f"SELECT COUNT(*) AS c FROM {schema}.match"
+                        for schema in all_season_schemas
+                    ]
+                )
                 final_query = f"SELECT SUM(c) AS total_matches FROM ({union_query}) AS all_counts;"
                 resu = execute_query(db_conn, final_query)
                 if resu is not None:

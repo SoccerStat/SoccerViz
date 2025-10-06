@@ -5,8 +5,9 @@ from components.commons.set_titles import set_sub_title
 from components.queries.execute_query import execute_query
 
 
-def get_teams_by_competition(db_conn):
-    all_season_schemas = get_all_season_schemas(db_conn)
+@st.cache_data(show_spinner=False)
+def get_teams_by_competition(_db_conn):
+    all_season_schemas = get_all_season_schemas(_db_conn)
 
     union_query = " UNION ALL ".join(
         [
@@ -54,7 +55,7 @@ def get_teams_by_competition(db_conn):
             ORDER BY "Season" desc, "Competition";
         """
 
-    return execute_query(db_conn, final_query)
+    return execute_query(_db_conn, final_query)
 
 
 def set_teams_by_competition_section(db_conn):
