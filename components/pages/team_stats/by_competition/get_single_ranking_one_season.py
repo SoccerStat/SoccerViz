@@ -254,20 +254,21 @@ def get_single_ranking_one_season(db_conn):
     chosen_comp = st.selectbox(
         key="single_ranking_one_season__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+    if chosen_comp:
+        seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    chosen_season = st.selectbox(
-        key="single_ranking_one_season__season",
-        label="Choose season...",
-        options=[""] + seasons_by_comp
-    )
+        chosen_season = st.selectbox(
+            key="single_ranking_one_season__season",
+            label="Choose season...",
+            options=[""] + seasons_by_comp
+        )
 
-    if chosen_season:
-        set_sub_sub_title("Average age of teams' squad")
-        get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season)
+        if chosen_season:
+            set_sub_sub_title("Average age of teams' squad")
+            get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season)
 
-        set_sub_sub_title("Single Stat ranking")
-        get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
+            set_sub_sub_title("Single Stat ranking")
+            get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)

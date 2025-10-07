@@ -24,46 +24,47 @@ def get_players_by_team(db_conn):
     chosen_season = st.selectbox(
         key="all_comps_players_by_team__season",
         label="Choose season...",
-        options=get_seasons_by_comp(db_conn, "All Competitions")
+        options=[""] + get_seasons_by_comp(db_conn, "All Competitions")
     )
 
-    all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, "all", [chosen_season])
-    # n_teams = len(all_teams_of_comp_of_season)
+    if chosen_season:
+        all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, "all", [chosen_season])
+        # n_teams = len(all_teams_of_comp_of_season)
 
-    chosen_team = st.selectbox(
-        key="all_comps_players_by_team__team",
-        label="Choose a team...",
-        options=[""] + all_teams_of_comp_of_season
-    )
+        chosen_team = st.selectbox(
+            key="all_comps_players_by_team__team",
+            label="Choose a team...",
+            options=[""] + all_teams_of_comp_of_season
+        )
 
-    if chosen_team:
-        df_team = get_players_with_given_rate_minutes(db_conn, chosen_season, chosen_team)
+        if chosen_team:
+            df_team = get_players_with_given_rate_minutes(db_conn, chosen_season, chosen_team)
 
-        col, _ = st.columns(2)
-        with col:
-            max_nb_matches = int(df_team["Total number of matches"].unique())
-            chosen_nb_matches = st.slider(
-                key="all_comps_players_by_team__nb_matches",
-                label="Minimum number of matches played",
-                min_value=0,
-                max_value=max_nb_matches,
-                value=0
-            )
+            col, _ = st.columns(2)
+            with col:
+                max_nb_matches = int(df_team["Total number of matches"].unique())
+                chosen_nb_matches = st.slider(
+                    key="all_comps_players_by_team__nb_matches",
+                    label="Minimum number of matches played",
+                    min_value=0,
+                    max_value=max_nb_matches,
+                    value=0
+                )
 
-        df_team = df_team[df_team["Matches"] >= chosen_nb_matches]
-        avg_age = df_team['Age'].mean()
-        df_team['Age'] = df_team['Age'].astype(int)
-        df_team.index = np.arange(1, len(df_team) + 1)
+            df_team = df_team[df_team["Matches"] >= chosen_nb_matches]
+            avg_age = df_team['Age'].mean()
+            df_team['Age'] = df_team['Age'].astype(int)
+            df_team.index = np.arange(1, len(df_team) + 1)
 
-        st.dataframe(df_team.drop(["Total number of matches", "Total number of players used"], axis=1))
+            st.dataframe(df_team.drop(["Total number of matches", "Total number of players used"], axis=1))
 
-        if not df_team.empty:
-            st.write(f"Average age of the club: **{int(avg_age)} years, {int((avg_age % 1) * 365)} days**")
+            if not df_team.empty:
+                st.write(f"Average age of the club: **{int(avg_age)} years, {int((avg_age % 1) * 365)} days**")
 
-            n_players = df_team.shape[0]
-            n_players_of_team = int(df_team["Total number of players used"].iloc[0])
+                n_players = df_team.shape[0]
+                n_players_of_team = int(df_team["Total number of players used"].iloc[0])
 
-            st.write(f"{n_players} player{'s' if n_players > 1 else ''} that ha{'ve' if n_players > 1 else 's'} played "
-                     f"at least {chosen_nb_matches} match{'es' if chosen_nb_matches > 1 else ''} "
-                     f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
-                     f"that are involved in all competitions).")
+                st.write(f"{n_players} player{'s' if n_players > 1 else ''} that ha{'ve' if n_players > 1 else 's'} played "
+                         f"at least {chosen_nb_matches} match{'es' if chosen_nb_matches > 1 else ''} "
+                         f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
+                         f"that are involved in all competitions).")

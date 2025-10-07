@@ -71,123 +71,124 @@ def get_combined_ranking_one_season(db_conn):
     chosen_comp = st.selectbox(
         key="combined_ranking_one_season__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+    if chosen_comp:
+        seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    chosen_season = st.selectbox(
-        key="combined_ranking_one_season__season",
-        label="Choose season...",
-        options=[""] + seasons_by_comp
-    )
+        chosen_season = st.selectbox(
+            key="combined_ranking_one_season__season",
+            label="Choose season...",
+            options=[""] + seasons_by_comp
+        )
 
-    if chosen_season:
-        first_week = 1
-        last_week = 100
-        first_date = '1970-01-01'
-        last_date = '2099-12-31'
+        if chosen_season:
+            first_week = 1
+            last_week = 100
+            first_date = '1970-01-01'
+            last_date = '2099-12-31'
 
-        if comps_and_kind[chosen_comp] == KIND_C_CUP:
-            sides = ["Home", "Both", "Away", "Neutral", "All"]
-            # rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]
-        else:
-            sides = ["Home", "Both", "Away"]
-            all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
-            n_teams = len(all_teams_of_comp_of_season)
+            if comps_and_kind[chosen_comp] == KIND_C_CUP:
+                sides = ["Home", "Both", "Away", "Neutral", "All"]
+                # rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]
+            else:
+                sides = ["Home", "Both", "Away"]
+                all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
+                n_teams = len(all_teams_of_comp_of_season)
 
-            filter_weeks = st.checkbox(
-                key='combined_ranking_one_season__filter_weeks',
-                label='Filter by week'
-            )
+                filter_weeks = st.checkbox(
+                    key='combined_ranking_one_season__filter_weeks',
+                    label='Filter by week'
+                )
 
-            if filter_weeks:
-                col1, col2 = st.columns(2)
-                max_week = 2 * (n_teams - 1)
+                if filter_weeks:
+                    col1, col2 = st.columns(2)
+                    max_week = 2 * (n_teams - 1)
 
-                with col1:
-                    first_week = st.slider(
-                        key='combined_ranking_one_season__first_week',
-                        label="First week",
-                        min_value=1,
-                        max_value=max_week,
-                        value=1
-                    )
-
-                if first_week == max_week:
-                    last_week = max_week
-                else:
-                    with col2:
-                        last_week = st.slider(
-                            key='combined_ranking_one_season__last_week',
-                            label="Last week",
-                            min_value=first_week,
+                    with col1:
+                        first_week = st.slider(
+                            key='combined_ranking_one_season__first_week',
+                            label="First week",
+                            min_value=1,
                             max_value=max_week,
-                            value=first_week
+                            value=1
                         )
 
-            # rankings = TEAM_RANKINGS
+                    if first_week == max_week:
+                        last_week = max_week
+                    else:
+                        with col2:
+                            last_week = st.slider(
+                                key='combined_ranking_one_season__last_week',
+                                label="Last week",
+                                min_value=first_week,
+                                max_value=max_week,
+                                value=first_week
+                            )
 
-        filter_dates = st.checkbox(
-            key='combined_ranking_one_season__filter_dates',
-            label='Filter by date'
-        )
+                # rankings = TEAM_RANKINGS
 
-        if filter_dates:
-            col1, col2 = st.columns(2)
-
-            with col1:
-                first_date = st.date_input(
-                    key='combined_ranking_one_season__first_date',
-                    label="First date",
-                    value="today"
-                )
-
-            with col2:
-                last_date = st.date_input(
-                    key='combined_ranking_one_season__last_date',
-                    label="Last date",
-                    value=first_date
-                )
-
-        side = st.radio(
-            key='combined_ranking_one_season__side',
-            label="Side",
-            options=sides,
-            horizontal=True,
-            label_visibility="collapsed",
-            index=1
-        )
-
-        combined_ranking = st.selectbox(
-            key="combined_ranking_one_season__ranking",
-            label="Choose combined ranking...",
-            options=["", "Shots", "Passes", "Outcomes", "xG"],
-            index=0
-        )
-
-        if combined_ranking != "":
-            df = get_chosen_combined_ranking(
-                db_conn,
-                combined_ranking,
-                chosen_comp,
-                chosen_season,
-                side,
-                first_week,
-                last_week,
-                first_date,
-                last_date
+            filter_dates = st.checkbox(
+                key='combined_ranking_one_season__filter_dates',
+                label='Filter by date'
             )
 
-            if not df.empty:
-                csv = df.to_csv(index=False, sep='|')
-                st.download_button(
-                    label="📥 Download CSV",
-                    data=csv,
-                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
-                              f"{combined_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
-                    mime="text/csv"
+            if filter_dates:
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    first_date = st.date_input(
+                        key='combined_ranking_one_season__first_date',
+                        label="First date",
+                        value="today"
+                    )
+
+                with col2:
+                    last_date = st.date_input(
+                        key='combined_ranking_one_season__last_date',
+                        label="Last date",
+                        value=first_date
+                    )
+
+            side = st.radio(
+                key='combined_ranking_one_season__side',
+                label="Side",
+                options=sides,
+                horizontal=True,
+                label_visibility="collapsed",
+                index=1
+            )
+
+            combined_ranking = st.selectbox(
+                key="combined_ranking_one_season__ranking",
+                label="Choose combined ranking...",
+                options=["", "Shots", "Passes", "Outcomes", "xG"],
+                index=0
+            )
+
+            if combined_ranking != "":
+                df = get_chosen_combined_ranking(
+                    db_conn,
+                    combined_ranking,
+                    chosen_comp,
+                    chosen_season,
+                    side,
+                    first_week,
+                    last_week,
+                    first_date,
+                    last_date
                 )
+
+                if not df.empty:
+                    csv = df.to_csv(index=False, sep='|')
+                    st.download_button(
+                        label="📥 Download CSV",
+                        data=csv,
+                        file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
+                                  f"{combined_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
+                        mime="text/csv"
+                    )
 
 
 def get_chosen_combined_ranking(

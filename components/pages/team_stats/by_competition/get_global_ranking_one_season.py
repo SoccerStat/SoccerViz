@@ -43,73 +43,74 @@ def get_ranking_one_season(db_conn):
     chosen_comp = st.selectbox(
         key="ranking_one_season__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    kind_of_comp = comps_and_kind[chosen_comp]
+    if chosen_comp:
+        kind_of_comp = comps_and_kind[chosen_comp]
 
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+        seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    chosen_season = st.selectbox(
-        key="ranking_one_season__season",
-        label="Choose season...",
-        options=[""] + seasons_by_comp
-    )
-
-    if chosen_season:
-
-        teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
-        n_teams = len(teams)
-
-        chosen_ranking = st.selectbox(
-            key="ranking_one_season__ranking",
-            label="Choose ranking...",
-            options=TEAM_STATS_RANKINGS_PLOTTABLE,
-            index=1
+        chosen_season = st.selectbox(
+            key="ranking_one_season__season",
+            label="Choose season...",
+            options=[""] + seasons_by_comp
         )
 
-        if chosen_ranking:
-            with st.spinner("Data loading..."):
-                if kind_of_comp == KIND_CHP:
-                    n_weeks = 2 * (n_teams - 1)
-                    df = ranking_by_chp_week(
-                        _db_conn=db_conn,
-                        chosen_ranking=chosen_ranking,
-                        chosen_comp=chosen_comp,
-                        chosen_season=chosen_season,
-                        nb_chp_weeks=n_weeks
-                    )
+        if chosen_season:
 
-                elif kind_of_comp == KIND_C_CUP:
-                    # n_weeks = 100
-                    df = ranking_by_c_cup_week(
-                        _db_conn=db_conn,
-                        chosen_ranking=chosen_ranking,
-                        chosen_comp=chosen_comp,
-                        chosen_season=chosen_season
-                    )
+            teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
+            n_teams = len(teams)
 
-            st.multiselect(
-                key="ranking_one_season__teams",
-                label="Choose teams...",
-                options=["All"] + teams
+            chosen_ranking = st.selectbox(
+                key="ranking_one_season__ranking",
+                label="Choose ranking...",
+                options=TEAM_STATS_RANKINGS_PLOTTABLE,
+                index=1
             )
 
-            chosen_teams = st.session_state.ranking_one_season__teams
+            if chosen_ranking:
+                with st.spinner("Data loading..."):
+                    if kind_of_comp == KIND_CHP:
+                        n_weeks = 2 * (n_teams - 1)
+                        df = ranking_by_chp_week(
+                            _db_conn=db_conn,
+                            chosen_ranking=chosen_ranking,
+                            chosen_comp=chosen_comp,
+                            chosen_season=chosen_season,
+                            nb_chp_weeks=n_weeks
+                        )
 
-            if 'All' in chosen_teams:
-                chosen_teams = teams
+                    elif kind_of_comp == KIND_C_CUP:
+                        # n_weeks = 100
+                        df = ranking_by_c_cup_week(
+                            _db_conn=db_conn,
+                            chosen_ranking=chosen_ranking,
+                            chosen_comp=chosen_comp,
+                            chosen_season=chosen_season
+                        )
 
-            if chosen_teams:
-                set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_teams)
-
-                csv = df.to_csv(index=False, sep='|')
-                st.download_button(
-                    label="📥 Download CSV",
-                    data=csv,
-                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_ranking_one_season.csv",
-                    mime="text/csv"
+                st.multiselect(
+                    key="ranking_one_season__teams",
+                    label="Choose teams...",
+                    options=["All"] + teams
                 )
+
+                chosen_teams = st.session_state.ranking_one_season__teams
+
+                if 'All' in chosen_teams:
+                    chosen_teams = teams
+
+                if chosen_teams:
+                    set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_teams)
+
+                    csv = df.to_csv(index=False, sep='|')
+                    st.download_button(
+                        label="📥 Download CSV",
+                        data=csv,
+                        file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_ranking_one_season.csv",
+                        mime="text/csv"
+                    )
 
 
 def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_teams):

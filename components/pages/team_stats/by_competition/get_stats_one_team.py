@@ -85,190 +85,241 @@ def get_stats_and_matches_one_team(db_conn):
     chosen_comp = st.selectbox(
         key="stats_one_team__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+    if chosen_comp:
+        seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    chosen_season = st.selectbox(
-        key="stats_one_team__season",
-        label="Choose season...",
-        options=seasons_by_comp
-    )
+        chosen_season = st.selectbox(
+            key="stats_one_team__season",
+            label="Choose season...",
+            options=[""] + seasons_by_comp
+        )
 
-    all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
-    n_teams = len(all_teams_of_comp_of_season)
+        if chosen_season:
+            all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
+            n_teams = len(all_teams_of_comp_of_season)
 
-    # search_function = make_search_function(all_teams_of_comp_of_season)
+            # search_function = make_search_function(all_teams_of_comp_of_season)
 
-    # chosen_team = st_searchbox(
-    #     search_function=search_function,
-    #     key="stats_one_team__team",
-    #     placeholder="Choose Team A",
-    # )
+            # chosen_team = st_searchbox(
+            #     search_function=search_function,
+            #     key="stats_one_team__team",
+            #     placeholder="Choose Team A",
+            # )
 
-    chosen_team = st.selectbox(
-        key="stats_one_team__team",
-        label="Choose a team...",
-        options=[""] + all_teams_of_comp_of_season
-    )
-
-    if chosen_team:
-        first_week = 1
-        last_week = 100
-        first_date = '1970-01-01'
-        last_date = '2099-12-31'
-
-        if comps_and_kind[chosen_comp] == KIND_CHP:
-
-            filter_weeks = st.checkbox(
-                key='stats_one_team__filter_weeks',
-                label='Filter by week'
+            chosen_team = st.selectbox(
+                key="stats_one_team__team",
+                label="Choose a team...",
+                options=[""] + all_teams_of_comp_of_season
             )
 
-            if filter_weeks:
-                col1, col2 = st.columns(2)
-                max_week = 2 * (n_teams - 1)
+            if chosen_team:
+                first_week = 1
+                last_week = 100
+                first_date = '1970-01-01'
+                last_date = '2099-12-31'
 
-                with col1:
-                    first_week = st.slider(
-                        key='stats_one_team__first_week',
-                        label="First week",
-                        min_value=1,
-                        max_value=max_week,
-                        value=1
+                if comps_and_kind[chosen_comp] == KIND_CHP:
+
+                    filter_weeks = st.checkbox(
+                        key='stats_one_team__filter_weeks',
+                        label='Filter by week'
                     )
 
-                if first_week == max_week:
-                    last_week = max_week
-                else:
-                    with col2:
-                        last_week = st.slider(
-                            key='stats_one_team__last_week',
-                            label="Last week",
-                            min_value=first_week,
-                            max_value=max_week,
-                            value=first_week
+                    if filter_weeks:
+                        col1, col2 = st.columns(2)
+                        max_week = 2 * (n_teams - 1)
+
+                        with col1:
+                            first_week = st.slider(
+                                key='stats_one_team__first_week',
+                                label="First week",
+                                min_value=1,
+                                max_value=max_week,
+                                value=1
+                            )
+
+                        if first_week == max_week:
+                            last_week = max_week
+                        else:
+                            with col2:
+                                last_week = st.slider(
+                                    key='stats_one_team__last_week',
+                                    label="Last week",
+                                    min_value=first_week,
+                                    max_value=max_week,
+                                    value=first_week
+                                )
+
+                filter_dates = st.checkbox(
+                    key='stats_one_team__filter_dates',
+                    label='Filter by date'
+                )
+
+                if filter_dates:
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        first_date = st.date_input(
+                            key='stats_one_team__first_date',
+                            label="First date",
+                            value="today"
                         )
 
-        filter_dates = st.checkbox(
-            key='stats_one_team__filter_dates',
-            label='Filter by date'
-        )
+                    with col2:
+                        last_date = st.date_input(
+                            key='stats_one_team__last_date',
+                            label="Last date",
+                            value=first_date
+                        )
 
-        if filter_dates:
-            col1, col2 = st.columns(2)
+                if comps_and_kind[chosen_comp] == KIND_C_CUP:
+                    sides = ["Home", "Both", "Away", "Neutral", "All"]
+                else:
+                    sides = ["Home", "Both", "Away"]
 
-            with col1:
-                first_date = st.date_input(
-                    key='stats_one_team__first_date',
-                    label="First date",
-                    value="today"
+                side = st.radio(
+                    key='stats_one_team__side',
+                    label="Side",
+                    options=sides,
+                    horizontal=True,
+                    label_visibility="collapsed",
+                    index=1
                 )
 
-            with col2:
-                last_date = st.date_input(
-                    key='stats_one_team__last_date',
-                    label="Last date",
-                    value=first_date
+                set_sub_sub_sub_title("Basic Stats")
+
+                team_stats = get_stats_of_team(
+                    db_conn,
+                    chosen_team,
+                    chosen_comp,
+                    chosen_season,
+                    side,
+                    first_week,
+                    last_week,
+                    first_date,
+                    last_date
                 )
 
-        if comps_and_kind[chosen_comp] == KIND_C_CUP:
-            sides = ["Home", "Both", "Away", "Neutral", "All"]
-        else:
-            sides = ["Home", "Both", "Away"]
+                team_stats_first_row = team_stats[["Club", "M", "W", "D", "L", "GF", "GA", "GD"]]
+                team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
+                team_stats_third_row = team_stats[
+                    [
+                        "Club",
+                        "Shots/onTarget For CR",
+                        "Shots/Goals For CR",
+                        "onTarget/Goals For CR"
+                    ]
+                ]
+                team_stats_fourth_row = team_stats[[
+                    "Club",
+                    "Shots/onTarget Against CR",
+                    "Shots/Goals Against CR",
+                    "onTarget/Goals Against CR"
+                ]]
 
-        side = st.radio(
-            key='stats_one_team__side',
-            label="Side",
-            options=sides,
-            horizontal=True,
-            label_visibility="collapsed",
-            index=1
+                st.dataframe(team_stats_first_row, hide_index=True)
+                st.dataframe(team_stats_second_row, hide_index=True)
+                st.dataframe(team_stats_third_row, hide_index=True)
+                st.dataframe(team_stats_fourth_row, hide_index=True)
+
+                get_selected_matches(
+                    db_conn,
+                    chosen_comp,
+                    chosen_season,
+                    chosen_team,
+                    side,
+                    first_week,
+                    last_week,
+                    first_date,
+                    last_date,
+                    comps_and_kind[chosen_comp]
+                )
+
+                get_team_squad(
+                    db_conn,
+                    chosen_comp,
+                    chosen_season,
+                    chosen_team,
+                    side
+                )
+
+
+def get_selected_matches(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        chosen_team,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        comp_kind
+):
+    set_sub_sub_sub_title("Selected matches")
+
+    team_matches = get_matches_of_team(
+        db_conn,
+        chosen_team,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        comp_kind
+    )
+
+    if comp_kind == KIND_CHP:
+        if not team_matches.empty:
+            team_matches = team_matches.drop("Round", axis=1)
+
+    st.dataframe(team_matches, hide_index=True)
+
+
+def get_team_squad(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        chosen_team,
+        side
+):
+    set_sub_sub_sub_title("% of players used")
+
+    df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, side)
+
+    col, _ = st.columns(2)
+    with col:
+        chosen_rate = st.slider(
+            key="rate_players_one_season__rate",
+            label="Minimum % of minutes played",
+            min_value=0,
+            max_value=100,
+            value=0
         )
 
-        set_sub_sub_sub_title("Basic Stats")
+    df = df[df["Minutes"] >= df["Total Minutes played by the whole team"] * chosen_rate / 100]
 
-        team_stats = get_stats_of_team(
-            db_conn,
-            chosen_team,
-            chosen_comp,
-            chosen_season,
-            side,
-            first_week,
-            last_week,
-            first_date,
-            last_date
-        )
+    avg_age = df['Age'].mean()
+    df['Age'] = df['Age'].astype(int)
+    df.index = range(1, len(df) + 1)
+    st.dataframe(df.drop(["Total number of players used", "Total Minutes played by the whole team"], axis=1))
 
-        team_stats_first_row = team_stats[["Club", "M", "W", "D", "L", "GF", "GA", "GD"]]
-        team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
-        team_stats_third_row = team_stats[["Club", "Shots/onTarget For CR", "Shots/Goals For CR", "onTarget/Goals For CR"]]
-        team_stats_fourth_row = team_stats[[
-            "Club",
-            "Shots/onTarget Against CR",
-            "Shots/Goals Against CR",
-            "onTarget/Goals Against CR"
-        ]]
+    if not df.empty:
+        st.write(f"Average age of the club: **{int(avg_age)} years, {int((avg_age % 1) * 365)} days**")
 
-        st.dataframe(team_stats_first_row, hide_index=True)
-        st.dataframe(team_stats_second_row, hide_index=True)
-        st.dataframe(team_stats_third_row, hide_index=True)
-        st.dataframe(team_stats_fourth_row, hide_index=True)
+        n_players = df.shape[0]
+        n_players_of_team = int(df["Total number of players used"].iloc[0])
 
-        set_sub_sub_sub_title("% of players used")
+        st.write(f"{n_players} player{'s' if n_players > 1 else ''} that ha{'ve' if n_players > 1 else 's'} "
+                 f"played at least {int(chosen_rate)}% of the possible minutes played "
+                 f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
+                 f"that are involved in {chosen_comp}).")
 
-        df = get_players_with_given_rate_minutes(db_conn, chosen_comp, chosen_season, chosen_team, side)
-
-        col, _ = st.columns(2)
-        with col:
-            chosen_rate = st.slider(
-                key="rate_players_one_season__rate",
-                label="Minimum % of minutes played",
-                min_value=0,
-                max_value=100,
-                value=0
-            )
-
-        df = df[df["Minutes"] >= df["Total Minutes played by the whole team"] * chosen_rate / 100]
-
-        avg_age = df['Age'].mean()
-        df['Age'] = df['Age'].astype(int)
-        df.index = range(1, len(df)+1)
-        st.dataframe(df.drop(["Total number of players used", "Total Minutes played by the whole team"], axis=1))
-
-        if not df.empty:
-            st.write(f"Average age of the club: **{int(avg_age)} years, {int((avg_age % 1) * 365)} days**")
-
-            n_players = df.shape[0]
-            n_players_of_team = int(df["Total number of players used"].iloc[0])
-
-            st.write(f"{n_players} player{'s' if n_players > 1 else ''} that ha{'ve' if n_players > 1 else 's'} "
-                     f"played at least {int(chosen_rate)}% of the possible minutes played "
-                     f"(or {round(100 * n_players / n_players_of_team, 2)}% of the players of the club "
-                     f"that are involved in {chosen_comp}).")
-
-            st.write("**% of minutes played** corresponds to the minutes played by the player "
-                     "divided by the playable minutes **of the the team**, "
-                     "not of the sum of minutes of the games the player has participated to.")
-
-        set_sub_sub_sub_title("Selected matches")
-
-        team_matches = get_matches_of_team(
-            db_conn,
-            chosen_team,
-            chosen_comp,
-            chosen_season,
-            side,
-            first_week,
-            last_week,
-            first_date,
-            last_date,
-            comps_and_kind[chosen_comp]
-        )
-
-        if comps_and_kind[chosen_comp] == KIND_CHP:
-            if not team_matches.empty:
-                team_matches = team_matches.drop("Round", axis=1)
-
-        st.dataframe(team_matches, hide_index=True)
+        st.write("**% of minutes played** corresponds to the minutes played by the player "
+                 "divided by the playable minutes **of the the team**, "
+                 "not of the sum of minutes of the games the player has participated to.")

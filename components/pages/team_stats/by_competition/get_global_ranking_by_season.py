@@ -51,55 +51,56 @@ def get_global_ranking_by_season(db_conn):
     chosen_comp = st.selectbox(
         key="global_ranking_by_season__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    # kind_of_comp = comps_and_kind[chosen_comp]
+    if chosen_comp:
+        # kind_of_comp = comps_and_kind[chosen_comp]
 
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+        seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    chosen_seasons = st.multiselect(
-        key="global_ranking_by_season__seasons",
-        label="Choose season...",
-        options=seasons_by_comp
-    )
-
-    if chosen_seasons:
-        # n_seasons = len(seasons_by_comp)
-
-        with st.spinner("Data loading..."):
-            df = ranking_by_chp_by_week_by_season(
-                _db_conn=db_conn,
-                chosen_ranking="Points",
-                chosen_comp=chosen_comp,
-                chosen_seasons=chosen_seasons,
-            )
-
-        teams = get_teams_by_comp_by_season(db_conn, chosen_comp, chosen_seasons)
-        n_teams = len(teams)
-
-        chosen_teams = st.multiselect(
-            key="global_ranking_by_season__teams",
-            label="Choose teams...",
-            options=["All"] + teams
+        chosen_seasons = st.multiselect(
+            key="global_ranking_by_season__seasons",
+            label="Choose season...",
+            options=seasons_by_comp
         )
 
-        if 'All' in chosen_teams:
-            chosen_teams = teams
+        if chosen_seasons:
+            # n_seasons = len(seasons_by_comp)
 
-        if chosen_teams:
+            with st.spinner("Data loading..."):
+                df = ranking_by_chp_by_week_by_season(
+                    _db_conn=db_conn,
+                    chosen_ranking="Points",
+                    chosen_comp=chosen_comp,
+                    chosen_seasons=chosen_seasons,
+                )
 
-            # set_plot(df, chosen_comp, chosen_teams, n_teams)
-            set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams)
-            set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams)
+            teams = get_teams_by_comp_by_season(db_conn, chosen_comp, chosen_seasons)
+            n_teams = len(teams)
 
-            csv = df.to_csv(index=False, sep='|', decimal=',')
-            st.download_button(
-                label="📥 Download CSV",
-                data=csv,
-                file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_by_season.csv",
-                mime="text/csv"
+            chosen_teams = st.multiselect(
+                key="global_ranking_by_season__teams",
+                label="Choose teams...",
+                options=["All"] + teams
             )
+
+            if 'All' in chosen_teams:
+                chosen_teams = teams
+
+            if chosen_teams:
+
+                # set_plot(df, chosen_comp, chosen_teams, n_teams)
+                set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams)
+                set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams)
+
+                csv = df.to_csv(index=False, sep='|', decimal=',')
+                st.download_button(
+                    label="📥 Download CSV",
+                    data=csv,
+                    file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_by_season.csv",
+                    mime="text/csv"
+                )
 
 
 def set_plot(df, chosen_comp, chosen_teams, n_teams):

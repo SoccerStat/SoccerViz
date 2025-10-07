@@ -58,34 +58,41 @@ def get_team_performance_against_top_and_bottom(db_conn):
     chosen_comp = st.selectbox(
         key="teams_performance_top_bottom_teams__comp",
         label="Choose competition...",
-        options=comps
+        options=[""] + comps
     )
 
-    seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
+    if chosen_comp:
+        seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-    chosen_season = st.selectbox(
-        key="teams_performance_top_bottom_teams__season",
-        label="Choose season...",
-        options=[""] + seasons_by_comp
-    )
-
-    if chosen_season:
-
-        side = st.radio(
-            label="Side",
-            options=["Home", "Both", "Away"],
-            horizontal=True,
-            label_visibility="collapsed",
-            index=1
+        chosen_season = st.selectbox(
+            key="teams_performance_top_bottom_teams__season",
+            label="Choose season...",
+            options=[""] + seasons_by_comp
         )
 
-        top_teams = get_top_teams(db_conn, chosen_comp, chosen_season)
-        bottom_teams = get_bottom_teams(db_conn, chosen_comp, chosen_season)
+        if chosen_season:
 
-        set_sub_sub_title("Against Top 6 Teams")
-        df_against_top_teams = get_teams_performance_against_teams(db_conn, chosen_comp, chosen_season, top_teams, side)
-        st.dataframe(df_against_top_teams)
+            side = st.radio(
+                label="Side",
+                options=["Home", "Both", "Away"],
+                horizontal=True,
+                label_visibility="collapsed",
+                index=1
+            )
 
-        set_sub_sub_title("Against Bottom 3 Teams")
-        df_against_bottom_teams = get_teams_performance_against_teams(db_conn, chosen_comp, chosen_season, bottom_teams, side)
-        st.dataframe(df_against_bottom_teams)
+            top_teams = get_top_teams(db_conn, chosen_comp, chosen_season)
+            bottom_teams = get_bottom_teams(db_conn, chosen_comp, chosen_season)
+
+            set_sub_sub_title("Against Top 6 Teams")
+            df_against_top_teams = get_teams_performance_against_teams(db_conn, chosen_comp, chosen_season, top_teams, side)
+            st.dataframe(df_against_top_teams)
+
+            set_sub_sub_title("Against Bottom 3 Teams")
+            df_against_bottom_teams = get_teams_performance_against_teams(
+                db_conn,
+                chosen_comp,
+                chosen_season,
+                bottom_teams,
+                side
+            )
+            st.dataframe(df_against_bottom_teams)
