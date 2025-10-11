@@ -137,7 +137,7 @@ DATABASE_CONFIG = {
     'default_host': os.getenv('DB_HOST', '10.0.0.1'),
     'default_port': os.getenv('DB_PORT', '5432'),
     'default_database': os.getenv('DB_NAME', 'prd_soccersql'),
-    'default_user': os.getenv('DB_USER', 'thomas')
+    'default_user': os.getenv('DB_USER', '')
 }
 
 CHART_CONFIG = {
