@@ -267,8 +267,8 @@ def get_single_ranking_one_season(db_conn):
         )
 
         if chosen_season:
-            set_sub_sub_title("Average age of teams' squad")
-            get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season)
-
             set_sub_sub_title("Single Stat ranking")
             get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
+
+            set_sub_sub_title("Average age of teams' squad")
+            get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season)
