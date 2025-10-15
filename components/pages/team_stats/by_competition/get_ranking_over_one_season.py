@@ -17,7 +17,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
 
     for j in range(1, nb_chp_weeks + 1):
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/over_one_season/get_cumulative_ranking_one_season.sql",
+            file_name="components/queries/team_stats/given_competition/over_one_season/get_ranking_over_one_season.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=chosen_season,
@@ -36,7 +36,7 @@ def ranking_by_c_cup_week(_db_conn, chosen_ranking, chosen_comp, chosen_season):
     return complete_df
 
 
-def get_ranking_one_season(db_conn):
+def get_ranking_over_one_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 

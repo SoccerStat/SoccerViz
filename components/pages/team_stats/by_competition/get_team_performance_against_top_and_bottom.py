@@ -39,7 +39,7 @@ def get_teams_performance_against_teams(_db_conn, chosen_comp, chosen_season, op
 
     for team in teams:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/top_bottom/get_global_ranking_against_teams.sql",
+            file_name="components/queries/team_stats/given_competition/top_bottom/get_ranking_against_teams.sql",
             name_comp=chosen_comp,
             season=chosen_season,
             name_team=team,

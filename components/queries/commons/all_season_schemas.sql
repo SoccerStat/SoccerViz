@@ -1,4 +1,4 @@
 SELECT "Schema"
 FROM analytics.get_season_schemas()
-WHERE "Schema" >= 'season_2000_2001'
+WHERE "Schema" >= 'season_{{ threshold_season }}'
 ORDER BY "Schema" desc

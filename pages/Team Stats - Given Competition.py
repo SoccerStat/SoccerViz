@@ -1,10 +1,11 @@
 from components.connection import get_connection
 from components.pages.team_stats.by_competition.get_combined_ranking_one_season import get_combined_ranking_one_season
-from components.pages.team_stats.by_competition.get_global_ranking_by_season import get_global_ranking_by_season
-from components.pages.team_stats.by_competition.get_global_ranking_many_seasons import get_global_ranking_many_seasons
-from components.pages.team_stats.by_competition.get_global_ranking_one_season import get_ranking_one_season
-from components.pages.team_stats.by_competition.get_single_ranking_one_season import get_single_ranking_one_season
-from components.pages.team_stats.by_competition.get_stats_one_team import get_stats_and_matches_one_team
+from components.pages.team_stats.by_competition.get_ranking_by_season import get_ranking_by_season
+from components.pages.team_stats.by_competition.get_ranking_over_many_seasons import get_ranking_over_many_seasons
+from components.pages.team_stats.by_competition.get_ranking_over_one_season import get_ranking_over_one_season
+from components.pages.team_stats.by_competition.get_single_stat_and_squad_age_rankings_one_season import (
+    get_single_stat_and_squad_age_rankings_one_season)
+from components.pages.team_stats.by_competition.get_stats_and_matches_one_team import get_stats_and_matches_one_team
 from components.pages.team_stats.by_competition.get_team_performance_against_top_and_bottom import (
     get_team_performance_against_top_and_bottom
 )
@@ -22,18 +23,15 @@ class TeamStatsPage(BasePage):
             self.set_sub_sub_title("Basic Stats of one team")
             get_stats_and_matches_one_team(db_conn)
 
-        with self.set_expander("Single Stat ranking"):
-            get_single_ranking_one_season(db_conn)
+        with self.set_expander("Single Stat ranking and Squad age ranking"):
+            get_single_stat_and_squad_age_rankings_one_season(db_conn)
 
         with self.set_expander("Combined Stat ranking"):
             self.set_sub_sub_title("Combined Stat ranking")
             get_combined_ranking_one_season(db_conn)
 
-        with self.set_expander("Moving Ranking"):
-            self.set_sub_sub_title("Moving Ranking")
-
-        # self.set_sub_sub_title("Global ranking over the season")
-        # get_global_ranking_one_season(db_conn)
+        # with self.set_expander("Moving Ranking"):
+        #     self.set_sub_sub_title("Moving Ranking")
 
         with self.set_expander("Teams Performance against Top/Bottom teams"):
             self.set_sub_sub_title("Teams Performance against Top/Bottom teams")
@@ -41,15 +39,15 @@ class TeamStatsPage(BasePage):
 
         with self.set_expander("Ranking over the season"):
             self.set_sub_sub_title("Ranking over the season")
-            get_ranking_one_season(db_conn)
+            get_ranking_over_one_season(db_conn)
 
         with self.set_expander("Global ranking over the completed seasons"):
             self.set_sub_sub_title("Global ranking over the completed seasons")
-            get_global_ranking_many_seasons(db_conn)
+            get_ranking_over_many_seasons(db_conn)
 
         with self.set_expander("Global ranking over each season"):
             self.set_sub_sub_title("Global ranking over each season")
-            get_global_ranking_by_season(db_conn)
+            get_ranking_by_season(db_conn)
 
 
 if __name__ == "__main__" or True:

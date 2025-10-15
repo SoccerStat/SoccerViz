@@ -49,7 +49,7 @@ def get_one_ranking(
     return execute_query(_db_conn, sql_file)
 
 
-def get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season):
+def get_players_age_ranking(db_conn, chosen_comp, chosen_season):
     players_stats_and_age = get_players_age_by_team(db_conn, chosen_comp, chosen_season)
 
     col, _ = st.columns(2)
@@ -96,7 +96,7 @@ def get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season):
     st.dataframe(avg_age_of_squads)
 
 
-def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
+def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
     first_week = 1
     last_week = 100
     first_date = '1970-01-01'
@@ -249,7 +249,7 @@ def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
         )
 
 
-def get_single_ranking_one_season(db_conn):
+def get_single_stat_and_squad_age_rankings_one_season(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
@@ -270,7 +270,7 @@ def get_single_ranking_one_season(db_conn):
 
         if chosen_season:
             set_sub_sub_title("Single Stat ranking")
-            get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
+            get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
 
             set_sub_sub_title("Average age of teams' squad")
-            get_avg_players_age_ranking(db_conn, chosen_comp, chosen_season)
+            get_players_age_ranking(db_conn, chosen_comp, chosen_season)

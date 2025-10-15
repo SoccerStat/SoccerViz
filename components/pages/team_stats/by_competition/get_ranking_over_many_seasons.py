@@ -17,7 +17,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/over_complete_seasons/get_ranking_many_seasons.sql",
+            file_name="components/queries/team_stats/given_competition/over_many_seasons/get_ranking_over_many_seasons.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -28,12 +28,12 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
     return complete_df
 
 
-def get_global_ranking_many_seasons(db_conn):
+def get_ranking_over_many_seasons(db_conn):
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
     comps = list(comps_and_kind.keys())
 
     chosen_comp = st.selectbox(
-        key="global_ranking_many_seasons__comp",
+        key="ranking_over_many_seasons__comp",
         label="Choose competition...",
         options=[""] + comps
     )
@@ -70,7 +70,7 @@ def get_global_ranking_many_seasons(db_conn):
             df = pd.merge(all_combinations, df, how='left', on=['Club', 'Season'])
 
         chosen_teams = st.multiselect(
-            key="global_ranking_many_seasons__teams",
+            key="ranking_over_many_seasons__teams",
             label="Choose teams...",
             options=["All"] + teams,
         )
@@ -86,7 +86,7 @@ def get_global_ranking_many_seasons(db_conn):
             st.download_button(
                 label="📥 Download CSV",
                 data=csv,
-                file_name=f"{chosen_comp.replace(' ', '_').lower()}_global_ranking_many_seasons.csv",
+                file_name=f"{chosen_comp.replace(' ', '_').lower()}_ranking_over_many_seasons.csv",
                 mime="text/csv"
             )
 

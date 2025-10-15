@@ -6,7 +6,7 @@ from utils.file_helper.reader import read_sql_file
 
 @st.cache_data(show_spinner=False)
 def get_all_season_schemas(_db_conn):
-    sql_file = read_sql_file("components/queries/commons/all_season_schemas.sql")
+    sql_file = read_sql_file("components/queries/commons/all_season_schemas.sql", threshold_season=THRESHOLD_SEASON)
     result = execute_query(_db_conn, sql_file)
     return result['Schema'].to_list()
 
