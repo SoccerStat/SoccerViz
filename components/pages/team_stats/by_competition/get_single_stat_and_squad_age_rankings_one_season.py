@@ -22,9 +22,9 @@ def get_players_age_by_team(_db_conn, chosen_comp, chosen_season):
     return execute_query(_db_conn, sql_file)
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def get_one_ranking(
-            _db_conn,
+        _db_conn,
         chosen_comp,
         chosen_season,
         chosen_ranking,
@@ -32,8 +32,12 @@ def get_one_ranking(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
+    day_slots = [slot.split(' ')[0] for slot in slots]
+    time_slots = [slot.split(' ')[1] for slot in slots]
+
     sql_file = read_sql_file(
         file_name="components/queries/team_stats/given_competition/single/get_single_ranking_one_season.sql",
         name_comp=chosen_comp,
@@ -43,10 +47,24 @@ def get_one_ranking(
         last_week=last_week,
         first_date=first_date,
         last_date=last_date,
+        day_slots=day_slots,
+        time_slots=time_slots,
         in_side=side.lower()
     )
 
     return execute_query(_db_conn, sql_file)
+
+
+# @st.cache_data(show_spinner=False)
+def get_distinct_slots(_db_conn, chosen_comp, chosen_season, ):
+    sql_file = read_sql_file(
+        file_name="components/queries/commons/get_distinct_slots_by_comp_by_season.sql",
+        name_comp=chosen_comp,
+        season=chosen_season
+    )
+    result = execute_query(_db_conn, sql_file)
+
+    return result["Slot"].to_list()
 
 
 def get_players_age_ranking(db_conn, chosen_comp, chosen_season):
@@ -101,6 +119,7 @@ def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
     last_week = 100
     first_date = '1970-01-01'
     last_date = '2099-12-31'
+    slots = []
 
     if comps_and_kind[chosen_comp] == KIND_C_CUP:
         rankings = [ranking for ranking in TEAM_RANKINGS if ranking not in C_CUPS_TEAMS_EXCLUDED_RANKINGS]
@@ -164,6 +183,21 @@ def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
                 value=first_date
             )
 
+    filter_slots = st.checkbox(
+        key='single_ranking_one_season__filter_slots',
+        label="Filter by time"
+    )
+
+    if filter_slots:
+        col, _ = st.columns(2)
+
+        with col:
+            slots = st.multiselect(
+                key="single_ranking_one_season__slots",
+                label="Time",
+                options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
+            )
+
     sides = (
         ["Home", "Both", "Away", "Neutral", "All"]
         if comps_and_kind[chosen_comp] == KIND_C_CUP
@@ -195,7 +229,8 @@ def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
             first_week,
             last_week,
             first_date,
-            last_date
+            last_date,
+            slots
         )
 
         ordered_clubs = df.sort_values(by=f"{chosen_ranking} Ranking", ascending=True)['Club'].tolist()
