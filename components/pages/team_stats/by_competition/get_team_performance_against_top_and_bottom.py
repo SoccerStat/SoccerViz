@@ -12,7 +12,7 @@ from utils.file_helper.reader import read_sql_file
 @st.cache_data(show_spinner=False)
 def get_top_teams(_db_conn, chosen_comp, chosen_season):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/by_competition/top_bottom/get_top_teams.sql",
+        file_name="components/queries/team_stats/given_competition/top_bottom/get_top_teams.sql",
         name_comp=chosen_comp,
         season=chosen_season
     )
@@ -23,7 +23,7 @@ def get_top_teams(_db_conn, chosen_comp, chosen_season):
 @st.cache_data(show_spinner=False)
 def get_bottom_teams(_db_conn, chosen_comp, chosen_season):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/by_competition/top_bottom/get_bottom_teams.sql",
+        file_name="components/queries/team_stats/given_competition/top_bottom/get_bottom_teams.sql",
         name_comp=chosen_comp,
         season=chosen_season
     )
@@ -39,7 +39,7 @@ def get_teams_performance_against_teams(_db_conn, chosen_comp, chosen_season, op
 
     for team in teams:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/by_competition/top_bottom/get_global_ranking_against_teams.sql",
+            file_name="components/queries/team_stats/given_competition/top_bottom/get_global_ranking_against_teams.sql",
             name_comp=chosen_comp,
             season=chosen_season,
             name_team=team,

@@ -11,7 +11,7 @@ from utils.file_helper.reader import read_sql_file
 @st.cache_data(show_spinner=False)
 def get_players_with_given_rate_minutes(_db_conn, chosen_season, chosen_team, r=3):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/all_competitions/players_by_team/get_players_with_given_rate_minutes.sql",
+        file_name="components/queries/team_stats/all_competitions/players_by_team/get_players_with_given_rate.sql",
         chosen_season=chosen_season,
         name_team=chosen_team,
         r=r
@@ -24,7 +24,7 @@ def get_players_by_team(db_conn):
     chosen_season = st.selectbox(
         key="all_comps_players_by_team__season",
         label="Choose season...",
-        options=[""] + get_seasons_by_comp(db_conn, "All Competitions")
+        options=[""] + get_seasons_by_comp(db_conn, name_comp="All Competitions")
     )
 
     if chosen_season:

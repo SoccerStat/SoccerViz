@@ -12,9 +12,9 @@ from (
         home_lose + away_lose as n_loses
     from analytics.staging_teams_performance
     WHERE
-    {% if name_comp != "All Competitions" %}
-    competition = '{{ name_comp }}' and
-    {% endif %}
+    {%- if name_comp != "All Competitions" -%}
+        {{ " " -}} competition = '{{ name_comp }}' AND {{- " " }}
+    {%- endif -%}
     season IN ({{ seasons_ids | join(', ') }})
 ) as stp
 left join upper.club c

@@ -128,22 +128,22 @@ neutral as (
     WHERE round = 'Final' and date >= '2000-01-01'
 ),
 selected_matches as (
-    {% if teamA in side %}
+    {%- if teamA in side %}
     select *
     from team_a
-    {% elif teamB in side %}
+    {%- elif teamB in side %}
     select *
     from team_b
-    {% elif side == 'Neutral' %}
+    {%- elif side == 'Neutral' %}
     select *
     from neutral
-    {% elif side == 'Both' %}
+    {%- elif side == 'Both' %}
     select *
     from team_a
     union all
     select *
     from team_b
-    {% else %}
+    {%- else %}
     select *
     from team_a
     union all
@@ -152,7 +152,7 @@ selected_matches as (
     union all
     select *
     from neutral
-    {% endif %}
+    {%- endif %}
 )
 select *
 from selected_matches

@@ -36,13 +36,17 @@ def get_home_away_balance(db_conn):
 
     set_sub_sub_sub_title("All seasons")
     df_all_seasons = df[df["Season"] == "All"]
-    get_home_away_balance_all_seasons_plotly(df_all_seasons)
+    get_balance_outcome_goals_all_seasons_plotly(df_all_seasons)
+
+
+def get_stats_by_season(db_conn):
+    df = get_balance(db_conn)
+
+    set_sub_sub_sub_title("Stats by season")
 
     colors_by_comp = set_colors_by_comp()
     df_by_season = df[df["Season"] != "All"]
     df_by_season = df_by_season.sort_values(["Season", "Competition"])
-
-    set_sub_sub_sub_title("Stats by season")
 
     col, _ = st.columns(2)
     with col:
@@ -60,10 +64,10 @@ def get_home_away_balance(db_conn):
         label_visibility="collapsed",
         index=1
     )
-    get_home_away_stats_by_season_plotly(df_by_season, chosen_stat, side, colors_by_comp)
+    get_stats_by_season_plotly(df_by_season, chosen_stat, side, colors_by_comp)
 
 
-def get_home_away_balance_all_seasons_plotly(df):
+def get_balance_outcome_goals_all_seasons_plotly(df):
     color_map_outcomes = {
         "Home Wins": '#1f77b4',
         "Draws": '#aec7e8',
@@ -146,7 +150,7 @@ def get_home_away_balance_all_seasons_plotly(df):
         st.plotly_chart(fig_goals, use_container_width=True)
 
 
-def get_home_away_stats_by_season_plotly(df, stat, side, colors):
+def get_stats_by_season_plotly(df, stat, side, colors):
     side_stat = f"{side} {stat}" if side != 'Both' else f"Total {stat}"
     df[f"{side_stat} / Match"] = df[side_stat] / df["Matches"]
 

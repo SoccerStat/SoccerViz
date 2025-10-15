@@ -6,8 +6,8 @@ from utils.file_helper.reader import read_sql_file
 
 
 @st.cache_data(show_spinner=False)
-def get_all_teams(_db_conn):
-    sql_file = read_sql_file("components/queries/commons/get_all_teams.sql")
+def get_all_clubs(_db_conn):
+    sql_file = read_sql_file("components/queries/commons/get_all_clubs.sql")
     result = execute_query(_db_conn, sql_file)
 
     return result["Club"].to_list()

@@ -13,7 +13,7 @@ from config import TEAM_RANKINGS, COMPETITIONS, C_CUPS_TEAMS_EXCLUDED_RANKINGS, 
 @st.cache_data(show_spinner=False)
 def get_players_age_by_team(_db_conn, chosen_comp, chosen_season):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/by_competition/single/get_players_age_by_team.sql",
+        file_name="components/queries/team_stats/given_competition/single/get_players_age_by_team.sql",
         name_comp=chosen_comp,
         season=chosen_season,
         r=2
@@ -35,7 +35,7 @@ def get_one_ranking(
         last_date
 ):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/by_competition/single/get_single_ranking_one_season.sql",
+        file_name="components/queries/team_stats/given_competition/single/get_single_ranking_one_season.sql",
         name_comp=chosen_comp,
         season=chosen_season,
         ranking=chosen_ranking,

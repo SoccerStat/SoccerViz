@@ -58,11 +58,10 @@ ON stp.id_opponent = stp.id_comp || '_' || opponent.id
 WHERE competition = '{{ name_comp }}'
 AND season = '{{ season }}'
 AND (
-    {% if kind_comp == 'C_CUP' %}
-    week is null
-    or
-    {% endif %}
-    cast(week as int) between {{ first_week }} and {{ last_week }}
+    {%- if kind_comp == 'C_CUP' -%}
+    week is null or {{- " " }}
+    {%- endif -%}
+    cast(week as int) between {{ first_week }} and {{ last_week -}}
 )
 AND date between '{{ first_date }}' and '{{ last_date }}'
 AND CASE

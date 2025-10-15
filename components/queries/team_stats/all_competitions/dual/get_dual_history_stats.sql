@@ -90,22 +90,22 @@ all_matches as (
 )
 ,
 selected_matches as (
-    {% if teamA in side %}
+    {%- if teamA in side %}
     select *
     from team_a
-    {% elif teamB in side %}
+    {%- elif teamB in side %}
     select *
     from team_b
-    {% elif side == 'Neutral' %}
+    {%- elif side == 'Neutral' %}
     select *
     from neutral
-    {% elif side == 'Both' %}
+    {%- elif side == 'Both' %}
     select *
     from both_sides
-    {% else %}
+    {%- else %}
     select *
     from all_matches
-    {% endif %}
+    {%- endif %}
 )
 select *
 from selected_matches;

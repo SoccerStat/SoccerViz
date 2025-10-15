@@ -1,26 +1,23 @@
 SELECT
     "Club",
     "Ranking"
-    {% if combined_ranking == 'shots' %}
-    ,
+    {%- if combined_ranking == 'shots' %},
     "Goals For",
     "Goals Against",
     "Shots For",
     "Shots Against",
     "Shots on Target For",
     "Shots on Target Against"
-    {% elif combined_ranking == 'outcomes' %}
-    ,
+    {%- elif combined_ranking == 'outcomes' %},
     "Wins",
     "Draws",
     "Loses"
-    {% elif combined_ranking == 'passes' %}
-    ,
+    {%- elif combined_ranking == 'passes' %},
     "Succ Passes",
     "Att Passes",
     "Succ Passes" + "Att Passes" as "Total Passes",
     "Succ Passes Rate"
-    {% endif %}
+    {%- endif %}
 FROM analytics.all_teams_rankings(
     in_comp    := '{{ name_comp }}',
     in_seasons := ARRAY['{{ season }}'],

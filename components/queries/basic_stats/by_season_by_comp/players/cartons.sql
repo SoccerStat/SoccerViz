@@ -5,9 +5,9 @@ WITH spp AS (
       SUM(home_r_cards + away_r_cards) AS "R"
     FROM analytics.staging_players_performance
     WHERE
-    {% if name_comp != "All Competitions" %}
-    competition = '{{ name_comp }}' AND
-    {% endif %}
+    {%- if name_comp != "All Competitions" -%}
+        {{ " " -}} competition = '{{ name_comp }}' AND {{- " " }}
+    {%- endif -%}
     season IN ({{ seasons_ids | join(', ') }})
     GROUP BY id_player
 )

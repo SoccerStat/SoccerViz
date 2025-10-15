@@ -23,7 +23,7 @@ def get_combined_ranking(
         last_date
 ):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/by_competition/combined/get_combined_ranking_one_season.sql",
+        file_name="components/queries/team_stats/given_competition/combined/get_combined_ranking_one_season.sql",
         name_comp=chosen_comp,
         season=chosen_season,
         combined_ranking=combined_ranking.lower(),
@@ -50,7 +50,7 @@ def get_combined_ranking_enriched(
         last_date
 ):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/by_competition/combined/get_combined_ranking_one_season_enriched.sql",
+        file_name="components/queries/team_stats/given_competition/combined/get_combined_ranking_one_season_enriched.sql",
         name_comp=chosen_comp,
         season=chosen_season,
         combined_ranking=combined_ranking.lower(),

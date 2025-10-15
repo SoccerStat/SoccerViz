@@ -5,7 +5,7 @@ import numpy as np
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.search_for_item import make_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
-from components.commons.get_all_teams import get_all_teams
+from components.commons.get_all_teams import get_all_clubs
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -15,7 +15,7 @@ from config import COMPETITIONS
 @st.cache_data(show_spinner=False)
 def get_history(_db_conn, teamA, teamB, all_comps, all_season_schemas, side):
     sql_file = read_sql_file(
-        "components/queries/team_stats/all_competitions/dual/get_dual_history.sql",
+        "components/queries/team_stats/all_competitions/dual/get_dual_history_stats.sql",
         teamA=teamA,
         teamB=teamB,
         comps=', '.join([f"'{comp}'" for comp in all_comps]),
@@ -42,7 +42,7 @@ def get_history_matches(_db_conn, teamA, teamB, all_comps, all_season_schemas, s
 def get_dual_history(db_conn):
     all_comps = [comp["label"] for comp in COMPETITIONS.values()]
     all_season_schemas = get_all_season_schemas(db_conn)
-    all_teams = list(get_all_teams(db_conn))
+    all_teams = list(get_all_clubs(db_conn))
 
     search_function = make_search_function(all_teams)
 
