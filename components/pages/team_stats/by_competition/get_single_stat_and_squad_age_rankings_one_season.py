@@ -185,7 +185,7 @@ def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
 
     filter_slots = st.checkbox(
         key='single_ranking_one_season__filter_slots',
-        label="Filter by time"
+        label="Filter by slot"
     )
 
     if filter_slots:
@@ -194,7 +194,7 @@ def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
         with col:
             slots = st.multiselect(
                 key="single_ranking_one_season__slots",
-                label="Time",
+                label="Slot",
                 options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
             )
 
