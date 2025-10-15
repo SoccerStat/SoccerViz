@@ -164,9 +164,11 @@ def get_single_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
                 value=first_date
             )
 
-    sides = ["Home", "Both", "Away", "Neutral", "All"] if comps_and_kind[chosen_comp] == KIND_C_CUP else ["Home",
-                                                                                                          "Both",
-                                                                                                          "Away"]
+    sides = (
+        ["Home", "Both", "Away", "Neutral", "All"]
+        if comps_and_kind[chosen_comp] == KIND_C_CUP
+        else ["Home", "Both", "Away"]
+    )
     side = st.radio(
         key='single_ranking_one_season__side',
         label="Side",

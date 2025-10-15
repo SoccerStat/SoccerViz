@@ -5,6 +5,18 @@ from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
 
+@st.cache_data(show_spinner=False)
+def set_count_matches(_db_conn, all_season_schemas):
+    union_query = " UNION ALL ".join(
+        [
+            f"SELECT COUNT(*) AS c FROM {schema}.match"
+            for schema in all_season_schemas
+        ]
+    )
+    final_query = f"SELECT SUM(c) AS total_matches FROM ({union_query}) AS all_counts;"
+    return execute_query(_db_conn, final_query)
+
+
 def set_all_seasons_basic_stats(db_conn):
     if db_conn:
         with st.container():
@@ -13,7 +25,7 @@ def set_all_seasons_basic_stats(db_conn):
             all_season_schemas = get_all_season_schemas(db_conn)
 
             with players:
-                query = read_sql_file("components/queries/basic_stats/n_players.sql")
+                query = read_sql_file("components/queries/basic_stats/upper/count_players.sql")
                 resu = execute_query(db_conn, query)
                 if resu is not None:
                     st.markdown(
@@ -26,14 +38,7 @@ def set_all_seasons_basic_stats(db_conn):
                     )
 
             with matches:
-                union_query = " UNION ALL ".join(
-                    [
-                        f"SELECT COUNT(*) AS c FROM {schema}.match"
-                        for schema in all_season_schemas
-                    ]
-                )
-                final_query = f"SELECT SUM(c) AS total_matches FROM ({union_query}) AS all_counts;"
-                resu = execute_query(db_conn, final_query)
+                resu = set_count_matches(db_conn, all_season_schemas)
                 if resu is not None:
                     st.markdown(
                         f"""
@@ -45,7 +50,7 @@ def set_all_seasons_basic_stats(db_conn):
                     )
 
             with clubs:
-                query = read_sql_file("components/queries/basic_stats/n_clubs.sql")
+                query = read_sql_file("components/queries/basic_stats/upper/count_clubs.sql")
                 resu = execute_query(db_conn, query)
                 if resu is not None:
                     st.markdown(

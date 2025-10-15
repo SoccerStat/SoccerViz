@@ -1,5 +1,6 @@
 import streamlit as st
 from components.queries.execute_query import execute_query
+from config import THRESHOLD_SEASON
 from utils.file_helper.reader import read_sql_file
 
 
@@ -12,6 +13,10 @@ def get_all_season_schemas(_db_conn):
 
 @st.cache_data(show_spinner=False)
 def get_seasons_by_comp(_db_conn, name_comp):
-    sql_file = read_sql_file("components/queries/basic_stats/by_comp/seasons.sql", name_comp=name_comp)
+    sql_file = read_sql_file(
+        file_name="components/queries/basic_stats/by_comp/seasons.sql",
+        name_comp=name_comp,
+        season_threshold=THRESHOLD_SEASON
+    )
     result = execute_query(_db_conn, sql_file)
-    return result['season'].to_list()
+    return result['Season'].to_list()

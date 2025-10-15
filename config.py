@@ -42,6 +42,8 @@ SELECTED_BUTTON_CONFIG = {
     "border_color": "#607D8B"
 }
 
+THRESHOLD_SEASON = "2000_2001"
+
 KIND_CHP = "CHP"
 KIND_C_CUP = "C_CUP"
 
