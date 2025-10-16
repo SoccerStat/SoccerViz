@@ -12,7 +12,7 @@ with stats as (
         first_date := '{{ first_date }}',
         last_date  := '{{ last_date }}',
         time_slots := ARRAY[{{ time_slots }}]::varchar[],
-        day_slots  := ARRAY[{{ day_slot }}]::varchar[],
+        day_slots  := ARRAY[{{ day_slots }}]::varchar[],
         side       := '{{ in_side }}'
     )
 )
