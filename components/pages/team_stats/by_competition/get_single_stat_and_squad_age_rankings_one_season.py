@@ -3,7 +3,7 @@ import altair as alt
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.set_titles import set_sub_sub_title
+from components.commons.set_titles import set_sub_sub_title, set_sub_sub_sub_title
 from components.commons.get_slots import get_distinct_slots
 from components.queries.execute_query import execute_query
 
@@ -44,6 +44,37 @@ def get_one_ranking(
         name_comp=chosen_comp,
         season=chosen_season,
         ranking=chosen_ranking,
+        first_week=first_week,
+        last_week=last_week,
+        first_date=first_date,
+        last_date=last_date,
+        day_slots=day_slots,
+        time_slots=time_slots,
+        in_side=side.lower()
+    )
+
+    return execute_query(_db_conn, sql_file)
+
+
+@st.cache_data(show_spinner=False)
+def get_global_ranking(
+        _db_conn,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        slots
+):
+    day_slots = [slot.split(' ')[0] for slot in slots]
+    time_slots = [slot.split(' ')[1] for slot in slots]
+
+    sql_file = read_sql_file(
+        file_name="components/queries/team_stats/given_competition/single/get_overall_ranking.sql",
+        name_comp=chosen_comp,
+        season=chosen_season,
         first_week=first_week,
         last_week=last_week,
         first_date=first_date,
@@ -103,7 +134,124 @@ def get_players_age_ranking(db_conn, chosen_comp, chosen_season):
     st.dataframe(avg_age_of_squads)
 
 
-def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind):
+def get_single_stat_ranking(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        slots,
+        rankings,
+):
+    chosen_ranking = st.selectbox(
+        key="single_ranking_one_season__ranking",
+        label="Choose ranking...",
+        options=[""] + rankings,
+        index=0
+    )
+
+    if chosen_ranking != "":
+        df = get_one_ranking(
+            db_conn,
+            chosen_comp,
+            chosen_season,
+            chosen_ranking,
+            side,
+            first_week,
+            last_week,
+            first_date,
+            last_date,
+            slots
+        )
+
+        ordered_clubs = df.sort_values(by=f"{chosen_ranking} Ranking", ascending=True)['Club'].tolist()
+
+        if chosen_ranking == "Points":
+            tooltip = ["Club", chosen_ranking, "Global Ranking"]
+        else:
+            tooltip = ["Club", chosen_ranking, "Global Ranking", f"{chosen_ranking} Ranking"]
+
+        bars = alt.Chart(df).mark_bar().encode(
+            x=chosen_ranking,
+            y=alt.Y(shorthand='Club', sort=ordered_clubs),
+            tooltip=tooltip
+        )
+
+        text_pos = alt.Chart(df).mark_text(
+            align='left',
+            baseline='middle',
+            dx=3
+        ).encode(
+            x=chosen_ranking,
+            y=alt.Y(shorthand='Club', sort=ordered_clubs),
+            text=chosen_ranking
+        ).transform_filter(
+            alt.datum[chosen_ranking] >= 0
+        )
+
+        text_neg = alt.Chart(df).mark_text(
+            align='right',
+            baseline='middle',
+            dx=-3
+        ).encode(
+            x=chosen_ranking,
+            y=alt.Y(shorthand='Club', sort=ordered_clubs),
+            text=chosen_ranking
+        ).transform_filter(
+            alt.datum[chosen_ranking] < 0
+        )
+
+        chart = alt.layer(bars, text_pos, text_neg)
+
+        st.altair_chart(chart, use_container_width=True)
+
+        csv = df.to_csv(index=False, sep='|')
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv,
+            file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
+                      f"{chosen_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
+            mime="text/csv"
+        )
+
+def get_overall_ranking(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        slots,
+):
+    df = get_global_ranking(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        slots
+    )
+
+    st.dataframe(df.set_index("Ranking"))
+
+    csv = df.to_csv(index=False, sep='|')
+    st.download_button(
+        label="📥 Download CSV",
+        data=csv,
+        file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
+                  "overall_ranking.csv",
+        mime="text/csv"
+    )
+
+def get_rankings(db_conn, chosen_comp, chosen_season, comps_and_kind):
     first_week = 1
     last_week = 100
     first_date = '1970-01-01'
@@ -201,76 +349,32 @@ def get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
         index=1
     )
 
-    chosen_ranking = st.selectbox(
-        key="single_ranking_one_season__ranking",
-        label="Choose ranking...",
-        options=[""] + rankings,
-        index=0
+    set_sub_sub_title("Overall ranking")
+    get_overall_ranking(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        slots
     )
 
-    if chosen_ranking != "":
-        df = get_one_ranking(
-            db_conn,
-            chosen_comp,
-            chosen_season,
-            chosen_ranking,
-            side,
-            first_week,
-            last_week,
-            first_date,
-            last_date,
-            slots
-        )
-
-        ordered_clubs = df.sort_values(by=f"{chosen_ranking} Ranking", ascending=True)['Club'].tolist()
-
-        if chosen_ranking == "Points":
-            tooltip = ["Club", chosen_ranking, "Global Ranking"]
-        else:
-            tooltip = ["Club", chosen_ranking, "Global Ranking", f"{chosen_ranking} Ranking"]
-
-        bars = alt.Chart(df).mark_bar().encode(
-            x=chosen_ranking,
-            y=alt.Y(shorthand='Club', sort=ordered_clubs),
-            tooltip=tooltip
-        )
-
-        text_pos = alt.Chart(df).mark_text(
-            align='left',
-            baseline='middle',
-            dx=3
-        ).encode(
-            x=chosen_ranking,
-            y=alt.Y(shorthand='Club', sort=ordered_clubs),
-            text=chosen_ranking
-        ).transform_filter(
-            alt.datum[chosen_ranking] >= 0
-        )
-
-        text_neg = alt.Chart(df).mark_text(
-            align='right',
-            baseline='middle',
-            dx=-3
-        ).encode(
-            x=chosen_ranking,
-            y=alt.Y(shorthand='Club', sort=ordered_clubs),
-            text=chosen_ranking
-        ).transform_filter(
-            alt.datum[chosen_ranking] < 0
-        )
-
-        chart = alt.layer(bars, text_pos, text_neg)
-
-        st.altair_chart(chart, use_container_width=True)
-
-        csv = df.to_csv(index=False, sep='|')
-        st.download_button(
-            label="📥 Download CSV",
-            data=csv,
-            file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
-                      f"{chosen_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
-            mime="text/csv"
-        )
+    set_sub_sub_sub_title("Single Stat ranking")
+    get_single_stat_ranking(
+        db_conn,
+        chosen_comp,
+        chosen_season,
+        side,
+        first_week,
+        last_week,
+        first_date,
+        last_date,
+        slots,
+        rankings
+    )
 
 
 def get_single_stat_and_squad_age_rankings_one_season(db_conn):
@@ -293,8 +397,8 @@ def get_single_stat_and_squad_age_rankings_one_season(db_conn):
         )
 
         if chosen_season:
-            set_sub_sub_title("Single Stat ranking")
-            get_single_stat_ranking(db_conn, chosen_comp, chosen_season, comps_and_kind)
+            set_sub_sub_title("Rankings")
+            get_rankings(db_conn, chosen_comp, chosen_season, comps_and_kind)
 
             set_sub_sub_title("Average age of teams' squad")
             get_players_age_ranking(db_conn, chosen_comp, chosen_season)
