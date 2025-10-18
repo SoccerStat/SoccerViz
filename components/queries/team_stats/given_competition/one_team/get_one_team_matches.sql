@@ -70,6 +70,14 @@ WITH matches AS (
         cast(week as int) between {{ first_week }} and {{ last_week -}}
     )
     AND date between '{{ first_date }}' and '{{ last_date }}'
+    AND (
+        cardinality(ARRAY[{{ day_slots }}]::text[]) = 0
+        OR TRIM(TO_CHAR(date, 'Day')) = ANY(ARRAY[{{ day_slots }}]::text[])
+    )
+    AND (
+        cardinality(ARRAY[{{ time_slots }}]::text[]) = 0
+        OR LEFT(stp.time::text, 5) = ANY(ARRAY[{{ time_slots }}]::text[])
+    )
     AND CASE
         WHEN '{{ in_side }}' = 'home' THEN played_home and (round is null or round != 'Final')
         WHEN '{{ in_side }}' = 'away' THEN not played_home and (round is null or round != 'Final')

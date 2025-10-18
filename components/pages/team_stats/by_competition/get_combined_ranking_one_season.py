@@ -4,6 +4,7 @@ import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
+from components.commons.get_slots import get_distinct_slots
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -20,8 +21,12 @@ def get_combined_ranking(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots,
 ):
+    day_slots = [slot.split(' ')[0] for slot in slots]
+    time_slots = [slot.split(' ')[1] for slot in slots]
+
     sql_file = read_sql_file(
         file_name="components/queries/team_stats/given_competition/combined/get_combined_ranking_one_season.sql",
         name_comp=chosen_comp,
@@ -31,6 +36,8 @@ def get_combined_ranking(
         last_week=last_week,
         first_date=first_date,
         last_date=last_date,
+        day_slots=day_slots,
+        time_slots=time_slots,
         in_side=side.lower()
     )
 
@@ -47,8 +54,12 @@ def get_combined_ranking_enriched(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
+    day_slots = [slot.split(' ')[0] for slot in slots]
+    time_slots = [slot.split(' ')[1] for slot in slots]
+
     sql_file = read_sql_file(
         file_name="components/queries/team_stats/given_competition/combined/get_combined_ranking_one_season_enriched.sql",
         name_comp=chosen_comp,
@@ -58,6 +69,8 @@ def get_combined_ranking_enriched(
         last_week=last_week,
         first_date=first_date,
         last_date=last_date,
+        day_slots=day_slots,
+        time_slots=time_slots,
         in_side=side.lower()
     )
 
@@ -88,6 +101,7 @@ def get_combined_ranking_one_season(db_conn):
             last_week = 100
             first_date = '1970-01-01'
             last_date = '2099-12-31'
+            slots = []
 
             if comps_and_kind[chosen_comp] == KIND_C_CUP:
                 sides = ["Home", "Both", "Away", "Neutral", "All"]
@@ -151,6 +165,21 @@ def get_combined_ranking_one_season(db_conn):
                         value=first_date
                     )
 
+            filter_slots = st.checkbox(
+                key='combined_ranking_one_season__filter_slots',
+                label="Filter by slot"
+            )
+
+            if filter_slots:
+                col, _ = st.columns(2)
+
+                with col:
+                    slots = st.multiselect(
+                        key="combined_ranking_one_season__slots",
+                        label="Slot",
+                        options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
+                    )
+
             side = st.radio(
                 key='combined_ranking_one_season__side',
                 label="Side",
@@ -177,7 +206,8 @@ def get_combined_ranking_one_season(db_conn):
                     first_week,
                     last_week,
                     first_date,
-                    last_date
+                    last_date,
+                    slots
                 )
 
                 if not df.empty:
@@ -200,7 +230,8 @@ def get_chosen_combined_ranking(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
     if combined_ranking == "Shots":
         df = get_combined_shots(
@@ -212,7 +243,8 @@ def get_chosen_combined_ranking(
             first_week,
             last_week,
             first_date,
-            last_date
+            last_date,
+            slots
         )
     elif combined_ranking == "Passes":
         df = get_combined_passes(
@@ -224,7 +256,8 @@ def get_chosen_combined_ranking(
             first_week,
             last_week,
             first_date,
-            last_date
+            last_date,
+            slots
         )
     elif combined_ranking == "Outcomes":
         df = get_combined_outcomes(
@@ -236,7 +269,8 @@ def get_chosen_combined_ranking(
             first_week,
             last_week,
             first_date,
-            last_date
+            last_date,
+            slots
         )
     elif combined_ranking == "xG":
         df = get_combined_xgs(
@@ -248,7 +282,8 @@ def get_chosen_combined_ranking(
             first_week,
             last_week,
             first_date,
-            last_date
+            last_date,
+            slots
         )
 
     else:
@@ -266,7 +301,8 @@ def get_combined_shots(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
     df = get_combined_ranking(
         db_conn,
@@ -277,7 +313,8 @@ def get_combined_shots(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
     )
 
     df['Shots Against'] = -df['Shots Against']
@@ -368,7 +405,8 @@ def get_combined_passes(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
     df = get_combined_ranking(
         db_conn,
@@ -379,7 +417,8 @@ def get_combined_passes(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
     )
 
     df['Ranking'] = df['Ranking'].astype(int)
@@ -447,7 +486,8 @@ def get_combined_outcomes(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
     df = get_combined_ranking(
         db_conn,
@@ -458,7 +498,8 @@ def get_combined_outcomes(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
     )
 
     df['Ranking'] = df['Ranking'].astype(int)
@@ -516,7 +557,8 @@ def get_combined_xgs(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
 ):
     df = get_combined_ranking_enriched(
         db_conn,
@@ -527,7 +569,8 @@ def get_combined_xgs(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots
     )
 
     df["xG Against (fbref)"] = -df["xG Against (fbref)"]

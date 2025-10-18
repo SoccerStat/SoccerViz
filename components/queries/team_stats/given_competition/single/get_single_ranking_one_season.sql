@@ -11,8 +11,8 @@ with stats as (
         last_week  := {{ last_week }},
         first_date := '{{ first_date }}',
         last_date  := '{{ last_date }}',
-        time_slots := ARRAY[{{ time_slots }}]::varchar[],
         day_slots  := ARRAY[{{ day_slots }}]::varchar[],
+        time_slots := ARRAY[{{ time_slots }}]::varchar[],
         side       := '{{ in_side }}'
     )
 )

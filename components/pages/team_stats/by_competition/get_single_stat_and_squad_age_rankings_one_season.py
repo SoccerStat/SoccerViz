@@ -4,6 +4,7 @@ import altair as alt
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.commons.set_titles import set_sub_sub_title
+from components.commons.get_slots import get_distinct_slots
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -22,7 +23,7 @@ def get_players_age_by_team(_db_conn, chosen_comp, chosen_season):
     return execute_query(_db_conn, sql_file)
 
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_one_ranking(
         _db_conn,
         chosen_comp,
@@ -53,18 +54,6 @@ def get_one_ranking(
     )
 
     return execute_query(_db_conn, sql_file)
-
-
-# @st.cache_data(show_spinner=False)
-def get_distinct_slots(_db_conn, chosen_comp, chosen_season, ):
-    sql_file = read_sql_file(
-        file_name="components/queries/commons/get_distinct_slots_by_comp_by_season.sql",
-        name_comp=chosen_comp,
-        season=chosen_season
-    )
-    result = execute_query(_db_conn, sql_file)
-
-    return result["Slot"].to_list()
 
 
 def get_players_age_ranking(db_conn, chosen_comp, chosen_season):

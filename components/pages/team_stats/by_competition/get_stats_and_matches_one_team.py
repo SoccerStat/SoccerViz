@@ -2,8 +2,8 @@ import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
-# from components.commons.search_for_item import make_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
+from components.commons.get_slots import get_distinct_slots
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -34,18 +34,24 @@ def get_stats_of_team(
         first_week,
         last_week,
         first_date,
-        last_date
+        last_date,
+        slots,
 ):
+    day_slots = [slot.split(' ')[0] for slot in slots]
+    time_slots = [slot.split(' ')[1] for slot in slots]
+
     sql_file = read_sql_file(
         "components/queries/team_stats/given_competition/one_team/get_one_team_stats.sql",
         name_team=chosen_team,
         name_comp=chosen_comp,
         season=chosen_season,
-        in_side=side.lower(),
         first_week=first_week,
         last_week=last_week,
         first_date=first_date,
-        last_date=last_date
+        last_date=last_date,
+        day_slots=day_slots,
+        time_slots=time_slots,
+        in_side=side.lower(),
     )
     return execute_query(_db_conn, sql_file)
 
@@ -61,8 +67,12 @@ def get_matches_of_team(
         last_week,
         first_date,
         last_date,
+        slots,
         kind_comp
 ):
+    day_slots = [slot.split(' ')[0] for slot in slots]
+    time_slots = [slot.split(' ')[1] for slot in slots]
+
     sql_file = read_sql_file(
         "components/queries/team_stats/given_competition/one_team/get_one_team_matches.sql",
         name_team=chosen_team,
@@ -73,6 +83,8 @@ def get_matches_of_team(
         last_week=last_week,
         first_date=first_date,
         last_date=last_date,
+        day_slots=day_slots,
+        time_slots=time_slots,
         kind_comp=kind_comp
     )
     return execute_query(_db_conn, sql_file)
@@ -120,6 +132,7 @@ def get_stats_and_matches_one_team(db_conn):
                 last_week = 100
                 first_date = '1970-01-01'
                 last_date = '2099-12-31'
+                slots = []
 
                 if comps_and_kind[chosen_comp] == KIND_CHP:
 
@@ -175,6 +188,21 @@ def get_stats_and_matches_one_team(db_conn):
                             value=first_date
                         )
 
+                filter_slots = st.checkbox(
+                    key='stats_one_team__filter_slots',
+                    label="Filter by slot"
+                )
+
+                if filter_slots:
+                    col, _ = st.columns(2)
+
+                    with col:
+                        slots = st.multiselect(
+                            key="stats_one_team__slots",
+                            label="Slot",
+                            options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
+                        )
+
                 if comps_and_kind[chosen_comp] == KIND_C_CUP:
                     sides = ["Home", "Both", "Away", "Neutral", "All"]
                 else:
@@ -200,7 +228,8 @@ def get_stats_and_matches_one_team(db_conn):
                     first_week,
                     last_week,
                     first_date,
-                    last_date
+                    last_date,
+                    slots
                 )
 
                 team_stats_first_row = team_stats[["Club", "M", "W", "D", "L", "GF", "GA", "GD"]]
@@ -235,6 +264,7 @@ def get_stats_and_matches_one_team(db_conn):
                     last_week,
                     first_date,
                     last_date,
+                    slots,
                     comps_and_kind[chosen_comp]
                 )
 
@@ -257,6 +287,7 @@ def get_selected_matches(
         last_week,
         first_date,
         last_date,
+        slots,
         comp_kind
 ):
     set_sub_sub_sub_title("Selected matches")
@@ -271,6 +302,7 @@ def get_selected_matches(
         last_week,
         first_date,
         last_date,
+        slots,
         comp_kind
     )
 

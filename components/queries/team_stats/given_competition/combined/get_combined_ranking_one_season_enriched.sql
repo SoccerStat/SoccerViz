@@ -16,5 +16,7 @@ FROM analytics.all_teams_rankings_enriched(
     first_date := '{{ first_date }}',
     last_date  := '{{ last_date }}',
     side       := '{{ in_side }}',
+    day_slots  := ARRAY[{{ day_slots }}]::varchar[],
+    time_slots := ARRAY[{{ time_slots }}]::varchar[],
     r          := 2
 );
