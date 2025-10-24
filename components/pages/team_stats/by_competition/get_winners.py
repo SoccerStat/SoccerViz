@@ -32,18 +32,7 @@ def get_winners(db_conn):
 
         df_winners = get_winners_by_competition(db_conn, chosen_season).groupby("Competition")
 
-        col_width = '150px'
-
-        for competition, winner_stats in df_winners:
+        for competition, podium_stats in df_winners:
             st.write(f"**{competition}**")
-            df_winner = (
-                winner_stats
-                .drop("Competition", axis=1)
-                .style.set_table_styles([
-                    {'selector': 'th', 'props': [('min-width', col_width), ('text-align', 'center')]},
-                    {'selector': 'td', 'props': [('min-width', col_width), ('text-align', 'center')]}
-                ])
-                .hide(axis="index")
-            )
 
-            st.dataframe(df_winner, hide_index=True, use_container_width=True)
+            st.dataframe(podium_stats.drop("Competition", axis=1), hide_index=True, use_container_width=True)

@@ -16,6 +16,6 @@ CROSS JOIN LATERAL (
 		"Goals Diff",
 		"Points"
 	FROM analytics.overall_teams_ranking(chps."Competition", ARRAY['{{ season }}'])
-	LIMIT 1
+	LIMIT 3
 ) rk
 ORDER BY chps."Competition", rk."Points" DESC;
