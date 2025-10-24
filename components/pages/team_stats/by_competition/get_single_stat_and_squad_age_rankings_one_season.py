@@ -217,6 +217,7 @@ def get_single_stat_ranking(
             mime="text/csv"
         )
 
+
 def get_overall_ranking(
         db_conn,
         chosen_comp,
@@ -250,6 +251,7 @@ def get_overall_ranking(
                   "overall_ranking.csv",
         mime="text/csv"
     )
+
 
 def get_rankings(db_conn, chosen_comp, chosen_season, comps_and_kind):
     first_week = 1

@@ -84,7 +84,13 @@ def get_team_performance_against_top_and_bottom(db_conn):
             bottom_teams = get_bottom_teams(db_conn, chosen_comp, chosen_season)
 
             set_sub_sub_title("Against Top 6 Teams")
-            df_against_top_teams = get_teams_performance_against_teams(db_conn, chosen_comp, chosen_season, top_teams, side)
+            df_against_top_teams = get_teams_performance_against_teams(
+                db_conn,
+                chosen_comp,
+                chosen_season,
+                top_teams,
+                side
+            )
             st.dataframe(df_against_top_teams)
 
             set_sub_sub_title("Against Bottom 3 Teams")

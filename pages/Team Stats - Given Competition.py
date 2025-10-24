@@ -1,5 +1,6 @@
 from components.connection import get_connection
 from components.pages.team_stats.by_competition.get_combined_ranking_one_season import get_combined_ranking_one_season
+from components.pages.team_stats.by_competition.get_promoted_teams import get_promoted_teams
 from components.pages.team_stats.by_competition.get_ranking_by_season import get_ranking_by_season
 from components.pages.team_stats.by_competition.get_ranking_over_many_seasons import get_ranking_over_many_seasons
 from components.pages.team_stats.by_competition.get_ranking_over_one_season import get_ranking_over_one_season
@@ -9,6 +10,7 @@ from components.pages.team_stats.by_competition.get_stats_and_matches_one_team i
 from components.pages.team_stats.by_competition.get_team_performance_against_top_and_bottom import (
     get_team_performance_against_top_and_bottom
 )
+from components.pages.team_stats.by_competition.get_winners import get_winners
 from config import TEAM_STATS_PAGES
 from utils.commons.BasePage import BasePage
 
@@ -48,6 +50,14 @@ class TeamStatsPage(BasePage):
         with self.set_expander("Global ranking over each season"):
             self.set_sub_sub_title("Global ranking over each season")
             get_ranking_by_season(db_conn)
+
+        with self.set_expander("History of competitions"):
+            with self.set_expander("Winners"):
+                self.set_sub_sub_title("Winners")
+                get_winners(db_conn)
+            with self.set_expander("Promoted teams"):
+                self.set_sub_sub_title("Promoted teams")
+                get_promoted_teams(db_conn)
 
 
 if __name__ == "__main__" or True:
