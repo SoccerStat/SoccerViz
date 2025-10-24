@@ -15,7 +15,8 @@ TEAM_STATS_PAGES = "Team Stats"
 TEAM_STATS_ALL_PAGE = "Team Stats - All Competitions"
 TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competition"
 PLAYER_STATS_PAGE = "Player Stats"
-PLAYER_X_TEAM_STATS = "Player x Team Stats"
+PLAYER_X_TEAM_STATS_PAGE = "Player x Team Stats"
+PUBLISHING_PAGE = "Publishing on Instagram"
 
 PAGES_CONFIG = [
     BASIC_STATS_PAGE,
@@ -24,7 +25,8 @@ PAGES_CONFIG = [
     TEAM_STATS_ALL_PAGE,
     TEAM_STATS_SPECIFIC_PAGE,
     PLAYER_STATS_PAGE,
-    PLAYER_X_TEAM_STATS
+    PLAYER_X_TEAM_STATS_PAGE,
+    PUBLISHING_PAGE
 ]
 
 ALL_BUTTON_CONFIG = {

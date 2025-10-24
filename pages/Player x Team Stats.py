@@ -1,4 +1,4 @@
-from config import PLAYER_X_TEAM_STATS
+from config import PLAYER_X_TEAM_STATS_PAGE
 
 from utils.commons.BasePage import BasePage
 
@@ -9,5 +9,5 @@ class PlayerTeamStats(BasePage):
 
 
 if __name__ == "__main__" or True:
-    page = PlayerTeamStats(PLAYER_X_TEAM_STATS)
+    page = PlayerTeamStats(PLAYER_X_TEAM_STATS_PAGE)
     page.render()
