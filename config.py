@@ -243,3 +243,13 @@ C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
     "xG Against",
     "xG Against/Match"
 ]
+
+# INSTAGRAM PUBLISHING
+
+TEMPLATES_PATH = "Maquettes Insta/v5/Streamlit/"
+
+INSTAGRAM_SUBJECTS = {
+    "VS": TEMPLATES_PATH + "VS.pptx",
+    "Tour d'Europe": TEMPLATES_PATH + "Tour d'Europe.pptx",
+    "Birthday Boys": TEMPLATES_PATH + "Birthday Boys.pptx"
+}
