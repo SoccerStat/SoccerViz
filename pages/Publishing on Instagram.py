@@ -26,12 +26,10 @@ class PublishingPage(BasePage):
         if chosen_subject:
             set_sub_sub_title(chosen_subject)
 
-            template_path = INSTAGRAM_SUBJECTS[chosen_subject]
 
             if chosen_subject == "VS":
-                publish_vs_post(
-                    template_path = template_path
-                )
+                publish_vs_post()
+
 
 if __name__ == "__main__" or True:
     page = PublishingPage(PUBLISHING_PAGE)
