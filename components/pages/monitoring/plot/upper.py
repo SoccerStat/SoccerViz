@@ -31,6 +31,9 @@ def plot_upper(db_conn, column):
     df_clubs = get_counts_by_item(db_conn, column, clubs.lower()[:-1], frequency)
     df_players = get_counts_by_item(db_conn, column, players.lower()[:-1], frequency)
 
+    df_players[column] = pd.to_datetime(df_players[column], errors='coerce', utc=True)
+    df_clubs[column] = pd.to_datetime(df_clubs[column], errors='coerce', utc=True)
+
     df = pd.merge(df_clubs, df_players, on=column, how='outer').fillna(0)
     df = df.sort_values(column)
 

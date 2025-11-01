@@ -32,6 +32,10 @@ def plot_by_season(db_conn, chosen_season, column):
 
     df_matches = get_counts_by_item(db_conn, chosen_season, column, matches.lower()[:-2], frequency)
     df_teams = get_counts_by_item(db_conn, chosen_season, column, teams.lower()[:-1], frequency)
+
+    df_matches[column] = pd.to_datetime(df_matches[column], errors='coerce', utc=True)
+    df_teams[column] = pd.to_datetime(df_teams[column], errors='coerce', utc=True)
+
     df_team_players = get_counts_by_item(
         _db_conn=db_conn,
         chosen_season=chosen_season,
@@ -39,6 +43,8 @@ def plot_by_season(db_conn, chosen_season, column):
         item=team_players.lower().replace(' ', '_')[:-1],
         frequency=frequency
     )
+
+    df_team_players[column] = pd.to_datetime(df_team_players[column], errors='coerce', utc=True)
 
     df = pd.merge(df_matches, df_teams, on=column, how='outer').fillna(0)
     df = pd.merge(df, df_team_players, on=column, how='outer').fillna(0)
