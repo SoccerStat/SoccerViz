@@ -59,6 +59,8 @@ def get_top_players(db_conn):
                     index=1
                 )
 
+                # TODO: ajouter filtres week / date / slots
+
     if chosen_comp and chosen_season:
         goals, assists = st.columns(2)
 
