@@ -244,6 +244,45 @@ C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
     "xG Against/Match"
 ]
 
+# PLAYER_RANKINGS
+
+PLAYER_RANKING = [
+    'Minutes',
+    'Matches',
+    'Started',
+    'Sub In',
+    'Sub Out',
+    'Injured',
+    'Captain',
+    'Wins',
+    'Draws',
+    'Loses',
+    'Goals',
+    'Att Penalties',
+    'Succ Penalties',
+    'Assists',
+    'xG (fbref)',
+    'xG (fbref) / Match',
+    'xG (understat)',
+    'xG (understat) / Match',
+
+    'Yellow Cards',
+    'Red Cards',
+    'Incl. 2 Yellow Cards',
+
+    'Shots',
+    'Shots on Target',
+
+    'Succ Passes',
+    'Att Passes',
+
+    'Shots/onTarget Conversion Rate',
+    'Shots/Goals Conversion Rate',
+    'onTarget/Goals Conversion Rate',
+
+    'Succ Passes Rate'
+]
+
 # INSTAGRAM PUBLISHING
 
 TEMPLATES_PATH = "Maquettes Insta/v5/Streamlit/"
