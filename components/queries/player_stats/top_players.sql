@@ -1,7 +1,7 @@
-SELECT "Player", "Matches", "Stat" as "{{ ranking }}"
+SELECT "Player", "Matches", coalesce("Stat", 0) as "{{ ranking }}"
 FROM analytics.one_players_ranking('{{ ranking }}', array['{{ comp }}'], array['{{ season }}'])
 WHERE case
-	when 'ALL' = ANY(ARRAY['{{ comp }}'])
+	when 'ALL' = ANY(ARRAY[upper('{{ comp }}')])
 	then "Competition" = 'ALL'
 	else "Competition" != 'ALL'
 end
