@@ -164,7 +164,8 @@ def get_top_players(db_conn):
             last_date,
             slots
         )
-        top_assists= get_top_players_by_stat(
+
+        top_assists = get_top_players_by_stat(
             db_conn,
             'Assists',
             chosen_comp,

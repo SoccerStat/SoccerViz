@@ -26,7 +26,6 @@ class PublishingPage(BasePage):
         if chosen_subject:
             set_sub_sub_title(chosen_subject)
 
-
             if chosen_subject == "VS":
                 publish_vs_post()
 
