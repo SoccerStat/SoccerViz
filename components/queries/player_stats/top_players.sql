@@ -1,9 +1,8 @@
 SELECT "Player", "Matches", coalesce("Stat", 0) as "{{ ranking }}"
-FROM analytics.one_players_ranking('{{ ranking }}', array['{{ comp }}'], array['{{ season }}'])
-WHERE case
-	when 'ALL' = ANY(ARRAY[upper('{{ comp }}')])
-	then "Competition" = 'ALL'
-	else "Competition" != 'ALL'
-end
-AND "Club" = 'ALL'
-ORDER BY "Stat" DESC;
+FROM analytics.one_players_ranking(
+    in_ranking := '{{ ranking }}',
+    in_comps := array['{{ comp }}'],
+    in_seasons := array['{{ season }}'],
+    group_competitions := 'ALL' = ANY(ARRAY[upper('{{ comp }}')])
+)
+ORDER BY "Stat" DESC, "Matches" ASC;

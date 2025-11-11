@@ -36,7 +36,10 @@ def get_top_players_by_stat(
         slots=slots,
     )
 
-    return execute_query(_db_conn, sql_file)
+    df = execute_query(_db_conn, sql_file)
+    df.index = range(1, len(df) + 1)
+
+    return df
 
 
 def get_top_players(db_conn):
@@ -176,6 +179,8 @@ def get_top_players(db_conn):
         top_decisive = top_scorers.merge(top_assists, how="inner", on="Player", suffixes=('_scorers', '_assists'))
         top_decisive['Matches'] = top_decisive['Matches_scorers']
         top_decisive['G+A'] = top_decisive[['Goals', 'Assists']].sum(axis=1, skipna=True)
+        top_decisive = top_decisive[['Player', 'Matches', 'G+A']].sort_values(by=['G+A', 'Matches'], ascending=[False, True])
+        top_decisive.index = range(1, len(top_decisive) + 1)
 
         with goals:
             set_sub_sub_title("Goals")
@@ -183,7 +188,7 @@ def get_top_players(db_conn):
 
         with decisive:
             set_sub_sub_title("G + A")
-            st.write(top_decisive[['Player', 'Matches', 'G+A']])
+            st.write(top_decisive)
 
         with assists:
             set_sub_sub_title("Assists")
