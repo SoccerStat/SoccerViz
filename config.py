@@ -16,6 +16,7 @@ TEAM_STATS_ALL_PAGE = "Team Stats - All Competitions"
 TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competition"
 PLAYER_STATS_PAGE = "Player Stats"
 PLAYER_X_TEAM_STATS_PAGE = "Player x Team Stats"
+COACHES_STATS_PAGE = "Coaches Stats"
 PUBLISHING_PAGE = "Publishing on Instagram"
 
 PAGES_CONFIG = [
@@ -26,6 +27,7 @@ PAGES_CONFIG = [
     TEAM_STATS_SPECIFIC_PAGE,
     PLAYER_STATS_PAGE,
     PLAYER_X_TEAM_STATS_PAGE,
+    COACHES_STATS_PAGE,
     PUBLISHING_PAGE
 ]
 

@@ -3,29 +3,25 @@ import streamlit as st
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.get_slots import get_distinct_slots
-from components.commons.set_titles import set_sub_sub_title
 from components.queries.execute_query import execute_query
 from config import COMPETITIONS
 
 from utils.file_helper.reader import read_sql_file
 
 
-@st.cache_data(show_spinner=False)
-def get_top_players_by_stat(
-        _db_conn,
-        in_ranking,
-        chosen_comp,
-        chosen_season,
-        chosen_side,
-        first_week,
-        last_week,
-        first_date,
-        last_date,
-        slots,
+def get_coaches_stats_by_comp_by_season(
+    _db_conn,
+    chosen_comp,
+    chosen_season,
+    chosen_side,
+    first_week,
+    last_week,
+    first_date,
+    last_date,
+    slots,
 ):
     sql_file = read_sql_file(
-        file_name="components/queries/player_stats/top_players.sql",
-        ranking=in_ranking,
+        file_name="components/queries/coaches_stats/coaches_stats.sql",
         comp=chosen_comp,
         season=chosen_season,
         side=chosen_side.lower(),
@@ -42,12 +38,12 @@ def get_top_players_by_stat(
     return df
 
 
-def get_top_players(db_conn):
+def get_coaches_stats(db_conn):
     col, _ = st.columns(2)
 
     with col:
         chosen_comp = st.selectbox(
-            key="top_players__comp",
+            key="coaches_stats__comp",
             label="Choose one competition...",
             options=[""] + ["All"] + [comp["label"] for _, comp in COMPETITIONS.items()]
         )
@@ -56,7 +52,7 @@ def get_top_players(db_conn):
             all_seasons = [season_schema[7:] for season_schema in get_all_season_schemas(db_conn)]
 
             chosen_season = st.selectbox(
-                key="top_players__season",
+                key="coaches_stats__season",
                 label="Choose one season...",
                 options=[""] + all_seasons
             )
@@ -140,7 +136,7 @@ def get_top_players(db_conn):
                             options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
                         )
                 chosen_side = st.radio(
-                    key="top_players__side",
+                    key="coaches_stats__side",
                     label="Side",
                     options=["Home", "Both", "Away"],
                     horizontal=True,
@@ -149,10 +145,8 @@ def get_top_players(db_conn):
                 )
 
     if chosen_comp and chosen_season:
-        goals, decisive, assists = st.columns(3)
-        top_scorers = get_top_players_by_stat(
+        coaches_stats = get_coaches_stats_by_comp_by_season(
             db_conn,
-            'Goals',
             chosen_comp,
             chosen_season,
             chosen_side,
@@ -163,32 +157,4 @@ def get_top_players(db_conn):
             slots
         )
 
-        top_assists = get_top_players_by_stat(
-            db_conn,
-            'Assists',
-            chosen_comp,
-            chosen_season,
-            chosen_side,
-            first_week,
-            last_week,
-            first_date,
-            last_date,
-            slots
-        )
-        top_decisive = top_scorers.merge(top_assists, how="inner", on="Player", suffixes=('_scorers', '_assists'))
-        top_decisive['M'] = top_decisive['M_scorers']
-        top_decisive['G+A'] = top_decisive[['Goals', 'Assists']].sum(axis=1, skipna=True)
-        top_decisive = top_decisive[['Player', 'M', 'G+A']].sort_values(by=['G+A', 'M'], ascending=[False, True])
-        top_decisive.index = range(1, len(top_decisive) + 1)
-
-        with goals:
-            set_sub_sub_title("Goals")
-            st.write(top_scorers)
-
-        with decisive:
-            set_sub_sub_title("G + A")
-            st.write(top_decisive)
-
-        with assists:
-            set_sub_sub_title("Assists")
-            st.write(top_assists)
+        st.write(coaches_stats)
