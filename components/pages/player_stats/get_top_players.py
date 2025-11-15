@@ -178,9 +178,9 @@ def get_top_players(db_conn):
             slots
         )
         top_decisive = top_scorers.merge(top_assists, how="inner", on="Player", suffixes=('_scorers', '_assists'))
-        top_decisive['Matches'] = top_decisive['Matches_scorers']
+        top_decisive['M'] = top_decisive['M_scorers']
         top_decisive['G+A'] = top_decisive[['Goals', 'Assists']].sum(axis=1, skipna=True)
-        top_decisive = top_decisive[['Player', 'Matches', 'G+A']].sort_values(by=['G+A', 'Matches'], ascending=[False, True])
+        top_decisive = top_decisive[['Player', 'M', 'G+A']].sort_values(by=['G+A', 'M'], ascending=[False, True])
         top_decisive.index = range(1, len(top_decisive) + 1)
 
         with goals:
