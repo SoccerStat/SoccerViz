@@ -23,6 +23,7 @@ def get_top_players_by_stat(
         last_date,
         slots,
         group_clubs,
+        group_competitions,
 ):
     sql_file = read_sql_file(
         file_name="components/queries/player_stats/top_players.sql",
@@ -35,7 +36,8 @@ def get_top_players_by_stat(
         first_date=first_date,
         last_date=last_date,
         slots=slots,
-        group_clubs=group_clubs
+        group_clubs=group_clubs,
+        group_competitions=group_competitions,
     )
 
     df = execute_query(_db_conn, sql_file)
@@ -156,6 +158,15 @@ def get_top_players(db_conn):
                     value=False
                 )
 
+                if chosen_comp == 'ALL':
+                    group_competitions = st.checkbox(
+                        key="top_players__group_competitions",
+                        label="Group clubs",
+                        value=False
+                    )
+                else:
+                    group_competitions = False
+
     if chosen_comp and chosen_season:
         goals, decisive, assists = st.columns(3)
         top_scorers = get_top_players_by_stat(
@@ -169,7 +180,8 @@ def get_top_players(db_conn):
             first_date,
             last_date,
             slots,
-            group_clubs
+            group_clubs,
+            group_competitions
         )
 
         top_assists = get_top_players_by_stat(

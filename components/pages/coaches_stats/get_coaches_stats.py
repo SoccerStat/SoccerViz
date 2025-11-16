@@ -20,6 +20,7 @@ def get_coaches_stats_by_comp_by_season(
     last_date,
     slots,
     group_clubs,
+    group_competitions,
 ):
     sql_file = read_sql_file(
         file_name="components/queries/coaches_stats/coaches_stats.sql",
@@ -32,6 +33,7 @@ def get_coaches_stats_by_comp_by_season(
         last_date=last_date,
         slots=slots,
         group_clubs=group_clubs,
+        group_competitions=group_competitions,
     )
 
     df = execute_query(_db_conn, sql_file)
@@ -152,6 +154,15 @@ def get_coaches_stats(db_conn):
                     value=False
                 )
 
+                if chosen_comp == 'ALL':
+                    group_competitions = st.checkbox(
+                        key="coaches_stats__group_competitions",
+                        label="Group clubs",
+                        value=False
+                    )
+                else:
+                    group_competitions = False
+
     if chosen_comp and chosen_season:
         coaches_stats = get_coaches_stats_by_comp_by_season(
             db_conn,
@@ -163,7 +174,8 @@ def get_coaches_stats(db_conn):
             first_date,
             last_date,
             slots,
-            group_clubs
+            group_clubs,
+            group_competitions
         )
 
         st.write(coaches_stats)
