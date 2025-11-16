@@ -15,5 +15,6 @@ select
 from analytics.all_coaches_rankings(
     in_comps := array['{{ comp }}'],
     in_seasons := array['{{ season }}'],
-    group_competitions := 'ALL' = ANY(ARRAY[upper('{{ comp }}')])
+    group_competitions := 'ALL' = ANY(ARRAY[upper('{{ comp }}')]),
+    group_clubs := {{ group_clubs }}
 );
