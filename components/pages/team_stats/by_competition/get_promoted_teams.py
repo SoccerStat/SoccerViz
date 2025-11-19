@@ -3,6 +3,7 @@ import streamlit as st
 
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.set_titles import set_sub_sub_sub_title
+from components.commons.streamlit_widgets import select__get_one_season
 
 from components.queries.execute_query import execute_query
 
@@ -21,12 +22,12 @@ def get_promoted_teams_by_season(_db_conn, current_season, previous_season):
 
 
 def get_promoted_teams(db_conn):
+    prefix = "promoted_teams"
     all_seasons = [season[7:] for season in get_all_season_schemas(db_conn)]
 
-    chosen_season = st.selectbox(
-        key="promoted_teams__season",
-        label="Choose season...",
-        options=[""] + all_seasons[:-1]
+    chosen_season = select__get_one_season(
+        prefix=prefix,
+        custom_options=all_seasons[1:]
     )
 
     if chosen_season:

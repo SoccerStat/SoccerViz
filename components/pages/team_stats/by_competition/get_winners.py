@@ -2,6 +2,7 @@ import streamlit as st
 
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.set_titles import set_sub_sub_sub_title
+from components.commons.streamlit_widgets import select__get_one_season
 
 from components.queries.execute_query import execute_query
 
@@ -19,12 +20,12 @@ def get_winners_by_competition(_db_conn, chosen_season):
 
 
 def get_winners(db_conn):
+    prefix = "winners"
     all_seasons = [season[7:] for season in get_all_season_schemas(db_conn)]
 
-    chosen_season = st.selectbox(
-        key="winners__season",
-        label="Choose season...",
-        options=[""] + all_seasons[:-1]
+    chosen_season = select__get_one_season(
+        prefix=prefix,
+        custom_options=all_seasons[1:]
     )
 
     if chosen_season:

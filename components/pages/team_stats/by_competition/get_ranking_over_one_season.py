@@ -5,6 +5,8 @@ import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
+from components.commons.streamlit_widgets import select__get_one_comp, select__get_one_season, select__get_many_teams, \
+    download_button
 from components.queries.execute_query import execute_query
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP, \
     TEAM_STATS_RANKINGS_PLOTTABLE
@@ -37,24 +39,19 @@ def ranking_by_c_cup_week(_db_conn, chosen_ranking, chosen_comp, chosen_season):
 
 
 def get_ranking_over_one_season(db_conn):
+    prefix = "ranking_over_one_season"
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
-    comps = list(comps_and_kind.keys())
 
-    chosen_comp = st.selectbox(
-        key="ranking_one_season__comp",
-        label="Choose competition...",
-        options=[""] + comps
-    )
+    chosen_comp = select__get_one_comp(prefix=prefix)
 
     if chosen_comp:
         kind_of_comp = comps_and_kind[chosen_comp]
 
         seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-        chosen_season = st.selectbox(
-            key="ranking_one_season__season",
-            label="Choose season...",
-            options=[""] + seasons_by_comp
+        chosen_season = select__get_one_season(
+            prefix=prefix,
+            custom_options=seasons_by_comp
         )
 
         if chosen_season:
@@ -62,11 +59,9 @@ def get_ranking_over_one_season(db_conn):
             teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
             n_teams = len(teams)
 
-            chosen_ranking = st.selectbox(
-                key="ranking_one_season__ranking",
-                label="Choose ranking...",
-                options=TEAM_STATS_RANKINGS_PLOTTABLE,
-                index=1
+            chosen_ranking = select__get_one_season(
+                prefix=prefix,
+                custom_options=TEAM_STATS_RANKINGS_PLOTTABLE
             )
 
             if chosen_ranking:
@@ -90,13 +85,10 @@ def get_ranking_over_one_season(db_conn):
                             chosen_season=chosen_season
                         )
 
-                st.multiselect(
-                    key="ranking_one_season__teams",
-                    label="Choose teams...",
-                    options=["All"] + teams
+                chosen_teams = select__get_many_teams(
+                    prefix=prefix,
+                    options=teams
                 )
-
-                chosen_teams = st.session_state.ranking_one_season__teams
 
                 if 'All' in chosen_teams:
                     chosen_teams = teams
@@ -105,8 +97,8 @@ def get_ranking_over_one_season(db_conn):
                     set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_teams)
 
                     csv = df.to_csv(index=False, sep='|')
-                    st.download_button(
-                        label="📥 Download CSV",
+                    download_button(
+                        prefix=prefix,
                         data=csv,
                         file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_ranking_one_season.csv",
                         mime="text/csv"

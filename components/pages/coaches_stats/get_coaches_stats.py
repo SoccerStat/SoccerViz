@@ -1,6 +1,12 @@
+import streamlit as st
+
 from components.commons.get_all_teams import get_teams_by_comp_by_season
+from components.commons.get_seasons import get_all_season_schemas
 from components.commons.get_slots import get_distinct_slots
-from components.commons.streamlit_widgets import *
+from components.commons.streamlit_widgets import (select__get_one_comp, select__get_one_season, radio__select_side,
+                                                  check__filter_by_week, check__filter_by_date, check__filter_by_slot,
+                                                  slider__get_one_week, date__get_one_date, multiselect__get_slots,
+                                                  check__group_by_club, check__group_by_competition, check__group_by_season)
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -43,7 +49,7 @@ def get_coaches_stats_by_comp_by_season(
 
 
 def get_all_coaches_stats(db_conn):
-    prefix="coach_stats"
+    prefix = "coach_stats"
     col, _ = st.columns(2)
 
     with col:
@@ -92,13 +98,13 @@ def get_all_coaches_stats(db_conn):
                     else:
                         with col2:
                             last_week = slider__get_one_week(
-                            prefix=prefix,
-                            suffix="last_week",
-                            label="Last week",
-                            min_value=first_week,
-                            max_value=max_week,
-                            default_value=first_week
-                        )
+                                prefix=prefix,
+                                suffix="last_week",
+                                label="Last week",
+                                min_value=first_week,
+                                max_value=max_week,
+                                default_value=first_week
+                            )
 
                 # rankings = TEAM_RANKINGS
 
@@ -119,7 +125,7 @@ def get_all_coaches_stats(db_conn):
                             prefix=prefix,
                             suffix="last_date",
                             label="Last date",
-                            default_value=last_date
+                            default_value=first_date
                         )
 
                 filter_slots = check__filter_by_slot(prefix=prefix)

@@ -3,6 +3,7 @@ import numpy as np
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
+from components.commons.streamlit_widgets import select__get_one_season, select__generic, slider__generic
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -21,20 +22,22 @@ def get_players_with_given_rate_minutes(_db_conn, chosen_season, chosen_team, r=
 
 
 def get_players_by_team(db_conn):
-    chosen_season = st.selectbox(
-        key="all_comps_players_by_team__season",
-        label="Choose season...",
-        options=[""] + get_seasons_by_comp(db_conn, name_comp="All Competitions")
+    prefix = "all_comps_players_by_team"
+
+    chosen_season = select__get_one_season(
+        prefix=prefix,
+        custom_options=get_seasons_by_comp(db_conn, name_comp="All Competitions")
     )
 
     if chosen_season:
         all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, "all", [chosen_season])
         # n_teams = len(all_teams_of_comp_of_season)
 
-        chosen_team = st.selectbox(
-            key="all_comps_players_by_team__team",
+        chosen_team = select__generic(
+            prefix=prefix,
+            suffix="team",
             label="Choose a team...",
-            options=[""] + all_teams_of_comp_of_season
+            options=all_teams_of_comp_of_season
         )
 
         if chosen_team:
@@ -43,12 +46,13 @@ def get_players_by_team(db_conn):
             col, _ = st.columns(2)
             with col:
                 max_nb_matches = int(df_team["Total number of matches"].unique())
-                chosen_nb_matches = st.slider(
-                    key="all_comps_players_by_team__nb_matches",
+                chosen_nb_matches = slider__generic(
+                    prefix=prefix,
+                    suffix="nb_matches",
                     label="Minimum number of matches played",
                     min_value=0,
                     max_value=max_nb_matches,
-                    value=0
+                    default_value=0
                 )
 
             df_team = df_team[df_team["Matches"] >= chosen_nb_matches]

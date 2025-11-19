@@ -4,6 +4,9 @@ from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.commons.set_titles import set_sub_sub_sub_title
 from components.commons.get_slots import get_distinct_slots
+from components.commons.streamlit_widgets import select__get_one_season, check__filter_by_week, slider__get_one_week, \
+    check__filter_by_date, date__get_one_date, check__filter_by_slot, multiselect__get_slots, radio__select_side, \
+    slider__generic, select__get_one_comp, select__generic
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -91,22 +94,17 @@ def get_matches_of_team(
 
 
 def get_stats_and_matches_one_team(db_conn):
+    prefix = "stats_one_team"
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
-    comps = list(comps_and_kind.keys())
 
-    chosen_comp = st.selectbox(
-        key="stats_one_team__comp",
-        label="Choose competition...",
-        options=[""] + comps
-    )
+    chosen_comp = select__get_one_comp(prefix=prefix)
 
     if chosen_comp:
         seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-        chosen_season = st.selectbox(
-            key="stats_one_team__season",
-            label="Choose season...",
-            options=[""] + seasons_by_comp
+        chosen_season = select__get_one_season(
+            prefix=prefix,
+            custom_options=seasons_by_comp
         )
 
         if chosen_season:
@@ -121,10 +119,11 @@ def get_stats_and_matches_one_team(db_conn):
             #     placeholder="Choose Team A",
             # )
 
-            chosen_team = st.selectbox(
-                key="stats_one_team__team",
+            chosen_team = select__generic(
+                prefix=prefix,
+                suffix="team",
                 label="Choose a team...",
-                options=[""] + all_teams_of_comp_of_season
+                options=all_teams_of_comp_of_season
             )
 
             if chosen_team:
@@ -136,70 +135,63 @@ def get_stats_and_matches_one_team(db_conn):
 
                 if comps_and_kind[chosen_comp] == KIND_CHP:
 
-                    filter_weeks = st.checkbox(
-                        key='stats_one_team__filter_weeks',
-                        label='Filter by week'
-                    )
+                    filter_weeks = check__filter_by_week(prefix=prefix)
 
                     if filter_weeks:
                         col1, col2 = st.columns(2)
                         max_week = 2 * (n_teams - 1)
 
                         with col1:
-                            first_week = st.slider(
-                                key='stats_one_team__first_week',
+                            first_week = slider__get_one_week(
+                                prefix=prefix,
+                                suffix="first_week",
                                 label="First week",
                                 min_value=1,
                                 max_value=max_week,
-                                value=1
+                                default_value=1
                             )
 
                         if first_week == max_week:
                             last_week = max_week
                         else:
                             with col2:
-                                last_week = st.slider(
-                                    key='stats_one_team__last_week',
+                                last_week = slider__get_one_week(
+                                    prefix=prefix,
+                                    suffix="last_week",
                                     label="Last week",
                                     min_value=first_week,
                                     max_value=max_week,
-                                    value=first_week
+                                    default_value=first_week
                                 )
 
-                filter_dates = st.checkbox(
-                    key='stats_one_team__filter_dates',
-                    label='Filter by date'
-                )
+                filter_dates = check__filter_by_date(prefix=prefix)
 
                 if filter_dates:
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        first_date = st.date_input(
-                            key='stats_one_team__first_date',
-                            label="First date",
-                            value="today"
+                        first_date = date__get_one_date(
+                            prefix=prefix,
+                            suffix="first_date",
+                            label="First date"
                         )
 
                     with col2:
-                        last_date = st.date_input(
-                            key='stats_one_team__last_date',
+                        last_date = date__get_one_date(
+                            prefix=prefix,
+                            suffix="last_date",
                             label="Last date",
-                            value=first_date
+                            default_value=first_date
                         )
 
-                filter_slots = st.checkbox(
-                    key='stats_one_team__filter_slots',
-                    label="Filter by slot"
-                )
+                filter_slots = check__filter_by_slot(prefix=prefix)
 
                 if filter_slots:
                     col, _ = st.columns(2)
 
                     with col:
-                        slots = st.multiselect(
-                            key="stats_one_team__slots",
-                            label="Slot",
+                        slots = multiselect__get_slots(
+                            prefix=prefix,
                             options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
                         )
 
@@ -208,13 +200,10 @@ def get_stats_and_matches_one_team(db_conn):
                 else:
                     sides = ["Home", "Both", "Away"]
 
-                side = st.radio(
-                    key='stats_one_team__side',
+                side = radio__select_side(
+                    prefix=prefix,
                     label="Side",
-                    options=sides,
-                    horizontal=True,
-                    label_visibility="collapsed",
-                    index=1
+                    custom_options=sides
                 )
 
                 set_sub_sub_sub_title("Basic Stats")
@@ -270,6 +259,7 @@ def get_stats_and_matches_one_team(db_conn):
 
                 get_team_squad(
                     db_conn,
+                    prefix,
                     chosen_comp,
                     chosen_season,
                     chosen_team,
@@ -315,6 +305,7 @@ def get_selected_matches(
 
 def get_team_squad(
         db_conn,
+        prefix,
         chosen_comp,
         chosen_season,
         chosen_team,
@@ -326,12 +317,13 @@ def get_team_squad(
 
     col, _ = st.columns(2)
     with col:
-        chosen_rate = st.slider(
-            key="rate_players_one_season__rate",
+        chosen_rate = slider__generic(
+            prefix=prefix,
+            suffix="rate_players",
             label="Minimum % of minutes played",
             min_value=0,
             max_value=100,
-            value=0
+            default_value=0
         )
 
     df = df[df["Minutes"] >= df["Total Minutes played by the whole team"] * chosen_rate / 100]

@@ -4,11 +4,11 @@ from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.get_slots import get_distinct_slots
 from components.commons.set_titles import set_sub_sub_title
-from components.commons.streamlit_widgets import select__get_one_comp, select__get_one_season, check__filter_by_week, \
-    slider__get_one_week, check__filter_by_date, date__get_one_date, check__filter_by_slot, multiselect__get_slots, \
-    radio__select_side, check__group_by_club, check__group_by_competition, check__group_by_season
+from components.commons.streamlit_widgets import (select__get_one_comp, select__get_one_season, radio__select_side,
+                                                  check__filter_by_week, check__filter_by_date, check__filter_by_slot,
+                                                  slider__get_one_week, date__get_one_date, multiselect__get_slots,
+                                                  check__group_by_club, check__group_by_competition, check__group_by_season)
 from components.queries.execute_query import execute_query
-from config import COMPETITIONS
 
 from utils.file_helper.reader import read_sql_file
 
@@ -126,7 +126,8 @@ def get_top_players(db_conn):
                         last_date = date__get_one_date(
                             prefix=prefix,
                             suffix="last_date",
-                            label="Last date"
+                            label="Last date",
+                            default_value=first_date
                         )
 
                 filter_slots = check__filter_by_slot(prefix=prefix)

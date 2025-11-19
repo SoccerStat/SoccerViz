@@ -2,6 +2,7 @@ import plotly.express as px
 import streamlit as st
 
 from components.commons.set_titles import set_sub_sub_sub_title
+from components.commons.streamlit_widgets import select__generic, radio__select_side, download_button
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
@@ -40,6 +41,7 @@ def get_home_away_balance(db_conn):
 
 
 def get_stats_by_season(db_conn):
+    prefix = "home_away_balance"
     df = get_balance(db_conn)
 
     set_sub_sub_sub_title("Stats by season")
@@ -50,21 +52,18 @@ def get_stats_by_season(db_conn):
 
     col, _ = st.columns(2)
     with col:
-        chosen_stat = st.selectbox(
-            key='home_away_balance__stat',
-            label="Choose stat",
+        chosen_stat = select__generic(
+            prefix=prefix,
+            suffix="stat",
+            label="Choose one stat...",
             options=["Goals", "Yellow Cards", "2nd Yellow Cards", "Red Cards"]
         )
 
-    side = st.radio(
-        key='home_away_balance__side_goals',
-        label="Side",
-        options=["Home", "Both", "Away"],
-        horizontal=True,
-        label_visibility="collapsed",
-        index=1
-    )
-    get_stats_by_season_plotly(df_by_season, chosen_stat, side, colors_by_comp)
+        st.write(chosen_stat)
+
+    side = radio__select_side(prefix=prefix)
+
+    get_stats_by_season_plotly(df_by_season, prefix, chosen_stat, side, colors_by_comp)
 
 
 def get_balance_outcome_goals_all_seasons_plotly(df):
@@ -150,7 +149,7 @@ def get_balance_outcome_goals_all_seasons_plotly(df):
         st.plotly_chart(fig_goals, use_container_width=True)
 
 
-def get_stats_by_season_plotly(df, stat, side, colors):
+def get_stats_by_season_plotly(df, prefix, stat, side, colors):
     side_stat = f"{side} {stat}" if side != 'Both' else f"Total {stat}"
     df[f"{side_stat} / Match"] = df[side_stat] / df["Matches"]
 
@@ -175,8 +174,8 @@ def get_stats_by_season_plotly(df, stat, side, colors):
     st.plotly_chart(fig, use_container_width=True)
 
     csv = df.to_csv(index=False, sep='|')
-    st.download_button(
-        label="📥 Download CSV",
+    download_button(
+        prefix=prefix,
         data=csv,
         file_name=f"all_competitions_{side.lower()}_stats_by_season.csv",
         mime="text/csv"

@@ -3,6 +3,7 @@ import pandas as pd
 
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.set_titles import set_sub_sub_title
+from components.commons.streamlit_widgets import date__get_one_date
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -23,17 +24,16 @@ def get_birthday_boys_by_season(_db_conn, season_schema, date):
 
 
 def get_birthday_boys(db_conn):
+    prefix="birthday_boy"
     n_seasons = 5
     all_seasons_schema = get_all_season_schemas(db_conn)
 
     date_input, actual_date = st.columns([2, 2])
 
     with date_input:
-        chosen_date = st.date_input(
-            key="birthday_boy__date",
-            label="Choose a date...",
-            value="today",
-            format="YYYY-MM-DD"
+        chosen_date = date__get_one_date(
+            prefix=prefix,
+            suffix="date"
         )
 
     with actual_date:

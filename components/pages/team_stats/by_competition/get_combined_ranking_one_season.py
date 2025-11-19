@@ -6,6 +6,11 @@ from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.commons.get_slots import get_distinct_slots
 from components.queries.execute_query import execute_query
+from components.commons.streamlit_widgets import (select__get_one_comp, select__get_one_season, radio__select_side,
+                                                  check__filter_by_week, check__filter_by_date, check__filter_by_slot,
+                                                  slider__get_one_week, date__get_one_date,
+                                                  select__get_combined_ranking, select__get_combined_ranking_sorting,
+                                                  multiselect__get_slots, download_button)
 
 from utils.file_helper.reader import read_sql_file
 from config import COMPETITIONS, KIND_C_CUP
@@ -78,22 +83,17 @@ def get_combined_ranking_enriched(
 
 
 def get_combined_ranking_one_season(db_conn):
+    prefix = "combined_ranking_one_season"
     comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
-    comps = list(comps_and_kind.keys())
 
-    chosen_comp = st.selectbox(
-        key="combined_ranking_one_season__comp",
-        label="Choose competition...",
-        options=[""] + comps
-    )
+    chosen_comp = select__get_one_comp(prefix=prefix)
 
     if chosen_comp:
         seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-        chosen_season = st.selectbox(
-            key="combined_ranking_one_season__season",
-            label="Choose season...",
-            options=[""] + seasons_by_comp
+        chosen_season = select__get_one_season(
+            prefix=prefix,
+            custom_options=seasons_by_comp
         )
 
         if chosen_season:
@@ -111,95 +111,83 @@ def get_combined_ranking_one_season(db_conn):
                 all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
                 n_teams = len(all_teams_of_comp_of_season)
 
-                filter_weeks = st.checkbox(
-                    key='combined_ranking_one_season__filter_weeks',
-                    label='Filter by week'
-                )
+                filter_weeks = check__filter_by_week(prefix=prefix)
 
                 if filter_weeks:
                     col1, col2 = st.columns(2)
                     max_week = 2 * (n_teams - 1)
 
                     with col1:
-                        first_week = st.slider(
-                            key='combined_ranking_one_season__first_week',
+                        first_week = slider__get_one_week(
+                            prefix=prefix,
+                            suffix="first_week",
                             label="First week",
                             min_value=1,
                             max_value=max_week,
-                            value=1
+                            default_value=1
                         )
 
                     if first_week == max_week:
                         last_week = max_week
                     else:
                         with col2:
-                            last_week = st.slider(
-                                key='combined_ranking_one_season__last_week',
+                            last_week = slider__get_one_week(
+                                prefix=prefix,
+                                suffix="last_week",
                                 label="Last week",
                                 min_value=first_week,
                                 max_value=max_week,
-                                value=first_week
+                                default_value=first_week
                             )
 
                 # rankings = TEAM_RANKINGS
 
-            filter_dates = st.checkbox(
-                key='combined_ranking_one_season__filter_dates',
-                label='Filter by date'
-            )
+            filter_dates = check__filter_by_date(prefix=prefix)
 
             if filter_dates:
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    first_date = st.date_input(
-                        key='combined_ranking_one_season__first_date',
-                        label="First date",
-                        value="today"
+                    first_date = date__get_one_date(
+                        prefix=prefix,
+                        suffix="first_date",
+                        label="First date"
                     )
 
                 with col2:
-                    last_date = st.date_input(
-                        key='combined_ranking_one_season__last_date',
+                    last_date = date__get_one_date(
+                        prefix=prefix,
+                        suffix="last_date",
                         label="Last date",
-                        value=first_date
+                        default_value=first_date
                     )
 
-            filter_slots = st.checkbox(
-                key='combined_ranking_one_season__filter_slots',
-                label="Filter by slot"
-            )
+            filter_slots = check__filter_by_slot(prefix=prefix)
 
             if filter_slots:
                 col, _ = st.columns(2)
 
                 with col:
-                    slots = st.multiselect(
-                        key="combined_ranking_one_season__slots",
-                        label="Slot",
+                    slots = multiselect__get_slots(
+                        prefix=prefix,
                         options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
                     )
 
-            side = st.radio(
-                key='combined_ranking_one_season__side',
-                label="Side",
-                options=sides,
-                horizontal=True,
-                label_visibility="collapsed",
-                index=1
+            side = radio__select_side(
+                prefix=prefix,
+                custom_options=sides
             )
 
-            combined_ranking = st.selectbox(
-                key="combined_ranking_one_season__ranking",
-                label="Choose combined ranking...",
+            combined_ranking = select__get_combined_ranking(
+                prefix=prefix,
                 options=["", "Shots", "Passes", "Outcomes", "xG"],
-                index=0
             )
 
             if combined_ranking != "":
                 df = get_chosen_combined_ranking(
                     db_conn,
                     combined_ranking,
+                    prefix,
                     chosen_comp,
                     chosen_season,
                     side,
@@ -212,8 +200,8 @@ def get_combined_ranking_one_season(db_conn):
 
                 if not df.empty:
                     csv = df.to_csv(index=False, sep='|')
-                    st.download_button(
-                        label="📥 Download CSV",
+                    download_button(
+                        prefix=prefix,
                         data=csv,
                         file_name=f"{chosen_comp.replace(' ', '_').lower()}_{chosen_season}_"
                                   f"{combined_ranking.replace(' ', '_').lower()}_simple_ranking.csv",
@@ -224,6 +212,7 @@ def get_combined_ranking_one_season(db_conn):
 def get_chosen_combined_ranking(
         db_conn,
         combined_ranking,
+        prefix,
         chosen_comp,
         chosen_season,
         side,
@@ -236,6 +225,7 @@ def get_chosen_combined_ranking(
     if combined_ranking == "Shots":
         df = get_combined_shots(
             db_conn,
+            prefix,
             chosen_comp,
             chosen_season,
             combined_ranking,
@@ -249,6 +239,7 @@ def get_chosen_combined_ranking(
     elif combined_ranking == "Passes":
         df = get_combined_passes(
             db_conn,
+            prefix,
             chosen_comp,
             chosen_season,
             combined_ranking,
@@ -262,6 +253,7 @@ def get_chosen_combined_ranking(
     elif combined_ranking == "Outcomes":
         df = get_combined_outcomes(
             db_conn,
+            prefix,
             chosen_comp,
             chosen_season,
             combined_ranking,
@@ -275,6 +267,7 @@ def get_chosen_combined_ranking(
     elif combined_ranking == "xG":
         df = get_combined_xgs(
             db_conn,
+            prefix,
             chosen_comp,
             chosen_season,
             combined_ranking,
@@ -294,6 +287,7 @@ def get_chosen_combined_ranking(
 
 def get_combined_shots(
         db_conn,
+        prefix,
         chosen_comp,
         chosen_season,
         combined_ranking,
@@ -322,9 +316,9 @@ def get_combined_shots(
     df['Goals Against'] = -df['Goals Against']
     df['Ranking'] = df['Ranking'].astype(int)
 
-    chosen_sorting = st.selectbox(
-        key="combined_ranking_one_season__sorting",
-        label="Sort by...",
+    chosen_sorting = select__get_combined_ranking_sorting(
+        prefix=prefix,
+        suffix="shots",
         options=[
             "Ranking",
             "Shots For", "Shots on Target For",
@@ -398,6 +392,7 @@ def get_combined_shots(
 
 def get_combined_passes(
         db_conn,
+        prefix,
         chosen_comp,
         chosen_season,
         combined_ranking,
@@ -424,9 +419,9 @@ def get_combined_passes(
     df['Ranking'] = df['Ranking'].astype(int)
     df["Failed Passes"] = df["Att Passes"] - df["Succ Passes"]
 
-    chosen_sorting = st.selectbox(
-        key="combined_ranking_one_season__sorting",
-        label="Sort by...",
+    chosen_sorting = select__get_combined_ranking_sorting(
+        prefix=prefix,
+        suffix="passes",
         options=["Ranking", "Succ Passes", "Att Passes", "Total Passes", "Succ Passes Rate"]
     )
 
@@ -479,6 +474,7 @@ def get_combined_passes(
 
 def get_combined_outcomes(
         db_conn,
+        prefix,
         chosen_comp,
         chosen_season,
         combined_ranking,
@@ -504,10 +500,11 @@ def get_combined_outcomes(
 
     df['Ranking'] = df['Ranking'].astype(int)
 
-    chosen_sorting = st.selectbox(
-        key="combined_ranking_one_season__sorting",
-        label="Sort by...",
-        options=["Ranking", "Wins", "Draws", "Loses"]
+    chosen_sorting = select__get_combined_ranking_sorting(
+        prefix=prefix,
+        suffix="outcomes",
+        options=["Ranking", "Wins", "Draws", "Loses"],
+        index=None
     )
 
     club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
@@ -550,6 +547,7 @@ def get_combined_outcomes(
 
 def get_combined_xgs(
         db_conn,
+        prefix,
         chosen_comp,
         chosen_season,
         combined_ranking,
@@ -578,9 +576,9 @@ def get_combined_xgs(
     df["Goals Against"] = -df["Goals Against"]
     df["Ranking"] = df["Ranking"].astype(int)
 
-    chosen_sorting = st.selectbox(
-        key="combined_ranking_one_season__sorting",
-        label="Sort by...",
+    chosen_sorting = select__get_combined_ranking_sorting(
+        prefix=prefix,
+        suffix="xgs",
         options=[
             "Ranking",
             "Goals For",
