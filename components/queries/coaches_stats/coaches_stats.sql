@@ -1,11 +1,14 @@
 select
     "Coach",
+    "Club",
+    "Competition",
+    --"Season",
     "Matches",
     "Points",
     "Points/Match",
     "Wins",
     "Draws",
-    "Loses"
+    "Loses",
     "% Wins",
     "% Loses",
     "Goals For",
@@ -15,6 +18,9 @@ select
 from analytics.all_coaches_rankings(
     in_comps := array['{{ comp }}'],
     in_seasons := array['{{ season }}'],
-    group_clubs := {{ group_clubs }},
-    group_competitions := {{ group_competitions }},
-);
+    side := '{{ side }}',
+    group_by_club := {{ group_by_club }},
+    group_by_competition := {{ group_by_competition }},
+    group_by_season := {{ group_by_season }}
+)
+order by "Points" desc, "Goals Diff" desc, "Goals For" desc;
