@@ -170,4 +170,7 @@ def get_all_coaches_stats(db_conn):
             group_by_season
         )
 
+        if chosen_comp.lower() != 'all':
+            coaches_stats = coaches_stats.drop(['Competition'], axis=1)
+
         st.write(coaches_stats)
