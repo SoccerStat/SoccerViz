@@ -3,7 +3,7 @@ from streamlit_searchbox import st_searchbox
 import numpy as np
 
 from components.commons.get_seasons import get_all_season_schemas
-from components.commons.search_for_item import make_search_function
+from components.commons.search_for_item import team_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
 from components.commons.get_all_teams import get_all_clubs
 from components.commons.streamlit_widgets import radio__select_side
@@ -46,19 +46,19 @@ def get_dual_history(db_conn):
     all_season_schemas = get_all_season_schemas(db_conn)
     all_teams = list(get_all_clubs(db_conn))
 
-    search_function = make_search_function(all_teams)
+    search_function = team_search_function(all_teams)
 
     teamA = st_searchbox(
         search_function=search_function,
-        key="dual_history__teamA",
+        key=f"{prefix}__teamA",
         placeholder="Choose Team A",
     )
 
-    search_function = make_search_function(all_teams, teamA)
+    search_function = team_search_function(all_teams, teamA)
 
     teamB = st_searchbox(
         search_function=search_function,
-        key="dual_history__teamB",
+        key=f"{prefix}__teamB",
         placeholder="Choose Team B",
     )
 

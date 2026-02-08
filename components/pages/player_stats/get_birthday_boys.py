@@ -24,7 +24,7 @@ def get_birthday_boys_by_season(_db_conn, season_schema, date):
 
 
 def get_birthday_boys(db_conn):
-    prefix="birthday_boy"
+    prefix = "birthday_boy"
     n_seasons = 5
     all_seasons_schema = get_all_season_schemas(db_conn)
 
