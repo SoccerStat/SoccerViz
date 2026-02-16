@@ -4,7 +4,7 @@ from typing import Callable
 def team_search_function(all_teams: list[str], teamA=None) -> Callable[[str], list[str]]:
     teams = [(team, team.lower()) for team in all_teams]
     if teamA:
-        teams.remove(teamA)
+        teams.remove((teamA, teamA.lower()))
 
     def search(term: str) -> list[str]:
         if not term:

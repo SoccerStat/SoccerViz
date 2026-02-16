@@ -11,7 +11,7 @@ with team_a as (
         "Goals Against"
     FROM analytics.teams_oppositions(
         ARRAY[{{ seasons }}],
-        array[{{ comps }}],
+        ARRAY[{{ comps }}],
         '{{ teamA }}',
         'home'
     )
