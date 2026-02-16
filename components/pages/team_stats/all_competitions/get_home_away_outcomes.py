@@ -63,7 +63,8 @@ def get_stats_by_season(db_conn):
 
     side = radio__select_side(prefix=prefix)
 
-    get_stats_by_season_plotly(df_by_season, prefix, chosen_stat, side, colors_by_comp)
+    if chosen_stat != "":
+        get_stats_by_season_plotly(df_by_season, prefix, chosen_stat, side, colors_by_comp)
 
 
 def get_balance_outcome_goals_all_seasons_plotly(df):
