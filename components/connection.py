@@ -1,6 +1,6 @@
 import streamlit as st
 
-from utils.database import init_session_state
+from utils.database_helper.database import init_session_state
 
 
 def ensure_connection():

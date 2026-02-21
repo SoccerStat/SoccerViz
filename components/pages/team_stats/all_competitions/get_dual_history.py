@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_searchbox import st_searchbox
 import numpy as np
 
+from components.commons.get_club_logo import get_club_logo
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.search_for_item import team_search_function
 from components.commons.set_titles import set_sub_sub_sub_title
@@ -62,12 +63,24 @@ def get_dual_history(db_conn):
         placeholder="Choose Team B",
     )
 
+    team_logos = (get_club_logo(db_conn, teamA), get_club_logo(db_conn, teamB))
+
     if teamA and teamB and teamA != teamB:
 
         side = radio__select_side(
             prefix=prefix,
             custom_options=[f"{teamA} home", "Both", f"{teamB} home", "Neutral", "All"]
         )
+
+        st.write(f"Team A: {teamA} (similarity: {team_logos[0]['similarity']}), Team B: {teamB} (similarity: {team_logos[1]['similarity']}).")
+
+        st.markdown(f"""
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img src="{team_logos[0]['logo']}" width="150" style="margin-right: 10px;">
+            <span style="font-size: 40px; font-weight: bold; margin: 0 10px;">🆚</span>
+            <img src="{team_logos[1]['logo']}" width="150" style="margin-left: 10px;">
+        </div>
+        """, unsafe_allow_html=True)
 
         set_sub_sub_sub_title("Basic Stats")
 

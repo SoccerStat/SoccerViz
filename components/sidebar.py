@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.database import create_database_connection, save_persistent_credentials, \
+from utils.database_helper.database import create_database_connection, save_persistent_credentials, \
     clear_session, init_session_state
 from config import DATABASE_CONFIG
 
