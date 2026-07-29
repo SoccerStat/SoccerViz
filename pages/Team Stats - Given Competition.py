@@ -7,8 +7,8 @@ from components.pages.team_stats.by_competition.get_ranking_over_one_season impo
 from components.pages.team_stats.by_competition.get_single_stat_and_squad_age_rankings_one_season import (
     get_single_stat_and_squad_age_rankings_one_season)
 from components.pages.team_stats.by_competition.get_stats_and_matches_one_team import get_stats_and_matches_one_team
-from components.pages.team_stats.by_competition.get_team_performance_against_top_and_bottom import (
-    get_team_performance_against_top_and_bottom
+from components.pages.team_stats.by_competition.get_team_performance_against_top_and_flop import (
+    get_team_performance_against_top_and_flop
 )
 from components.pages.team_stats.by_competition.get_winners import get_winners
 from config import TEAM_STATS_PAGES
@@ -35,9 +35,9 @@ class TeamStatsPage(BasePage):
         # with self.set_expander("Moving Ranking"):
         #     self.set_sub_sub_title("Moving Ranking")
 
-        with self.set_expander("Teams Performance against Top/Bottom teams"):
-            self.set_sub_sub_title("Teams Performance against Top/Bottom teams")
-            get_team_performance_against_top_and_bottom(db_conn)
+        with self.set_expander("Teams Performance against Top/Flop teams"):
+            self.set_sub_sub_title("Teams Performance against Top/Flop teams")
+            get_team_performance_against_top_and_flop(db_conn)
 
         with self.set_expander("Ranking over the season"):
             self.set_sub_sub_title("Ranking over the season")

@@ -12,7 +12,7 @@ from utils.file_helper.reader import read_sql_file
 @st.cache_data(show_spinner=False)
 def get_top_teams(_db_conn, chosen_comp, chosen_season):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/given_competition/top_bottom/get_top_teams.sql",
+        file_name="components/queries/team_stats/given_competition/top_flop/get_top_teams.sql",
         name_comp=chosen_comp,
         season=chosen_season
     )
@@ -21,9 +21,9 @@ def get_top_teams(_db_conn, chosen_comp, chosen_season):
 
 
 @st.cache_data(show_spinner=False)
-def get_bottom_teams(_db_conn, chosen_comp, chosen_season):
+def get_flop_teams(_db_conn, chosen_comp, chosen_season):
     sql_file = read_sql_file(
-        file_name="components/queries/team_stats/given_competition/top_bottom/get_bottom_teams.sql",
+        file_name="components/queries/team_stats/given_competition/top_flop/get_flop_teams.sql",
         name_comp=chosen_comp,
         season=chosen_season
     )
@@ -39,7 +39,7 @@ def get_teams_performance_against_teams(_db_conn, chosen_comp, chosen_season, op
 
     for team in teams:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/top_bottom/get_ranking_against_teams.sql",
+            file_name="components/queries/team_stats/given_competition/top_flop/get_ranking_against_teams.sql",
             name_comp=chosen_comp,
             season=chosen_season,
             name_team=team,
@@ -52,8 +52,8 @@ def get_teams_performance_against_teams(_db_conn, chosen_comp, chosen_season, op
     return df
 
 
-def get_team_performance_against_top_and_bottom(db_conn):
-    prefix = "teams_performance_top_bottom_teams"
+def get_team_performance_against_top_and_flop(db_conn):
+    prefix = "teams_performance_top_flop_teams"
 
     chosen_comp = select__get_one_comp(prefix=prefix)
 
@@ -70,7 +70,7 @@ def get_team_performance_against_top_and_bottom(db_conn):
             side = radio__select_side(prefix=prefix)
 
             top_teams = get_top_teams(db_conn, chosen_comp, chosen_season)
-            bottom_teams = get_bottom_teams(db_conn, chosen_comp, chosen_season)
+            flop_teams = get_flop_teams(db_conn, chosen_comp, chosen_season)
 
             set_sub_sub_title("Against Top 6 Teams")
             df_against_top_teams = get_teams_performance_against_teams(
@@ -82,12 +82,12 @@ def get_team_performance_against_top_and_bottom(db_conn):
             )
             st.dataframe(df_against_top_teams)
 
-            set_sub_sub_title("Against Bottom 3 Teams")
-            df_against_bottom_teams = get_teams_performance_against_teams(
+            set_sub_sub_title("Against Flop 3 Teams")
+            df_against_flop_teams = get_teams_performance_against_teams(
                 db_conn,
                 chosen_comp,
                 chosen_season,
-                bottom_teams,
+                flop_teams,
                 side
             )
-            st.dataframe(df_against_bottom_teams)
+            st.dataframe(df_against_flop_teams)

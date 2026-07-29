@@ -45,6 +45,7 @@ def get_combined_ranking(
         time_slots=time_slots,
         in_side=side.lower()
     )
+    print(sql_file)
 
     return execute_query(_db_conn, sql_file)
 
@@ -180,7 +181,7 @@ def get_combined_ranking_one_season(db_conn):
 
             combined_ranking = select__get_combined_ranking(
                 prefix=prefix,
-                options=["", "Shots", "Passes", "Outcomes", "xG"],
+                options=["Shots", "Passes", "Outcomes", "xG"],
             )
 
             if combined_ranking != "":
@@ -327,67 +328,69 @@ def get_combined_shots(
         ]
     )
 
-    club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
+    if chosen_sorting:
+        club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
-    df_melted = df.melt(
-        id_vars=['Club', 'Ranking'],
-        value_vars=[
-            'Shots For', 'Shots Against',
-            'Shots on Target For', 'Shots on Target Against',
-            'Goals For', 'Goals Against'
-        ],
-        var_name='Kind',
-        value_name='Shots'
-    )
+        df_melted = df.melt(
+            id_vars=['Club', 'Ranking'],
+            value_vars=[
+                'Shots For', 'Shots Against',
+                'Shots on Target For', 'Shots on Target Against',
+                'Goals For', 'Goals Against'
+            ],
+            var_name='Kind',
+            value_name='Shots'
+        )
 
-    df_melted['Shots_abs'] = df_melted['Shots'].abs()
+        df_melted['Shots_abs'] = df_melted['Shots'].abs()
 
-    df_melted['Category'] = df_melted['Kind'].apply(
-        lambda x: 'Shots' if 'Shots' in x and 'on Target' not in x else
-        'Shots on Target' if 'on Target' in x else
-        'Goals'
-    )
-    df_melted['Side'] = df_melted['Kind'].apply(lambda x: 'For' if 'For' in x else 'Against')
+        df_melted['Category'] = df_melted['Kind'].apply(
+            lambda x: 'Shots' if 'Shots' in x and 'on Target' not in x else
+            'Shots on Target' if 'on Target' in x else
+            'Goals'
+        )
+        df_melted['Side'] = df_melted['Kind'].apply(lambda x: 'For' if 'For' in x else 'Against')
 
-    bars_data = df_melted[df_melted['Category'] != 'Goals']
-    goals_data = df_melted[df_melted['Category'] == 'Goals']
+        bars_data = df_melted[df_melted['Category'] != 'Goals']
+        goals_data = df_melted[df_melted['Category'] == 'Goals']
 
-    bars = alt.Chart(bars_data).mark_bar().encode(
-        x=alt.X(shorthand='Shots:Q'),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color(
-            'Category:N',
-            scale=alt.Scale(
-                domain=['Shots', 'Shots on Target', 'Goals'],
-                range=['steelblue', 'orange', 'firebrick']
-            )
-        ),
-        tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
-        order=alt.Order('Category', sort='descending')
-    )
+        bars = alt.Chart(bars_data).mark_bar().encode(
+            x=alt.X(shorthand='Shots:Q'),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color(
+                'Category:N',
+                scale=alt.Scale(
+                    domain=['Shots', 'Shots on Target', 'Goals'],
+                    range=['steelblue', 'orange', 'firebrick']
+                )
+            ),
+            tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
+            order=alt.Order('Category', sort='descending')
+        )
 
-    goals = alt.Chart(goals_data).mark_bar().encode(
-        x=alt.X(shorthand='Shots:Q'),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color('Category:N', scale=alt.Scale(scheme='tableau10')),
-        tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
-        order=alt.Order('Category', sort='descending')
-    )
+        goals = alt.Chart(goals_data).mark_bar().encode(
+            x=alt.X(shorthand='Shots:Q'),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color('Category:N', scale=alt.Scale(scheme='tableau10')),
+            tooltip=['Club', 'Ranking', 'Category', alt.Tooltip('Shots_abs:Q', title='Shots')],
+            order=alt.Order('Category', sort='descending')
+        )
 
-    rule = alt.Chart(df_melted).mark_rule(color='white', strokeWidth=3).encode(
-        x=alt.datum(0)
-    )
+        rule = alt.Chart(df_melted).mark_rule(color='white', strokeWidth=3).encode(
+            x=alt.datum(0)
+        )
 
-    final_chart = (bars + goals + rule).resolve_scale(
-        y='shared'
-    ).properties(
-        title="Shots, Shots on Target, Goals — For vs Against",
-        width=600
-    )
+        final_chart = (bars + goals + rule).resolve_scale(
+            y='shared'
+        ).properties(
+            title="Shots, Shots on Target, Goals — For vs Against",
+            width=600
+        )
 
-    st.altair_chart(final_chart, use_container_width=True)
+        st.altair_chart(final_chart, use_container_width=True)
 
-    return df
+        return df
+    return pd.DataFrame()
 
 
 def get_combined_passes(
@@ -425,52 +428,53 @@ def get_combined_passes(
         options=["Ranking", "Succ Passes", "Att Passes", "Total Passes", "Succ Passes Rate"]
     )
 
-    club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
+    if chosen_sorting:
+        club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
-    df_melted = df.melt(
-        id_vars=["Club", "Att Passes"],
-        value_vars=["Succ Passes", "Failed Passes"],
-        var_name="Kind",
-        value_name="Count"
-    )
+        df_melted = df.melt(
+            id_vars=["Club", "Att Passes"],
+            value_vars=["Succ Passes", "Failed Passes"],
+            var_name="Kind",
+            value_name="Count"
+        )
 
-    chart = alt.Chart(df_melted).mark_bar().encode(
-        x=alt.X(shorthand='Count:Q', title="Number of passes"),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color(
-            'Kind:N',
-            title="Passes",
-            scale=alt.Scale(
-                domain=['Succ Passes', 'Failed Passes'],
-                range=['steelblue', 'orange']
-            )
-        ),
-        order=alt.Order("Kind:N", sort='descending'),
-        tooltip=['Club:N', 'Att Passes:Q', 'Kind:N', 'Count:Q']
-    )
+        chart = alt.Chart(df_melted).mark_bar().encode(
+            x=alt.X(shorthand='Count:Q', title="Number of passes"),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color(
+                'Kind:N',
+                title="Passes",
+                scale=alt.Scale(
+                    domain=['Succ Passes', 'Failed Passes'],
+                    range=['steelblue', 'orange']
+                )
+            ),
+            order=alt.Order("Kind:N", sort='descending'),
+            tooltip=['Club:N', 'Att Passes:Q', 'Kind:N', 'Count:Q']
+        )
 
-    rate = alt.Chart(df).mark_text(
-        align='left',
-        baseline='middle',
-        fontSize=12,
-        dx=4,
-        color='black'
-    ).encode(
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        x=alt.X(shorthand='Att Passes:Q', title="Number of passes"),
-        text=alt.Text('Succ Passes Rate:Q', format='.0%'),
-        tooltip=["Club:N", "Att Passes:Q", alt.Text('Succ Passes Rate:Q', format='.0%')]
-    )
+        rate = alt.Chart(df).mark_text(
+            align='left',
+            baseline='middle',
+            fontSize=12,
+            dx=4,
+            color='black'
+        ).encode(
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            x=alt.X(shorthand='Att Passes:Q', title="Number of passes"),
+            text=alt.Text('Succ Passes Rate:Q', format='.0%'),
+            tooltip=["Club:N", "Att Passes:Q", alt.Text('Succ Passes Rate:Q', format='.0%')]
+        )
 
-    chart = alt.layer(chart, rate).properties(
-        title="Successful vs Attempted Passes",
-        width=600
-    )
+        chart = alt.layer(chart, rate).properties(
+            title="Successful vs Attempted Passes",
+            width=600
+        )
 
-    st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 
-    return df
-
+        return df
+    return pd.DataFrame()
 
 def get_combined_outcomes(
         db_conn,
@@ -503,46 +507,47 @@ def get_combined_outcomes(
     chosen_sorting = select__get_combined_ranking_sorting(
         prefix=prefix,
         suffix="outcomes",
-        options=["Ranking", "Wins", "Draws", "Loses"],
-        index=None
+        options=["Ranking", "Wins", "Draws", "Loses"]
     )
 
-    club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
+    if chosen_sorting:
+        club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
-    df_melted = df.melt(
-        id_vars=['Club', 'Ranking'],
-        value_vars=['Wins', 'Draws', 'Loses'],
-        var_name='Outcome',
-        value_name='Count'
-    )
+        df_melted = df.melt(
+            id_vars=['Club', 'Ranking'],
+            value_vars=['Wins', 'Draws', 'Loses'],
+            var_name='Outcome',
+            value_name='Count'
+        )
 
-    if chosen_sorting == "Draws":
-        draws_order = {'Draws': 0, 'Wins': 1, 'Loses': 2}
-        df_melted['OutcomeOrder'] = df_melted['Outcome'].map(draws_order)
-    else:
-        outcome_order = {'Wins': 0, 'Draws': 1, 'Loses': 2}
-        df_melted['OutcomeOrder'] = df_melted['Outcome'].map(outcome_order)
+        if chosen_sorting == "Draws":
+            draws_order = {'Draws': 0, 'Wins': 1, 'Loses': 2}
+            df_melted['OutcomeOrder'] = df_melted['Outcome'].map(draws_order)
+        else:
+            outcome_order = {'Wins': 0, 'Draws': 1, 'Loses': 2}
+            df_melted['OutcomeOrder'] = df_melted['Outcome'].map(outcome_order)
 
-    chart = alt.Chart(df_melted).mark_bar().encode(
-        x=alt.X(shorthand='Count:Q', stack='zero'),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color(
-            shorthand='Outcome:N',
-            scale=alt.Scale(
-                domain=['Wins', 'Draws', 'Loses'],
-                range=['steelblue', 'orange', 'firebrick'],
-            )
-        ),
-        order=alt.Order(
-            'OutcomeOrder:N',
-            sort='ascending'
-        ),
-        tooltip=["Club", "Outcome", "Count", "Ranking"]
-    )
+        chart = alt.Chart(df_melted).mark_bar().encode(
+            x=alt.X(shorthand='Count:Q', stack='zero'),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color(
+                shorthand='Outcome:N',
+                scale=alt.Scale(
+                    domain=['Wins', 'Draws', 'Loses'],
+                    range=['steelblue', 'orange', 'firebrick'],
+                )
+            ),
+            order=alt.Order(
+                'OutcomeOrder:N',
+                sort='ascending'
+            ),
+            tooltip=["Club", "Outcome", "Count", "Ranking"]
+        )
 
-    st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 
-    return df
+        return df
+    return pd.DataFrame()
 
 
 def get_combined_xgs(
@@ -590,88 +595,90 @@ def get_combined_xgs(
         ]
     )
 
-    club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
+    if chosen_sorting:
+        club_order = df.sort_values(chosen_sorting, ascending=chosen_sorting == "Ranking")['Club'].tolist()
 
-    df_melted = df.melt(
-        id_vars=["Club", "Ranking"],
-        value_vars=[
-            "xG For (fbref)",
-            "xG For (understat)",
-            "xG Against (fbref)",
-            "xG Against (understat)",
-            "Goals For",
-            "Goals Against"
-        ],
-        var_name="Side",
-        value_name="Value"
-    )
+        df_melted = df.melt(
+            id_vars=["Club", "Ranking"],
+            value_vars=[
+                "xG For (fbref)",
+                "xG For (understat)",
+                "xG Against (fbref)",
+                "xG Against (understat)",
+                "Goals For",
+                "Goals Against"
+            ],
+            var_name="Side",
+            value_name="Value"
+        )
 
-    df_melted['Value_abs'] = df_melted['Value'].abs()
-    df_melted['Category'] = df_melted['Side'].apply(
-        lambda x: 'xG (fbref)' if 'fbref' in x else 'xG (understat)' if 'understat' in x else 'Goals'
-    )
-    df_melted['Side'] = df_melted['Side'].apply(lambda x: 'For' if 'For' in x else 'Against')
+        df_melted['Value_abs'] = df_melted['Value'].abs()
+        df_melted['Category'] = df_melted['Side'].apply(
+            lambda x: 'xG (fbref)' if 'fbref' in x else 'xG (understat)' if 'understat' in x else 'Goals'
+        )
+        df_melted['Side'] = df_melted['Side'].apply(lambda x: 'For' if 'For' in x else 'Against')
 
-    xg_fbref_data = df_melted[df_melted['Category'] == 'xG (fbref)']
-    xg_understat_data = df_melted[df_melted['Category'] == 'xG (understat)']
-    goals_data = df_melted[df_melted['Category'] == 'Goals']
+        xg_fbref_data = df_melted[df_melted['Category'] == 'xG (fbref)']
+        xg_understat_data = df_melted[df_melted['Category'] == 'xG (understat)']
+        goals_data = df_melted[df_melted['Category'] == 'Goals']
 
-    goals = alt.Chart(goals_data).mark_bar().encode(
-        x=alt.X(shorthand='Value:Q'),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color(
-            shorthand='Side:N',
-            scale=alt.Scale(
-                domain=["For", "Against"],
-                range=['steelblue', 'orange']
+        goals = alt.Chart(goals_data).mark_bar().encode(
+            x=alt.X(shorthand='Value:Q'),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color(
+                shorthand='Side:N',
+                scale=alt.Scale(
+                    domain=["For", "Against"],
+                    range=['steelblue', 'orange']
+                ),
+                legend=alt.Legend(title="Goals")
             ),
-            legend=alt.Legend(title="Goals")
-        ),
-        tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='Goals'), "Ranking"]
-    )
+            tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='Goals'), "Ranking"]
+        )
 
-    expected_fbref = alt.Chart(xg_fbref_data).mark_tick(thickness=4, size=20).encode(
-        x=alt.X(shorthand='Value:Q'),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color(
-            shorthand='Category:N',
-            scale=alt.Scale(
-                domain=["xG (fbref)", "xG (understat)"],
-                range=['green', 'black']
+        expected_fbref = alt.Chart(xg_fbref_data).mark_tick(thickness=4, size=20).encode(
+            x=alt.X(shorthand='Value:Q'),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color(
+                shorthand='Category:N',
+                scale=alt.Scale(
+                    domain=["xG (fbref)", "xG (understat)"],
+                    range=['green', 'black']
+                ),
+                legend=alt.Legend(title="xG Source")
             ),
-            legend=alt.Legend(title="xG Source")
-        ),
-        tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
-    )
+            tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
+        )
 
-    expected_understat = alt.Chart(xg_understat_data).mark_tick(thickness=4, size=20).encode(
-        x=alt.X(shorthand='Value:Q'),
-        y=alt.Y(shorthand='Club:N', sort=club_order),
-        color=alt.Color(
-            shorthand='Category:N',
-            scale=alt.Scale(
-                domain=["xG (fbref)", "xG (understat)"],
-                range=['green', 'black']
+        expected_understat = alt.Chart(xg_understat_data).mark_tick(thickness=4, size=20).encode(
+            x=alt.X(shorthand='Value:Q'),
+            y=alt.Y(shorthand='Club:N', sort=club_order),
+            color=alt.Color(
+                shorthand='Category:N',
+                scale=alt.Scale(
+                    domain=["xG (fbref)", "xG (understat)"],
+                    range=['green', 'black']
+                ),
+                legend=None
             ),
-            legend=None
-        ),
-        tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
-    )
+            tooltip=["Club", "Category", "Side", alt.Tooltip('Value_abs:Q', title='xG'), "Ranking"]
+        )
 
-    rule = alt.Chart(df_melted).mark_rule(color='white', strokeWidth=3).encode(
-        x=alt.datum(0)
-    )
+        rule = alt.Chart(df_melted).mark_rule(color='white', strokeWidth=3).encode(
+            x=alt.datum(0)
+        )
 
-    final_chart = (goals + expected_fbref + expected_understat + rule).resolve_scale(
-        y='shared'
-    ).resolve_scale(
-        color='independent',
-        y='shared'
-    ).properties(
-        title="xG — For vs Against",
-        width=600
-    )
+        final_chart = (goals + expected_fbref + expected_understat + rule).resolve_scale(
+            y='shared'
+        ).resolve_scale(
+            color='independent',
+            y='shared'
+        ).properties(
+            title="xG — For vs Against",
+            width=600
+        )
 
-    st.altair_chart(final_chart, use_container_width=True)
+        st.altair_chart(final_chart, use_container_width=True)
 
-    return df
+        return df
+    return pd.DataFrame()
