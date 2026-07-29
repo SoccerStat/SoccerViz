@@ -6,7 +6,7 @@ import streamlit as st
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.commons.streamlit_widgets import select__get_one_comp, select__get_one_season, select__get_many_teams, \
-    download_button
+    download_button, select__get_one_ranking
 from components.queries.execute_query import execute_query
 from config import COMPETITIONS, KIND_C_CUP, KIND_CHP, \
     TEAM_STATS_RANKINGS_PLOTTABLE
@@ -59,10 +59,10 @@ def get_ranking_over_one_season(db_conn):
             teams = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
             n_teams = len(teams)
 
-            chosen_ranking = select__get_one_season(
+            chosen_ranking = select__get_one_ranking(
                 prefix=prefix,
-                custom_options=TEAM_STATS_RANKINGS_PLOTTABLE
-            )
+                options=TEAM_STATS_RANKINGS_PLOTTABLE
+            ) # TODO: attendance par match mal calculé (Chelsea 2023_2024)
 
             if chosen_ranking:
                 with st.spinner("Data loading..."):
