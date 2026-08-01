@@ -7,7 +7,7 @@ import streamlit as st
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
 from components.commons.streamlit_widgets import select__get_one_comp, select__get_one_season, select__get_many_teams, \
-    download_button
+    download_button, select__get_many_seasons
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -56,14 +56,16 @@ def get_ranking_by_season(db_conn):
 
         seasons_by_comp = get_seasons_by_comp(db_conn, chosen_comp)
 
-        chosen_seasons = select__get_one_season(
+        chosen_seasons = select__get_many_seasons(
             prefix=prefix,
-            custom_options=seasons_by_comp
+            options=seasons_by_comp,
+            all_seasons=True
         )
 
-        if chosen_seasons:
-            # n_seasons = len(seasons_by_comp)
+        if "All" in chosen_seasons:
+            chosen_seasons = get_seasons_by_comp(db_conn, chosen_comp)
 
+        if chosen_seasons:
             with st.spinner("Data loading..."):
                 df = ranking_by_chp_by_week_by_season(
                     _db_conn=db_conn,
