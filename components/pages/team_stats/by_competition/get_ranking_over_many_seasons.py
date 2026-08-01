@@ -51,40 +51,41 @@ def get_ranking_over_many_seasons(db_conn):
                 options=TEAM_STATS_RANKINGS_PLOTTABLE
             )
 
-            df = ranking_by_chp_week(
-                _db_conn=db_conn,
-                chosen_ranking=chosen_ranking,
-                chosen_comp=chosen_comp,
-                chosen_seasons=seasons_by_comp,
-            )
+            if chosen_ranking:
+                df = ranking_by_chp_week(
+                    _db_conn=db_conn,
+                    chosen_ranking=chosen_ranking,
+                    chosen_comp=chosen_comp,
+                    chosen_seasons=seasons_by_comp,
+                )
 
-            all_combinations = pd.MultiIndex.from_product(
-                [teams, seasons_by_comp],
-                names=['Club', 'Season']
-            ).to_frame(index=False)
+                all_combinations = pd.MultiIndex.from_product(
+                    [teams, seasons_by_comp],
+                    names=['Club', 'Season']
+                ).to_frame(index=False)
 
-            df = pd.merge(all_combinations, df, how='left', on=['Club', 'Season'])
+                df = pd.merge(all_combinations, df, how='left', on=['Club', 'Season'])
 
-        chosen_teams = select__get_many_teams(
-            prefix=prefix,
-            options=teams,
-            all_teams=True
-        )
+                chosen_teams = select__get_many_teams(
+                    prefix=prefix,
+                    options=teams,
+                    all_teams=True
+                )
 
-        if 'All' in chosen_teams:
-            chosen_teams = teams
+                if 'All' in chosen_teams:
+                    chosen_teams = teams
 
-        if chosen_teams:
-            # set_plot(df, chosen_comp, chosen_teams, n_teams)
-            set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams)
+                if chosen_teams and chosen_ranking:
+                    # set_plot(df, chosen_comp, chosen_teams, n_teams)
+                    set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams)
 
-            csv = df.to_csv(index=False, sep='|')
-            download_button(
-                prefix=prefix,
-                data=csv,
-                file_name=f"{chosen_comp.replace(' ', '_').lower()}_ranking_over_many_seasons.csv",
-                mime="text/csv"
-            )
+                    csv = df.to_csv(index=False, sep='|')
+                    download_button(
+                        prefix=prefix,
+                        data=csv,
+                        file_name=f"{chosen_comp.replace(' ', '_').lower()}_ranking_over_many_seasons.csv",
+                        mime="text/csv"
+                    )
 
 
 def set_plot(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
