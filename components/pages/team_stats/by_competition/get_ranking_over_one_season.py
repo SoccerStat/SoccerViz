@@ -62,7 +62,7 @@ def get_ranking_over_one_season(db_conn):
             chosen_ranking = select__get_one_ranking(
                 prefix=prefix,
                 options=TEAM_STATS_RANKINGS_PLOTTABLE
-            ) # TODO: attendance par match mal calculé (Chelsea 2023_2024)
+            )
 
             if chosen_ranking:
                 with st.spinner("Data loading..."):
@@ -96,6 +96,9 @@ def get_ranking_over_one_season(db_conn):
                 if chosen_teams:
                     set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_teams)
 
+                    if chosen_ranking == "Attendance":
+                        df = df.drop("Attendance/Match", axis=1)
+
                     csv = df.to_csv(index=False, sep='|')
                     download_button(
                         prefix=prefix,
@@ -110,7 +113,8 @@ def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_te
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
     set_plot_cumulative_ranking(filtered_df, chosen_comp, chosen_season, chosen_ranking, n_teams)
-    set_plot_cumulative_ranking_per_match(filtered_df, chosen_comp, chosen_season, chosen_ranking, n_teams)
+    if chosen_ranking != "Attendance":
+        set_plot_cumulative_ranking_per_match(filtered_df, chosen_comp, chosen_season, chosen_ranking, n_teams)
 
 
 def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, n_teams):
