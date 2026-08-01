@@ -9,6 +9,6 @@ WHERE season = any(
     {%- endfor -%}
     ]
 )
-{%- if name_comp != 'all' -%}
+{%- if name_comp.lower() != 'all' -%}
     {{ " " -}} AND competition = '{{ name_comp }}'
 {% endif %}

@@ -2,7 +2,7 @@ select
     "Coach",
     "Club",
     "Competition",
-    --"Season",
+    "Season",
     "Matches",
     "Points",
     "Points/Match",
@@ -17,7 +17,7 @@ select
     "Clean Sheets"
 from analytics.all_coaches_rankings(
     in_comps := array['{{ comp }}'],
-    in_seasons := array['{{ season }}'],
+    in_seasons := array['{{ seasons | join("', '") }}'],
     side := '{{ side }}',
     group_by_club := {{ group_by_club }},
     group_by_competition := {{ group_by_competition }},

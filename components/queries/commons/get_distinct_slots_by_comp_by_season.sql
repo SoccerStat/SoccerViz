@@ -1,6 +1,12 @@
 SELECT DISTINCT extract(isodow from date), time, trim(to_char(date, 'Day')) || ' ' || LEFT(time::text, 5) as "Slot"
 FROM analytics.staging_teams_performance stp
-WHERE season = '{{ season }}'
+WHERE season = any(
+    ARRAY[
+        {%- for season in seasons -%}
+        '{{ season }}'{% if not loop.last %}, {% endif %}
+    {%- endfor -%}
+    ]
+)
 AND CASE
     WHEN lower('{{ name_comp }}') = 'all'
     THEN TRUE

@@ -4,21 +4,22 @@ from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_all_season_schemas
 from components.commons.get_slots import get_distinct_slots
 from components.commons.set_titles import set_sub_sub_title
-from components.commons.streamlit_widgets import (select__get_one_comp, select__get_one_season, radio__select_side,
+from components.commons.streamlit_widgets import (select__get_one_comp, radio__select_side,
                                                   check__filter_by_week, check__filter_by_date, check__filter_by_slot,
                                                   slider__get_one_week, date__get_one_date, multiselect__get_slots,
-                                                  check__group_by_club, check__group_by_competition, check__group_by_season)
+                                                  check__group_by_club, check__group_by_competition,
+                                                  check__group_by_season, select__get_many_seasons)
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
 
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_top_players_by_stat(
         _db_conn,
         in_ranking,
         chosen_comp,
-        chosen_season,
+        chosen_seasons,
         chosen_side,
         first_week,
         last_week,
@@ -33,7 +34,7 @@ def get_top_players_by_stat(
         file_name="components/queries/player_stats/top_players.sql",
         ranking=in_ranking,
         comp=chosen_comp,
-        season=chosen_season,
+        seasons=chosen_seasons,
         side=chosen_side.lower(),
         first_week=first_week,
         last_week=last_week,
@@ -64,20 +65,19 @@ def get_top_players(db_conn):
         if chosen_comp:
             all_seasons = [season_schema[7:] for season_schema in get_all_season_schemas(db_conn)]
 
-            chosen_season = select__get_one_season(
-                db_conn=db_conn,
+            chosen_seasons = select__get_many_seasons(
                 prefix=prefix,
-                custom_options=all_seasons,
+                options=all_seasons,
             )
 
-            if chosen_season:
+            if chosen_seasons:
                 first_week = 1
                 last_week = 100
                 first_date = '1970-01-01'
                 last_date = '2099-12-31'
                 slots = []
 
-                all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, [chosen_season])
+                all_teams_of_comp_of_season = get_teams_by_comp_by_season(db_conn, chosen_comp, chosen_seasons)
                 n_teams = len(all_teams_of_comp_of_season)
 
                 filter_weeks = check__filter_by_week(prefix=prefix)
@@ -138,7 +138,7 @@ def get_top_players(db_conn):
                     with col:
                         slots = multiselect__get_slots(
                             prefix=prefix,
-                            options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
+                            options=get_distinct_slots(db_conn, chosen_comp, chosen_seasons)
                         )
 
                 chosen_side = radio__select_side(prefix=prefix)
@@ -152,13 +152,13 @@ def get_top_players(db_conn):
 
                 group_by_season = check__group_by_season(prefix=prefix)
 
-    if chosen_comp and chosen_season:
+    if chosen_comp and chosen_seasons:
         goals, decisive, assists = st.columns(3)
         top_scorers = get_top_players_by_stat(
             db_conn,
             'Goals',
             chosen_comp,
-            chosen_season,
+            chosen_seasons,
             chosen_side,
             first_week,
             last_week,
@@ -174,7 +174,7 @@ def get_top_players(db_conn):
             db_conn,
             'Assists',
             chosen_comp,
-            chosen_season,
+            chosen_seasons,
             chosen_side,
             first_week,
             last_week,
