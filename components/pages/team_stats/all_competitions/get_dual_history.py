@@ -69,7 +69,8 @@ def get_dual_history(db_conn):
 
         side = radio__select_side(
             prefix=prefix,
-            custom_options=[f"{teamA} home", "Both", f"{teamB} home", "Neutral", "All"]
+            custom_options=[f"{teamA} home", "Both", f"{teamB} home", "Neutral", "All"],
+            default_index=4
         )
 
         st.write(f"Team A: {teamA} (similarity: {team_logos[0]['similarity']}), Team B: {teamB} (similarity: {team_logos[1]['similarity']}).")
