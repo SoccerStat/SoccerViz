@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.get_seasons import get_seasons_by_comp
+from components.commons.seasons import get_seasons_by_comp
 from components.queries.execute_query import execute_query
 from config import ALL_SEASONS_MODE, RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE
 

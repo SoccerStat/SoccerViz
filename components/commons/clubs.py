@@ -12,6 +12,14 @@ def get_all_clubs(_db_conn):
 
     return result["Club"].to_list()
 
+@st.cache_data(show_spinner=False)
+def get_club_logo(_db_conn, club_name):
+    sql_file = read_sql_file(
+        file_name="components/queries/commons/get_club_logo.sql",
+        club_name=club_name,
+    )
+    return execute_query(_db_conn, sql_file).iloc[0]
+
 
 @st.cache_data(show_spinner=False)
 def get_teams_by_comp_by_season(_db_conn, name_comp, seasons):

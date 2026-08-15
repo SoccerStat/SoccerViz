@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 
-from components.commons.get_seasons import get_all_season_schemas
-from components.commons.set_titles import set_sub_sub_title
-from components.commons.streamlit_widgets import date__get_one_date
+from components.commons.seasons import get_all_season_schemas
+from components.commons.streamlit.titles import set_sub_sub_title
+from components.commons.streamlit.widgets import date__get_one_date
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file

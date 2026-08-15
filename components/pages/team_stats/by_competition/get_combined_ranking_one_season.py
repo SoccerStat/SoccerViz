@@ -2,11 +2,11 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from components.commons.get_all_teams import get_teams_by_comp_by_season
-from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.get_slots import get_distinct_slots
+from components.commons.clubs import get_teams_by_comp_by_season
+from components.commons.seasons import get_seasons_by_comp
+from components.commons.slots import get_distinct_slots
 from components.queries.execute_query import execute_query
-from components.commons.streamlit_widgets import (select__get_one_comp, select__get_one_season, radio__select_side,
+from components.commons.streamlit.widgets import (select__get_one_comp, select__get_one_season, radio__select_side,
                                                   check__filter_by_week, check__filter_by_date, check__filter_by_slot,
                                                   slider__get_one_week, date__get_one_date,
                                                   select__get_combined_ranking, select__get_combined_ranking_sorting,

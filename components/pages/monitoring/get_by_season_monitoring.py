@@ -1,9 +1,9 @@
 import streamlit as st
 
-from components.commons.set_titles import set_sub_sub_title
+from components.commons.streamlit.titles import set_sub_sub_title
 from components.pages.monitoring.plot.by_season import plot_by_season
 from components.pages.monitoring.tables.by_season import get_by_season_tables
-from components.commons.get_seasons import get_all_season_schemas
+from components.commons.seasons import get_all_season_schemas
 
 
 def get_by_season_monitoring(db_conn, col_inserted_at, col_updated_at):

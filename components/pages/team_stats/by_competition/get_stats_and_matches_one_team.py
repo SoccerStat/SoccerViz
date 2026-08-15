@@ -1,10 +1,10 @@
 import streamlit as st
 
-from components.commons.get_all_teams import get_teams_by_comp_by_season
-from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.set_titles import set_sub_sub_sub_title
-from components.commons.get_slots import get_distinct_slots
-from components.commons.streamlit_widgets import select__get_one_season, check__filter_by_week, slider__get_one_week, \
+from components.commons.clubs import get_teams_by_comp_by_season
+from components.commons.seasons import get_seasons_by_comp
+from components.commons.streamlit.titles import set_sub_sub_sub_title
+from components.commons.slots import get_distinct_slots
+from components.commons.streamlit.widgets import select__get_one_season, check__filter_by_week, slider__get_one_week, \
     check__filter_by_date, date__get_one_date, check__filter_by_slot, multiselect__get_slots, radio__select_side, \
     slider__generic, select__get_one_comp, select__generic
 from components.queries.execute_query import execute_query

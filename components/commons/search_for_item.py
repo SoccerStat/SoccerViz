@@ -1,7 +1,7 @@
 from typing import Callable
 
 
-def team_search_function(all_teams: list[str], teamA=None) -> Callable[[str], list[str]]:
+def search_for_team(all_teams: list[str], teamA=None) -> Callable[[str], list[str]]:
     teams = [(team, team.lower()) for team in all_teams]
     if teamA:
         teams.remove((teamA, teamA.lower()))
@@ -15,7 +15,7 @@ def team_search_function(all_teams: list[str], teamA=None) -> Callable[[str], li
     return search
 
 
-def player_search_function(all_players: list[str]) -> Callable[[str], list[str]]:
+def search_for_player(all_players: list[str]) -> Callable[[str], list[str]]:
     players = [(player, player.lower()) for player in all_players]
 
     def search(term: str) -> list[str]:

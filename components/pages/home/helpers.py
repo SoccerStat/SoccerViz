@@ -3,7 +3,7 @@ import streamlit as st
 from typing import List
 
 from components.queries.execute_query import execute_query
-from components.commons.set_button_style import set_button_with_style
+from components.commons.streamlit.buttons import set_button_with_style
 
 from config import PAGES_CONFIG
 

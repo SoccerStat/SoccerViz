@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.set_titles import set_sub_sub_title
+from components.commons.streamlit.titles import set_sub_sub_title
 from components.pages.monitoring.plot.upper import plot_upper
 from components.pages.monitoring.tables.upper import get_upper_tables
 

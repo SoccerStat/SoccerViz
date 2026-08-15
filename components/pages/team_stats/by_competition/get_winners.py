@@ -1,8 +1,8 @@
 import streamlit as st
 
-from components.commons.get_seasons import get_all_season_schemas
-from components.commons.set_titles import set_sub_sub_sub_title
-from components.commons.streamlit_widgets import select__get_one_season
+from components.commons.seasons import get_all_season_schemas
+from components.commons.streamlit.titles import set_sub_sub_sub_title
+from components.commons.streamlit.widgets import select__get_one_season
 
 from components.queries.execute_query import execute_query
 

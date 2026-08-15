@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.get_seasons import get_all_season_schemas
+from components.commons.seasons import get_all_season_schemas
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 

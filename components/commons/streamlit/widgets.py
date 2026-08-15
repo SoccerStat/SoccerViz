@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.get_seasons import get_all_season_schemas
+from components.commons.seasons import get_all_season_schemas
 
 from config import COMPETITIONS
 

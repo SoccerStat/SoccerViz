@@ -1,9 +1,9 @@
 import streamlit as st
 
-from components.commons.get_all_teams import get_teams_by_comp_by_season
-from components.commons.get_seasons import get_all_season_schemas
-from components.commons.get_slots import get_distinct_slots
-from components.commons.streamlit_widgets import (select__get_one_comp, radio__select_side,
+from components.commons.clubs import get_teams_by_comp_by_season
+from components.commons.seasons import get_all_season_schemas
+from components.commons.slots import get_distinct_slots
+from components.commons.streamlit.widgets import (select__get_one_comp, radio__select_side,
                                                   check__filter_by_week, check__filter_by_date, check__filter_by_slot,
                                                   slider__get_one_week, date__get_one_date, multiselect__get_slots,
                                                   check__group_by_club, check__group_by_competition,

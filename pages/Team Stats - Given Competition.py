@@ -32,9 +32,6 @@ class TeamStatsPage(BasePage):
             self.set_sub_sub_title("Combined Stat ranking")
             get_combined_ranking_one_season(db_conn)
 
-        # with self.set_expander("Moving Ranking"):
-        #     self.set_sub_sub_title("Moving Ranking")
-
         with self.set_expander("Teams Performance against Top/Flop teams"):
             self.set_sub_sub_title("Teams Performance against Top/Flop teams")
             get_team_performance_against_top_and_flop(db_conn)

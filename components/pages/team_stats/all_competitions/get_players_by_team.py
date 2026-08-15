@@ -1,9 +1,9 @@
 import streamlit as st
 import numpy as np
 
-from components.commons.get_all_teams import get_teams_by_comp_by_season
-from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.streamlit_widgets import select__get_one_season, select__generic, slider__generic
+from components.commons.clubs import get_teams_by_comp_by_season
+from components.commons.seasons import get_seasons_by_comp
+from components.commons.streamlit.widgets import select__get_one_season, select__generic, slider__generic
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file

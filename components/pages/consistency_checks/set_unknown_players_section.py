@@ -1,7 +1,7 @@
 import streamlit as st
 
-from components.commons.get_seasons import get_all_season_schemas
-from components.commons.set_titles import set_sub_title, set_sub_sub_title
+from components.commons.seasons import get_all_season_schemas
+from components.commons.streamlit.titles import set_sub_title, set_sub_sub_title
 from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 

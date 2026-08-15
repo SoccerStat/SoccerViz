@@ -1,11 +1,11 @@
 import streamlit as st
 import altair as alt
 
-from components.commons.get_all_teams import get_teams_by_comp_by_season
-from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.set_titles import set_sub_sub_title, set_sub_sub_sub_title
-from components.commons.get_slots import get_distinct_slots
-from components.commons.streamlit_widgets import (select__get_one_ranking, select__get_one_comp, select__get_one_season,
+from components.commons.clubs import get_teams_by_comp_by_season
+from components.commons.seasons import get_seasons_by_comp
+from components.commons.streamlit.titles import set_sub_sub_title, set_sub_sub_sub_title
+from components.commons.slots import get_distinct_slots
+from components.commons.streamlit.widgets import (select__get_one_ranking, select__get_one_comp, select__get_one_season,
                                                   check__filter_by_week, check__filter_by_date, check__filter_by_slot,
                                                   slider__get_one_week, date__get_one_date, multiselect__get_slots,
                                                   radio__select_side, radio__generic, slider__generic,

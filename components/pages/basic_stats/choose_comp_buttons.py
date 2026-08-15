@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.set_button_style import set_button_with_style
+from components.commons.streamlit.buttons import set_button_with_style
 from config import COMPETITIONS, ALL_BUTTON_CONFIG
 
 

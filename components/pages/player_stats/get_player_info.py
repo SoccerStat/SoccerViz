@@ -1,14 +1,14 @@
 import streamlit as st
 from streamlit_searchbox import st_searchbox
 
-from components.commons.get_all_players import get_all_players
-from components.commons.search_for_item import player_search_function
+from components.commons.players import get_all_players
+from components.commons.search_for_item import search_for_player
 
 
 def get_player_info(db_conn):
     prefix = "player_info"
     all_players = list(get_all_players(db_conn))
-    search_function = player_search_function(all_players)
+    search_function = search_for_player(all_players)
 
     player = st_searchbox(
         search_function=search_function,

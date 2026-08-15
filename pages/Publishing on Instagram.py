@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.set_titles import set_sub_title, set_sub_sub_title
+from components.commons.streamlit.titles import set_sub_title, set_sub_sub_title
 from components.pages.instagram_publishing.publish_vs_post import publish_vs_post
 
 from config import PUBLISHING_PAGE, INSTAGRAM_SUBJECTS

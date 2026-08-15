@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.commons.set_titles import set_sub_sub_sub_title
+from components.commons.streamlit.titles import set_sub_sub_sub_title
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file

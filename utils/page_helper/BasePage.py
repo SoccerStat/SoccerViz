@@ -3,8 +3,8 @@ from typing import Literal
 
 import streamlit as st
 
-from components.commons.set_button_style import set_button_with_style
-from components.commons.set_titles import set_main_title, set_sub_title, set_sub_sub_title
+from components.commons.streamlit.buttons import set_button_with_style
+from components.commons.streamlit.titles import set_main_title, set_sub_title, set_sub_sub_title
 from config import PREFIX_PAGE, APP_CONFIG
 from components.sidebar import sidebar_connection
 from utils.database_helper.connection import set_connection_or_warning
