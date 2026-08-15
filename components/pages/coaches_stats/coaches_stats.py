@@ -14,7 +14,7 @@ from utils.file_helper.reader import read_sql_file
 
 
 @st.cache_data(show_spinner=False)
-def get_coaches_stats_by_comp_by_season(
+def _get_coaches_stats_by_comp_by_season(
     _db_conn,
     chosen_comp,
     chosen_seasons,
@@ -49,7 +49,7 @@ def get_coaches_stats_by_comp_by_season(
     return df
 
 
-def get_all_coaches_stats(db_conn):
+def get_coaches_stats(db_conn):
     prefix = "coach_stats"
     col, _ = st.columns(2)
 
@@ -155,7 +155,7 @@ def get_all_coaches_stats(db_conn):
                 group_by_season = check__group_by_season(prefix=prefix)
 
     if chosen_comp and chosen_seasons:
-        coaches_stats = get_coaches_stats_by_comp_by_season(
+        coaches_stats = _get_coaches_stats_by_comp_by_season(
             db_conn,
             chosen_comp,
             chosen_seasons,

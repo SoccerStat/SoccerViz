@@ -1,5 +1,5 @@
 from utils.database_helper.connection import get_connection
-from components.pages.coaches_stats.get_coaches_stats import get_all_coaches_stats
+from components.pages.coaches_stats.coaches_stats import get_coaches_stats
 
 from utils.page_helper.BasePage import BasePage
 from config import COACHES_STATS_PAGE
@@ -11,7 +11,7 @@ class PlayerTeamStats(BasePage):
 
         with self.set_expander("Coaches Stats"):
             self.set_sub_title("Main Stats")
-            get_all_coaches_stats(db_conn)
+            get_coaches_stats(db_conn)
 
             self.set_sub_title("One Stat")
             # get_one_coaches_stat(db_conn)
