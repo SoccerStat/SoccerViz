@@ -7,7 +7,7 @@ from utils.file_helper.reader import read_sql_file
 
 @st.cache_data(show_spinner=False)
 def get_all_clubs(_db_conn):
-    sql_file = read_sql_file("components/queries/commons/get_all_clubs.sql")
+    sql_file = read_sql_file("components/queries/commons/clubs/all_clubs.sql")
     result = execute_query(_db_conn, sql_file)
 
     return result["Club"].to_list()
@@ -16,7 +16,7 @@ def get_all_clubs(_db_conn):
 @st.cache_data(show_spinner=False)
 def get_club_logo(_db_conn, club_name):
     sql_file = read_sql_file(
-        file_name="components/queries/commons/get_club_logo.sql",
+        file_name="components/queries/commons/clubs/club_logo.sql",
         club_name=club_name,
     )
     return execute_query(_db_conn, sql_file).iloc[0]
@@ -25,7 +25,7 @@ def get_club_logo(_db_conn, club_name):
 @st.cache_data(show_spinner=False)
 def get_teams_by_comp_by_season(_db_conn, name_comp, seasons):
     sql_file = read_sql_file(
-        "components/queries/commons/get_teams_by_comp_by_season.sql",
+        "components/queries/commons/teams_by_comp_by_season.sql",
         name_comp=name_comp,
         seasons=seasons,
     )
