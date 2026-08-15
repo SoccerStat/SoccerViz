@@ -6,7 +6,7 @@ from components.queries.execute_query import execute_query
 
 
 @st.cache_data(show_spinner=False)
-def get_teams_by_competition(_db_conn):
+def _get_teams_by_competition(_db_conn):
     all_season_schemas = get_all_season_schemas(_db_conn)
 
     union_query = " UNION ALL ".join(
@@ -59,7 +59,7 @@ def get_teams_by_competition(_db_conn):
 
 
 def set_teams_by_competition_section(db_conn):
-    teams_by_competition = get_teams_by_competition(db_conn)
+    teams_by_competition = _get_teams_by_competition(db_conn)
 
     set_sub_title("Teams by competition in each table")
     st.write(teams_by_competition)

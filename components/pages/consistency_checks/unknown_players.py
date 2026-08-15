@@ -7,13 +7,13 @@ from utils.file_helper.reader import read_sql_file
 
 
 @st.cache_data(show_spinner=False)
-def get_unknown_players(_db_conn):
+def _get_unknown_players(_db_conn):
     sql_file = read_sql_file(file_name="components/queries/consistency_checks/unknown_players.sql")
     return execute_query(_db_conn, sql_file)
 
 
 @st.cache_data(show_spinner=False)
-def get_players_in_match_but_not_in_team(_db_conn):
+def _get_players_in_match_but_not_in_team(_db_conn):
     all_season_schemas = get_all_season_schemas(_db_conn)
     union_query = " UNION ALL ".join(
         [
@@ -45,8 +45,8 @@ def set_unknown_players_section(db_conn):
         cols = st.columns([2, 3])
         with cols[0]:
             set_sub_sub_title("Unknown players")
-            st.write(get_unknown_players(db_conn))
+            st.write(_get_unknown_players(db_conn))
 
         with cols[1]:
             set_sub_sub_title("Non team players who still played a game")
-            st.write(get_players_in_match_but_not_in_team(db_conn))
+            st.write(_get_players_in_match_but_not_in_team(db_conn))
