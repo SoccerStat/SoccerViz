@@ -9,12 +9,12 @@ from components.queries.execute_query import execute_query
 from utils.file_helper.reader import read_sql_file
 
 
-def format_dict(d):
+def _format_club_seasons(d):
     return ", ".join(f"{club}: [{', '.join(seasons)}]" for club, seasons in d.items())
 
 
 @st.cache_data(show_spinner=False)
-def get_birthday_boys_by_season(_db_conn, season_schema, date):
+def _get_birthday_boys_by_season(_db_conn, season_schema, date):
     sql_file = read_sql_file(
         file_name="components/queries/player_stats/birthday_boys.sql",
         season=season_schema[7:],
@@ -42,7 +42,7 @@ def get_birthday_boys(db_conn):
     df = pd.DataFrame()
 
     for season_schema in all_seasons_schema[:n_seasons]:
-        df_season = get_birthday_boys_by_season(db_conn, season_schema, chosen_date)
+        df_season = _get_birthday_boys_by_season(db_conn, season_schema, chosen_date)
         df = pd.concat([df, df_season], ignore_index=True)
 
     df = df
@@ -55,7 +55,7 @@ def get_birthday_boys(db_conn):
     )
 
     df["Season x Club"] = df.set_index(["Id", "Player", "Age"]).index.map(season_club_dict)
-    df["Season x Club"] = df["Season x Club"].apply(format_dict)
+    df["Season x Club"] = df["Season x Club"].apply(_format_club_seasons)
 
     df = df.drop(columns=["Season", "Club"])
     df = df.drop_duplicates(subset=["Id", "Player"])

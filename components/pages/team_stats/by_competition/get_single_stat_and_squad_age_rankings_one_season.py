@@ -331,7 +331,7 @@ def get_rankings(db_conn, prefix, chosen_comp, chosen_season, comps_and_kind):
         col, _ = st.columns(2)
 
         with col:
-            slots = multiselect__get_slots(prefix=prefix, options=get_distinct_slots(db_conn, chosen_comp, chosen_season))
+            slots = multiselect__get_slots(prefix=prefix, options=get_distinct_slots(db_conn, chosen_comp, [chosen_season]))
 
     sides = (
         ["Home", "Both", "Away", "Neutral", "All"]

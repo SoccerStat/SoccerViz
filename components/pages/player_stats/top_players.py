@@ -15,7 +15,7 @@ from utils.file_helper.reader import read_sql_file
 
 
 @st.cache_data(show_spinner=False)
-def get_top_players_by_stat(
+def _get_top_players_by_stat(
         _db_conn,
         in_ranking,
         chosen_comp,
@@ -153,8 +153,7 @@ def get_top_players(db_conn):
                 group_by_season = check__group_by_season(prefix=prefix)
 
     if chosen_comp and chosen_seasons:
-        goals, decisive, assists = st.columns(3)
-        top_scorers = get_top_players_by_stat(
+        top_scorers = _get_top_players_by_stat(
             db_conn,
             'Goals',
             chosen_comp,
@@ -170,7 +169,7 @@ def get_top_players(db_conn):
             group_by_season
         )
 
-        top_assists = get_top_players_by_stat(
+        top_assists = _get_top_players_by_stat(
             db_conn,
             'Assists',
             chosen_comp,
@@ -186,20 +185,20 @@ def get_top_players(db_conn):
             group_by_season
         )
         top_decisive = top_scorers.merge(top_assists, how="inner", on="Player", suffixes=('_scorers', '_assists'))
-        top_decisive['M'] = top_decisive['M_scorers']
+        top_decisive['Matches'] = top_decisive['Matches_scorers']
         top_decisive['Club'] = top_decisive['Club_scorers']
-        top_decisive['G+A'] = top_decisive[['Goals', 'Assists']].sum(axis=1, skipna=True)
-        top_decisive = top_decisive[['Player', 'Club', 'M', 'G+A']].sort_values(by=['G+A', 'M'], ascending=[False, True])
+        top_decisive['Competition'] = top_decisive['Competition_scorers']
+        top_decisive['Season'] = top_decisive['Season_scorers']
+        top_decisive['Goals + Assists'] = top_decisive[['Goals', 'Assists']].sum(axis=1, skipna=True)
+        top_decisive = (top_decisive[['Player', 'Club', 'Competition', 'Season', 'Matches', 'Goals + Assists']]
+                        .sort_values(by=['Goals + Assists', 'Matches'], ascending=[False, True]))
         top_decisive.index = range(1, len(top_decisive) + 1)
 
-        with goals:
-            set_sub_sub_title("Goals")
-            st.write(top_scorers)
+        set_sub_sub_title("Goals")
+        st.write(top_scorers)
 
-        with decisive:
-            set_sub_sub_title("G + A")
-            st.write(top_decisive)
+        set_sub_sub_title("Assists")
+        st.write(top_assists)
 
-        with assists:
-            set_sub_sub_title("Assists")
-            st.write(top_assists)
+        set_sub_sub_title("G + A")
+        st.write(top_decisive)

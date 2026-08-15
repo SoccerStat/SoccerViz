@@ -2,8 +2,8 @@ SELECT "Player",
     "Club",
     "Competition",
     "Season",
-    "Matches" as "M",
-    "Involved Matches" as "Inv. M",
+    "Matches",
+    "Involved Matches",
     coalesce("Stat", 0) as "{{ ranking }}"
 FROM analytics.one_players_ranking(
     in_ranking := '{{ ranking }}',

@@ -192,7 +192,7 @@ def get_stats_and_matches_one_team(db_conn):
                     with col:
                         slots = multiselect__get_slots(
                             prefix=prefix,
-                            options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
+                            options=get_distinct_slots(db_conn, chosen_comp, [chosen_season])
                         )
 
                 if comps_and_kind[chosen_comp] == KIND_C_CUP:

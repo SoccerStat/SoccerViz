@@ -171,7 +171,7 @@ def get_combined_ranking_one_season(db_conn):
                 with col:
                     slots = multiselect__get_slots(
                         prefix=prefix,
-                        options=get_distinct_slots(db_conn, chosen_comp, chosen_season)
+                        options=get_distinct_slots(db_conn, chosen_comp, [chosen_season])
                     )
 
             side = radio__select_side(

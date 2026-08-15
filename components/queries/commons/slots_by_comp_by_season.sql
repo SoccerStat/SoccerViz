@@ -7,9 +7,7 @@ WHERE season = any(
     {%- endfor -%}
     ]
 )
-AND CASE
-    WHEN lower('{{ name_comp }}') = 'all'
-    THEN TRUE
-    ELSE competition = '{{ name_comp }}'
-END
+{% if name_comp.lower() not in ['all', 'all competitions'] %}
+AND competition = '{{ name_comp }}'
+{% endif %}
 ORDER BY EXTRACT(ISODOW FROM date), time;
