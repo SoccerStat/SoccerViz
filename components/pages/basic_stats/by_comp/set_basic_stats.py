@@ -1,12 +1,12 @@
 import streamlit as st
 
-from components.pages.basic_stats.by_season_by_comp.compare_seasons import compare_seasons
-from components.pages.basic_stats.by_season_by_comp.range_seasons import range_seasons
+from components.pages.basic_stats.by_comp.compare_seasons import compare_seasons
+from components.pages.basic_stats.by_comp.range_seasons import range_seasons
 
-from config import COMPARE_SEASONS_MODE
+from config import COMPARE_SEASONS_MODE, RANGE_SEASONS_MODE, ALL_SEASONS_MODE
 
 
-def set_basic_stats_by_season_by_comp(db_conn, name_comp, season_mode, seasons_ids):
+def set_basic_stats_by_comp(db_conn, name_comp, season_mode, seasons_ids):
     chosen_comp, chosen_seasons, _, players_or_clubs = st.columns([1, 1, 1, 1])
 
     with chosen_comp:
@@ -30,7 +30,7 @@ def set_basic_stats_by_season_by_comp(db_conn, name_comp, season_mode, seasons_i
 
         st.markdown(
             f"""
-                <div style="display: flex; justify-content: center; align-items: center; height: 80px;">
+                <div style="display: flex; justify-content: center; align-items: center; height: 120px;">
                     <h3 style="margin: 0; font-weight: normal;"><strong>{seasons}</strong></h3>
                 </div>
                 """,
@@ -59,5 +59,7 @@ def set_basic_stats_by_season_by_comp(db_conn, name_comp, season_mode, seasons_i
 
     if season_mode == COMPARE_SEASONS_MODE:
         compare_seasons(db_conn, name_comp, seasons_ids, chosen_ranking)
-    else:
+    elif season_mode in (RANGE_SEASONS_MODE, ALL_SEASONS_MODE):
         range_seasons(db_conn, name_comp, seasons_ids, chosen_ranking)
+    else:
+        st.error(f"The selected mode is not recognized: {season_mode}.")

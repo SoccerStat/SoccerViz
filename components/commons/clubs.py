@@ -12,6 +12,7 @@ def get_all_clubs(_db_conn):
 
     return result["Club"].to_list()
 
+
 @st.cache_data(show_spinner=False)
 def get_club_logo(_db_conn, club_name):
     sql_file = read_sql_file(

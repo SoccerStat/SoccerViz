@@ -1,6 +1,6 @@
 import streamlit as st
 
-from components.pages.basic_stats.by_season_by_comp.get_stats import get_stats
+from components.pages.basic_stats.by_comp.get_stats import get_stats
 
 
 def range_seasons(db_conn, name_comp, seasons_ids, chosen_ranking):

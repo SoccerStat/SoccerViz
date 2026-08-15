@@ -4,7 +4,7 @@ from components.commons.streamlit.buttons import set_button_with_style
 from config import COMPETITIONS, ALL_BUTTON_CONFIG
 
 
-def choose_comp_buttons():
+def choose_comp():
     competitions = list(COMPETITIONS.keys())
 
     key_all_comps = f"{ALL_BUTTON_CONFIG["id"]}_comps"

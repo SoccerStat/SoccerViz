@@ -9,4 +9,5 @@ SELECT
     "Assists",
     "Red Cards" AS "R",
     "Yellow Cards" AS "Y"
-FROM analytics.players_rankings('{{ name_comp }}', ARRAY[{{ seasons_ids | join(', ')}}]);
+FROM analytics.players_rankings('{{ name_comp }}', ARRAY[{{ seasons_ids | join(', ')}}])
+LIMIT 100;

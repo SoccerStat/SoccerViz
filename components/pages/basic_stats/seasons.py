@@ -1,37 +1,14 @@
 import streamlit as st
 
 from components.commons.seasons import get_seasons_by_comp
-from components.queries.execute_query import execute_query
 from config import ALL_SEASONS_MODE, RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE
 
 
-@st.cache_data(show_spinner=False)
-def select_all_seasons_by_comp(db_conn, all_season_schemas, id_comp):
-    if id_comp != "all_comps":
-        condition_comp = f"WHERE competition = '{id_comp}'"
-    else:
-        condition_comp = ""
-
-    union_query = " UNION ALL ".join(
-        [
-            f"(SELECT '{schema[7:]}' as season FROM {schema}.match {condition_comp} LIMIT 1)"
-            for schema in all_season_schemas
-        ]
-    )
-    final_query = f"""
-        SELECT DISTINCT season AS distinct_season
-        FROM ({union_query}) AS all_counts
-        ORDER BY season;
-    """
-    result = execute_query(db_conn, final_query)
-    return result['distinct_season'].tolist()
-
-
-def choose_season_button(db_conn, name_comp):
+def choose_season(db_conn, name_comp):
     if name_comp:
-        all_seasons = get_seasons_by_comp(db_conn, name_comp)
+        all_seasons_of_comp = get_seasons_by_comp(db_conn, name_comp)
 
-        st.session_state.setdefault("basic_stats__seasons_selected", all_seasons)
+        st.session_state.setdefault("basic_stats__seasons_selected", all_seasons_of_comp)
 
         with st.container():
             season_modes = [RANGE_SEASONS_MODE, COMPARE_SEASONS_MODE, ALL_SEASONS_MODE]
@@ -53,14 +30,14 @@ def choose_season_button(db_conn, name_comp):
                 with cols[0]:
                     min_season = st.selectbox(
                         label="Min season",
-                        options=all_seasons
+                        options=all_seasons_of_comp
                     )
                     max_season = st.selectbox(
                         label="Max season",
-                        options=[season for season in all_seasons if season >= min_season]
+                        options=[season for season in all_seasons_of_comp if season >= min_season]
                     )
                     st.session_state.basic_stats__seasons_selected = \
-                        [season for season in all_seasons if min_season <= season <= max_season]
+                        [season for season in all_seasons_of_comp if min_season <= season <= max_season]
 
             elif selected_mode == COMPARE_SEASONS_MODE:
                 cols = st.columns(2)
@@ -68,13 +45,13 @@ def choose_season_button(db_conn, name_comp):
                     chosen_seasons = st.multiselect(
                         key="basic_stats__chosen_seasons",
                         label="select seasons...",
-                        options=all_seasons,
+                        options=all_seasons_of_comp,
                         max_selections=3
                     )
                     st.session_state.basic_stats__seasons_selected = chosen_seasons
 
             elif selected_mode == ALL_SEASONS_MODE:
-                st.session_state.basic_stats__seasons_selected = all_seasons
+                st.session_state.basic_stats__seasons_selected = all_seasons_of_comp
 
         return st.session_state.basic_stats__season_mode_selected, st.session_state.basic_stats__seasons_selected
 

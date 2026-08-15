@@ -13,9 +13,9 @@ from (
     from analytics.staging_teams_performance
     WHERE
     {%- if name_comp != "All Competitions" -%}
-        {{ " " -}} competition = '{{ name_comp }}' AND {{- " " }}
+        {{ " " -}} competition = '{{ name_comp }}' AND
     {%- endif -%}
-    season IN ({{ seasons_ids | join(', ') }})
+    {{- " " }}season IN ({{ seasons_ids | join(', ') }})
 ) as stp
 left join upper.club c
 on stp.id_team = stp.id_comp || '_' || c.id
