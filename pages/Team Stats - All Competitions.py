@@ -1,10 +1,10 @@
-from components.connection import get_connection
+from utils.database_helper.connection import get_connection
 from components.pages.team_stats.all_competitions.get_dual_history import get_dual_history
 from components.pages.team_stats.all_competitions.get_home_away_outcomes import get_home_away_balance, \
     get_stats_by_season
 from components.pages.team_stats.all_competitions.get_players_by_team import get_players_by_team
 from config import TEAM_STATS_PAGES
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 
 
 class TeamStatsPage(BasePage):

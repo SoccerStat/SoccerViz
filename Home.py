@@ -1,22 +1,16 @@
 import streamlit as st
 
 from components.pages.home.visualization_interface import set_visualization_interface
-from components.commons.ensure_connection_or_warning import set_connection_or_warning
-from components.connection import get_connection
 from components.pages.home.helpers import set_contents_table_buttons
 from components.pages.home.query_interface import set_query_interface
-from components.sidebar import sidebar_connection
+
+from utils.database_helper.connection import get_connection
+from utils.page_helper.BasePage import BasePage
+
 from config import HOME_PAGE
-from utils.commons.BasePage import BasePage
 
 
 class Home(BasePage):
-    def render(self):
-        self.set_page_config(home=True)
-        self.set_page_title()
-        sidebar_connection()
-        set_connection_or_warning(self.content)
-
     def content(self):
         db_conn = get_connection()
 
@@ -35,8 +29,6 @@ class Home(BasePage):
 
 
 def main():
-    """Fonction principale de l'application"""
-
     st.markdown("""
     <style>
         .main-title {
@@ -66,4 +58,4 @@ def main():
 
 if __name__ == "__main__":
     home_page = Home(HOME_PAGE)
-    home_page.render()
+    home_page.render(home=True)

@@ -1,4 +1,4 @@
-from components.connection import get_connection
+from utils.database_helper.connection import get_connection
 from components.pages.team_stats.by_competition.get_combined_ranking_one_season import get_combined_ranking_one_season
 from components.pages.team_stats.by_competition.get_promoted_teams import get_promoted_teams
 from components.pages.team_stats.by_competition.get_ranking_by_season import get_ranking_by_season
@@ -12,7 +12,7 @@ from components.pages.team_stats.by_competition.get_team_performance_against_top
 )
 from components.pages.team_stats.by_competition.get_winners import get_winners
 from config import TEAM_STATS_PAGES
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 
 
 class TeamStatsPage(BasePage):

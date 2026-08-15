@@ -1,8 +1,8 @@
-from components.connection import get_connection
+from utils.database_helper.connection import get_connection
 from components.pages.player_stats.get_birthday_boys import get_birthday_boys
 from components.pages.player_stats.get_player_info import get_player_info
 from components.pages.player_stats.get_top_players import get_top_players
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 from config import PLAYER_STATS_PAGE
 
 

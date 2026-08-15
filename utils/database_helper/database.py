@@ -74,10 +74,10 @@ def init_session_state():
 
     # Tentative de restauration de la connexion si les credentials existent
     if st.session_state.db_credentials and not st.session_state.connected:
-        restore_connection()
+        _restore_connection()
 
 
-def restore_connection():
+def _restore_connection():
     """Restaure la connexion depuis les credentials en cache"""
     creds = st.session_state.db_credentials
 

@@ -1,7 +1,7 @@
-from components.connection import get_connection
+from utils.database_helper.connection import get_connection
 from components.pages.coaches_stats.get_coaches_stats import get_all_coaches_stats
 
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 from config import COACHES_STATS_PAGE
 
 

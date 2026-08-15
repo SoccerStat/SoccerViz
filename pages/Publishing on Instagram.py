@@ -5,7 +5,7 @@ from components.pages.instagram_publishing.publish_vs_post import publish_vs_pos
 
 from config import PUBLISHING_PAGE, INSTAGRAM_SUBJECTS
 
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 
 
 class PublishingPage(BasePage):

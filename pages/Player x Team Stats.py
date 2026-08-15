@@ -1,6 +1,6 @@
 from config import PLAYER_X_TEAM_STATS_PAGE
 
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 
 
 class PlayerTeamStats(BasePage):

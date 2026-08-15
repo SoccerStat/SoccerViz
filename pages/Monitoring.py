@@ -2,9 +2,9 @@ import streamlit as st
 
 from components.pages.monitoring.get_upper_schema_monitoring import get_upper_schema_monitoring
 from components.pages.monitoring.get_by_season_monitoring import get_by_season_monitoring
-from components.connection import get_connection
+from utils.database_helper.connection import get_connection
 
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 from config import MONITORING_PAGE
 
 

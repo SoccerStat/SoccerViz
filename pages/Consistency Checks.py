@@ -1,12 +1,12 @@
 import streamlit as st
 
-from components.connection import get_connection
+from utils.database_helper.connection import get_connection
 from components.pages.consistency_checks.set_match_consistency import set_match_consistency_section
 from components.pages.consistency_checks.set_substitutions_checks import set_substitutions_checks_section
 from components.pages.consistency_checks.set_teams_by_competition_section import set_teams_by_competition_section
 from components.pages.consistency_checks.set_unknown_players_section import set_unknown_players_section
 
-from utils.commons.BasePage import BasePage
+from utils.page_helper.BasePage import BasePage
 from config import CONSISTENCY_PAGE
 
 
