@@ -6,7 +6,7 @@ import streamlit as st
 from components.commons.streamlit.buttons import set_button_with_style
 from components.commons.streamlit.titles import set_main_title, set_sub_title, set_sub_sub_title
 from config import PREFIX_PAGE, APP_CONFIG
-from components.sidebar import sidebar_connection
+from components.commons.streamlit.sidebar import sidebar_connection
 from utils.database_helper.connection import set_connection_or_warning
 
 
