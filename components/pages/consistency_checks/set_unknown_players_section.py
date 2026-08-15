@@ -8,7 +8,7 @@ from utils.file_helper.reader import read_sql_file
 
 @st.cache_data(show_spinner=False)
 def get_unknown_players(_db_conn):
-    sql_file = read_sql_file(file_name="components/queries/consistency_checks/unknown_players/unknown_players.sql")
+    sql_file = read_sql_file(file_name="components/queries/consistency_checks/unknown_players.sql")
     return execute_query(_db_conn, sql_file)
 
 
