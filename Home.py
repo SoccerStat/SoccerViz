@@ -1,10 +1,10 @@
 import streamlit as st
 
-from components.charts import visualization_interface
+from components.pages.home.visualization_interface import set_visualization_interface
 from components.commons.ensure_connection_or_warning import set_connection_or_warning
 from components.connection import get_connection
-from components.pages.home.navigation_buttons import set_navigation_buttons
-from components.queries.home.query_interface import query_interface
+from components.pages.home.helpers import set_contents_table_buttons
+from components.pages.home.query_interface import set_query_interface
 from components.sidebar import sidebar_connection
 from config import HOME_PAGE
 from utils.commons.BasePage import BasePage
@@ -20,18 +20,18 @@ class Home(BasePage):
     def content(self):
         db_conn = get_connection()
 
-        self.set_sub_title("Navigation")
+        self.set_sub_title("Table of contents")
 
-        set_navigation_buttons()
+        set_contents_table_buttons()
 
         st.divider()
 
         if db_conn:
             tab1, tab2 = st.tabs(["🔍 Queries", "📊 Graphs"])
             with tab1:
-                query_interface(db_conn)
+                set_query_interface(db_conn)
             with tab2:
-                visualization_interface()
+                set_visualization_interface()
 
 
 def main():

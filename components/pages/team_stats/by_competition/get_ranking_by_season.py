@@ -6,7 +6,7 @@ import streamlit as st
 
 from components.commons.get_all_teams import get_teams_by_comp_by_season
 from components.commons.get_seasons import get_seasons_by_comp
-from components.commons.streamlit_widgets import select__get_one_comp, select__get_one_season, select__get_many_teams, \
+from components.commons.streamlit_widgets import select__get_one_comp, select__get_many_teams, \
     download_button, select__get_many_seasons
 from components.queries.execute_query import execute_query
 

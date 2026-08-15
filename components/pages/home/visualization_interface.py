@@ -1,11 +1,11 @@
 import streamlit as st
 import plotly.express as px
 # import plotly.graph_objects as go
-from utils.helpers import get_numeric_columns, get_categorical_columns
+from components.pages.home.helpers import get_numeric_columns, get_categorical_columns
 from config import CHART_CONFIG
 
 
-def visualization_interface():
+def set_visualization_interface():
     """Interface de visualisation des données"""
     st.header("📈 Visualisations")
 

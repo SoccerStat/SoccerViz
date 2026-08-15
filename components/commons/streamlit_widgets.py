@@ -145,11 +145,13 @@ def select__get_combined_ranking_sorting(prefix, options, suffix=None, label="So
         options=options
     )
 
+
 def select__get_many_seasons(prefix, options, label="Choose seasons...", all_seasons=False):
     if all_seasons:
         options = ["All"] + options
 
     return multiselect__generic(prefix=prefix, suffix="seasons", label=label, options=options)
+
 
 def select__get_many_teams(prefix, options, label="Choose teams...", all_teams=False):
     if all_teams:

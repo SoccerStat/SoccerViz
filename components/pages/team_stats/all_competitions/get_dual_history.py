@@ -73,7 +73,8 @@ def get_dual_history(db_conn):
             default_index=4
         )
 
-        st.write(f"Team A: {teamA} (similarity: {team_logos[0]['similarity']}), Team B: {teamB} (similarity: {team_logos[1]['similarity']}).")
+        st.write(f"Team A: {teamA} (similarity: {team_logos[0]['similarity']}), "
+                 f"Team B: {teamB} (similarity: {team_logos[1]['similarity']}).")
 
         st.markdown(f"""
         <div style="display: flex; justify-content: center; align-items: center;">

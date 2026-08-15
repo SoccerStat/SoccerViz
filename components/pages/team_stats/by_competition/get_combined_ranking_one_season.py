@@ -476,6 +476,7 @@ def get_combined_passes(
         return df
     return pd.DataFrame()
 
+
 def get_combined_outcomes(
         db_conn,
         prefix,
