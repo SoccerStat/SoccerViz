@@ -228,7 +228,7 @@ TEAM_STATS_RANKINGS_PLOTTABLE = [
     "Clean Sheets",
 ]
 
-DUAL_STATS = [
+HEAD_TO_HEAD_STATS = [
     "Matches",
     "Wins",
     "Draws",

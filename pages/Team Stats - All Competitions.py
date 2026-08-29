@@ -1,5 +1,8 @@
 from utils.database_helper.connection import get_connection
-from components.pages.team_stats.all_competitions.get_dual_history import get_dual_history
+from components.pages.team_stats.all_competitions.get_head_to_head_history import get_head_to_head_history
+from components.pages.team_stats.all_competitions.get_by_country_head_to_head_history import (
+    get_by_country_head_to_head_history
+)
 from components.pages.team_stats.all_competitions.get_home_away_outcomes import get_home_away_balance, \
     get_stats_by_season
 from components.pages.team_stats.all_competitions.get_players_by_team import get_players_by_team
@@ -13,9 +16,13 @@ class TeamStatsPage(BasePage):
 
         self.set_sub_title("All competitions and seasons")
 
-        with self.set_expander("Dual history"):
-            self.set_sub_sub_title("Dual history")
-            get_dual_history(db_conn)
+        with self.set_expander("Head-to-Head history"):
+            self.set_sub_sub_title("Head-to-Head history")
+            get_head_to_head_history(db_conn)
+
+        with self.set_expander("By-Country Head-to-Head history"):
+            self.set_sub_sub_title("By-Country Head-to-Head history")
+            get_by_country_head_to_head_history(db_conn)
 
         with self.set_expander("Home / Away balance [EXCEPT FINAL]"):
             self.set_sub_sub_title("Home / Away balance")

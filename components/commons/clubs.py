@@ -7,10 +7,18 @@ from utils.file_helper.reader import read_sql_file
 
 @st.cache_data(show_spinner=False)
 def get_all_clubs(_db_conn):
-    sql_file = read_sql_file("components/queries/commons/clubs/all_clubs.sql")
+    sql_file = read_sql_file("components/queries/commons/clubs/all_clubs_and_countries.sql")
     result = execute_query(_db_conn, sql_file)
 
-    return result["Club"].to_list()
+    return result["Club"].unique().tolist()
+
+
+@st.cache_data(show_spinner=False)
+def get_all_club_countries(_db_conn):
+    sql_file = read_sql_file("components/queries/commons/clubs/all_clubs_and_countries.sql")
+    result = execute_query(_db_conn, sql_file)
+
+    return result["Country"].unique().tolist()
 
 
 @st.cache_data(show_spinner=False)
