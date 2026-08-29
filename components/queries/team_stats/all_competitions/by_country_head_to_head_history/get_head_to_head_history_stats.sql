@@ -107,4 +107,5 @@ selected_matches AS (
     {%- endif %}
 )
 SELECT *
-FROM selected_matches;
+FROM selected_matches
+ORDER BY "Face-to-Face", "Competition";
