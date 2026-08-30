@@ -220,6 +220,7 @@ TEAM_RANKINGS = [
 ]
 
 TEAM_STATS_RANKINGS_PLOTTABLE = [
+    "Overall",
     "Attendance",
     "Points",
     "Goals For",

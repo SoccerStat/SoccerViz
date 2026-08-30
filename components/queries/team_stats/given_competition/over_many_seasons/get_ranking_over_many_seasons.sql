@@ -2,7 +2,7 @@ with stats as (
     SELECT
         "Club",
         '{{ season }}' as "Season",
-        "Ranking" as "Global Ranking",
+        "Ranking" as "Overall Ranking",
         "Stat" as "{{ ranking }}"
     FROM analytics.one_teams_ranking(
         in_ranking := '{{ ranking }}',
