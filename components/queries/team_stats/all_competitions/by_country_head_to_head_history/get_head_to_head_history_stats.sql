@@ -1,50 +1,48 @@
 with home AS (
     select
         "Competition",
-        "Team" AS "Club",
         "Opponent",
         "Matches",
-        "Wins",
+        "Wins" AS "Wins {{ team }}",
         "Draws",
-        "Loses",
-        "Goals For",
-        "Goals Against"
+        "Loses" AS "Wins Opponent",
+        "Goals For" AS "Goals {{ team }}",
+        "Goals Against" AS "Goals Opponent"
     FROM analytics.teams_oppositions(
         ARRAY[{{ seasons }}],
         ARRAY[{{ comps }}],
         '{{ team }}',
         'home'
     )
-    WHERE "Opponent Country" = '{{ country }}'
+    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
 ),
 away AS (
     select
         "Competition",
-        "Team" AS "Club",
         "Opponent",
         "Matches",
-        "Wins",
+        "Wins" AS "Wins {{ team }}",
         "Draws",
-        "Loses",
-        "Goals For",
-        "Goals Against"
+        "Loses" AS "Wins Opponent",
+        "Goals For" AS "Goals {{ team }}",
+        "Goals Against" AS "Goals Opponent"
     FROM analytics.teams_oppositions(
         ARRAY[{{ seasons }}],
         ARRAY[{{ comps }}],
         '{{ team }}',
         'away'
     )
-    WHERE "Opponent Country" = '{{ country }}'
+    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
 ),
 neutral AS (
     select
         "Competition",
-        "Team" || ' - ' || "Opponent" AS "Face-to-Face",
+        "Opponent",
         "Matches",
-        "Wins" AS "Wins Team",
+        "Wins" AS "Wins {{ team }}",
         "Draws",
         "Loses" AS "Wins Opponent",
-        "Goals For" AS "Goals Team",
+        "Goals For" AS "Goals {{ team }}",
         "Goals Against" AS "Goals Opponent"
     FROM analytics.teams_oppositions(
         ARRAY[{{ seasons }}],
@@ -52,33 +50,32 @@ neutral AS (
         '{{ team }}',
         'neutral'
     )
-    WHERE "Opponent Country" = '{{ country }}'
+    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
 ),
 both_sides AS (
     select
         h."Competition",
-        h."Club" || ' - ' || a."Opponent"     AS "Face-to-Face",
-        h."Matches"       + a."Matches"       AS "Matches",
-        h."Wins"          + a."Loses"         AS "Wins Team",
-        h."Draws"         + a."Draws"         AS "Draws",
-        h."Loses"         + a."Wins"          AS "Wins Opponent",
-        h."Goals For"     + a."Goals Against" AS "Goals Team",
-        h."Goals Against" + a."Goals For"     AS "Goals Opponent"
+        h."Opponent",
+        h."Matches"          + a."Matches"          AS "Matches",
+        h."Wins {{ team }}"  + a."Wins {{ team }}"  AS "Wins {{ team }}",
+        h."Draws"            + a."Draws"            AS "Draws",
+        h."Wins Opponent"    + a."Wins Opponent"    AS "Wins Opponent",
+        h."Goals {{ team }}" + a."Goals {{ team }}" AS "Goals {{ team }}",
+        h."Goals Opponent"   + a."Goals Opponent"   AS "Goals Opponent"
     FROM home h
     JOIN away a
-    ON h."Club" = a."Club"
-    AND h."Opponent" = a."Opponent"
+    ON h."Opponent" = a."Opponent"
     AND h."Competition" = a."Competition"
 ),
 all_matches AS (
     select
         "Competition",
-        "Team" || ' - ' || "Opponent" AS "Face-to-Face",
+        "Opponent",
         "Matches",
-        "Wins" AS "Wins Team",
+        "Wins" AS "Wins {{ team }}",
         "Draws",
         "Loses" AS "Wins Opponent",
-        "Goals For" AS "Goals Team",
+        "Goals For" AS "Goals {{ team }}",
         "Goals Against" AS "Goals Opponent"
     FROM analytics.teams_oppositions(
         ARRAY[{{ seasons }}],
@@ -86,26 +83,39 @@ all_matches AS (
         '{{ team }}',
         'all'
     )
-    WHERE "Opponent Country" = '{{ country }}'
+    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
 ),
 selected_matches AS (
+    SELECT
+        "Opponent",
+        "Competition",
+        "Matches",
+        "Wins {{ team }}",
+        "Draws",
+        "Wins Opponent",
+        "Goals {{ team }}",
+        "Goals Opponent"
     {%- if 'home' in side %}
-    SELECT *
     FROM home
     {%- elif 'away' in side %}
-    SELECT *
     FROM away
     {%- elif side == 'Neutral' %}
-    SELECT *
     FROM neutral
     {%- elif side == 'Both' %}
-    SELECT *
     FROM both_sides
     {%- else %}
-    SELECT *
     FROM all_matches
     {%- endif %}
 )
-SELECT *
+SELECT
+    CASE WHEN GROUPING("Opponent") = 1 THEN 'ALL' ELSE "Opponent" END AS "Opponent",
+    CASE WHEN GROUPING("Competition") = 1 THEN 'ALL' ELSE "Competition" END AS "Competition",
+    SUM("Matches") AS "Matches",
+    SUM("Wins {{ team }}") AS "Wins {{ team }}",
+    SUM("Draws") AS "Draws",
+    SUM("Wins Opponent") AS "Wins Opponent",
+    SUM("Goals {{ team }}") AS "Goals {{ team }}",
+    SUM("Goals Opponent") AS "Goals Opponent"
 FROM selected_matches
-ORDER BY "Face-to-Face", "Competition";
+GROUP BY GROUPING SETS (("Opponent", "Competition"), ("Competition"), ())
+ORDER BY "Opponent", "Competition";
