@@ -14,6 +14,8 @@ class TeamStatsPage(BasePage):
     def content(self):
         db_conn = get_connection()
 
+        # TODO: ajouter des infos sur les matchs sur tapis vert dans chaque rubrique
+
         self.set_sub_title("All competitions and seasons")
 
         with self.set_expander("Head-to-Head history"):

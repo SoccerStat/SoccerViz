@@ -28,7 +28,7 @@ with team_a as (
             ELSE '🔴'
         END AS "Outcome for {{ team }}"
     FROM analytics.staging_teams_performance stp
-    WHERE club = '{{ team }}' and opponent_country = '{{ country }}' and played_home and (round is null or round != 'Final') and date >= '2000-01-01'
+    WHERE club = '{{ team }}' and opponent_country = '{{ country }}' and played_home and (round is null or round != 'Final')
 ),
 team_b as (
     SELECT
@@ -58,7 +58,7 @@ team_b as (
             ELSE '🔴'
         END AS "Outcome for {{ team }}"
     FROM analytics.staging_teams_performance stp
-    WHERE opponent = '{{ team }}' and club_country = '{{ country }}' and played_home and (round is null or round != 'Final') and date >= '2000-01-01'
+    WHERE opponent = '{{ team }}' and club_country = '{{ country }}' and played_home and (round is null or round != 'Final')
 ),
 neutral as (
     SELECT

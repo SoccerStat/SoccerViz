@@ -1,5 +1,6 @@
 with home AS (
     select
+        "Season",
         "Competition",
         "Opponent",
         "Matches",
@@ -14,10 +15,13 @@ with home AS (
         '{{ team }}',
         'home'
     )
-    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
+    WHERE "Opponent Country" = '{{ country }}'
+    AND "Granularity Competition" = 'Competition'
+    AND "Granularity Season" = 'Season'
 ),
 away AS (
     select
+        "Season",
         "Competition",
         "Opponent",
         "Matches",
@@ -32,10 +36,13 @@ away AS (
         '{{ team }}',
         'away'
     )
-    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
+    WHERE "Opponent Country" = '{{ country }}'
+    AND "Granularity Competition" = 'Competition'
+    AND "Granularity Season" = 'Season'
 ),
 neutral AS (
     select
+        "Season",
         "Competition",
         "Opponent",
         "Matches",
@@ -50,10 +57,13 @@ neutral AS (
         '{{ team }}',
         'neutral'
     )
-    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
+    WHERE "Opponent Country" = '{{ country }}'
+    AND "Granularity Competition" = 'Competition'
+    AND "Granularity Season" = 'Season'
 ),
 both_sides AS (
     select
+        h."Season",
         h."Competition",
         h."Opponent",
         h."Matches"          + a."Matches"          AS "Matches",
@@ -66,9 +76,11 @@ both_sides AS (
     JOIN away a
     ON h."Opponent" = a."Opponent"
     AND h."Competition" = a."Competition"
+    AND h."Season" = a."Season"
 ),
 all_matches AS (
     select
+        "Season",
         "Competition",
         "Opponent",
         "Matches",
@@ -83,10 +95,13 @@ all_matches AS (
         '{{ team }}',
         'all'
     )
-    WHERE "Opponent Country" = '{{ country }}' AND "Competition" != 'All'
+    WHERE "Opponent Country" = '{{ country }}'
+    AND "Granularity Competition" = 'Competition'
+    AND "Granularity Season" = 'Season'
 ),
 selected_matches AS (
     SELECT
+        "Season",
         "Opponent",
         "Competition",
         "Matches",
@@ -108,8 +123,9 @@ selected_matches AS (
     {%- endif %}
 )
 SELECT
-    CASE WHEN GROUPING("Opponent") = 1 THEN 'ALL' ELSE "Opponent" END AS "Opponent",
     CASE WHEN GROUPING("Competition") = 1 THEN 'ALL' ELSE "Competition" END AS "Competition",
+    CASE WHEN GROUPING("Season") = 1 THEN 'ALL' ELSE "Season" END AS "Season",
+    CASE WHEN GROUPING("Opponent") = 1 THEN 'ALL' ELSE "Opponent" END AS "Opponent",
     SUM("Matches") AS "Matches",
     SUM("Wins {{ team }}") AS "Wins {{ team }}",
     SUM("Draws") AS "Draws",
@@ -117,5 +133,5 @@ SELECT
     SUM("Goals {{ team }}") AS "Goals {{ team }}",
     SUM("Goals Opponent") AS "Goals Opponent"
 FROM selected_matches
-GROUP BY GROUPING SETS (("Opponent", "Competition"), ("Competition"), ())
-ORDER BY "Opponent", "Competition";
+GROUP BY CUBE ("Competition", "Season", "Opponent")
+ORDER BY "Competition", "Season", "Opponent";

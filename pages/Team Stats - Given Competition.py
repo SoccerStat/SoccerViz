@@ -19,6 +19,8 @@ class TeamStatsPage(BasePage):
     def content(self):
         db_conn = get_connection()
 
+        # TODO: ajouter des infos sur les points de pénalité dans chaque rubrique
+
         self.set_sub_title("By Competition by season")
 
         with self.set_expander("Basic Stats of one team"):

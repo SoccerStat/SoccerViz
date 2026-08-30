@@ -16,7 +16,6 @@ team_players as (
         positions,
         position_groups
     from season_{{ chosen_season }}.team_player tp
-    --group by team, player
 ),
 players_performance as (
     select
