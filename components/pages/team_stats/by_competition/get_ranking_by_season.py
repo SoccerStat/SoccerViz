@@ -162,6 +162,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams):
                     "Opponent: %{customdata[2]}<br><br>" +
                     "<b>Points:</b> %{y}<br>" +
                     "<b>Ranking:</b> %{text}<extra></extra>"
+                    "<b>Ranking (excl. p.d.):</b> %{text}<extra></extra>"
                 ),
                 customdata=df_cs[["Side", "Result", "Opponent"]],
                 showlegend=True,
@@ -196,7 +197,7 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams
         traces.append(
             go.Scatter(
                 x=df_cs['Week'],
-                y=df_cs['Points/Match (exclude p.d.)'],
+                y=df_cs['Points/Match'],
                 mode='lines+markers+text',
                 name=cs,
                 line=dict(color=club_colors[cs]),
@@ -210,7 +211,7 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams
                     "Side: %{customdata[0]}<br>" +
                     "Result: %{customdata[1]}<br>" +
                     "Opponent: %{customdata[2]}<br><br>" +
-                    "<b>Points/Match (exclude p.d.):</b> %{y:.2f}<br>" +
+                    "<b>Points/Match:</b> %{y:.2f}<br>" +
                     "<b>Ranking:</b> %{text}<extra></extra>"
                 ),
                 customdata=df_cs[["Side", "Result", "Opponent"]],

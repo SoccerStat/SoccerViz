@@ -13,7 +13,7 @@ from config import COMPETITIONS, KIND_C_CUP, KIND_CHP, \
 from utils.file_helper.reader import read_sql_file
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb_chp_weeks):
     complete_df = pd.DataFrame()
 
@@ -31,7 +31,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
     return complete_df
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def ranking_by_c_cup_week(_db_conn, chosen_ranking, chosen_comp, chosen_season):
     complete_df = pd.DataFrame()
 
@@ -61,7 +61,7 @@ def get_ranking_over_one_season(db_conn):
 
             chosen_ranking = select__get_one_ranking(
                 prefix=prefix,
-                options=TEAM_STATS_RANKINGS_PLOTTABLE
+                options=[ranking for ranking in TEAM_STATS_RANKINGS_PLOTTABLE if ranking != "Overall"]
             )
 
             if chosen_ranking:
@@ -138,6 +138,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
     # Points réels
     df_actual = df[[
         "Global Ranking",
+        "Global Ranking (excl. p.d.)",
         "Club",
         "Week",
         chosen_ranking,
@@ -172,9 +173,10 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
                     "<b>Opponent: </b>%{customdata[4]}<br><br>" +
                     f"<b>{chosen_ranking}:</b> %{{y}}<br>" +
                     f"<b>{chosen_ranking} Ranking:</b> %{{customdata[1]}}<br>" +
-                    "Global Ranking: %{customdata[0]}<extra></extra>"
+                    "<b>Global Ranking:</b> %{customdata[0]}<br>"
+                    "<b>Global Ranking (excl. p.d.):</b> %{customdata[5]}<extra></extra>"
                 ),
-                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent"]],
+                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent", "Global Ranking (excl. p.d.)"]],
                 line=dict(color=club_colors[club]),
                 marker=dict(color=club_colors[club]),
                 showlegend=True,

@@ -39,6 +39,7 @@ SELECT
     '{{ season }}' as "Season",
     {{ week }} as "Week",
     r."Ranking",
+    r."Ranking (excl. p.d.)",
     r."Stat" as "{{ ranking }}",
     round("Stat"::numeric / {{ week }}::numeric, 2) as "{{ ranking }}/Match"
 FROM analytics.one_teams_ranking(

@@ -36,6 +36,7 @@ stats as (
         "Club",
         {{ week }} as "Week",
         "Ranking" as "Global Ranking",
+        "Ranking (excl. p.d.)" as "Global Ranking (excl. p.d.)",
         "Stat" as "{{ ranking }}",
         round("Stat"::numeric / {{ week }}::numeric, 2) as "{{ ranking }}/Match"
     FROM analytics.one_teams_ranking (

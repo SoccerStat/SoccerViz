@@ -181,7 +181,9 @@ TEAM_RANKINGS = [
     "Attendance",
     "Matches",
     "Points",
-    "Points/Match (exclude p.d.)",
+    "Points (excl. p.d.)",
+    "Points/Match",
+    "Points/Match (excl. p.d.)",
     "Wins",
     "Draws",
     "Loses",
@@ -223,6 +225,7 @@ TEAM_STATS_RANKINGS_PLOTTABLE = [
     "Overall",
     "Attendance",
     "Points",
+    "Points (excl. p.d.)",
     "Goals For",
     "Goals Against",
     "Goals Diff",
@@ -240,7 +243,7 @@ HEAD_TO_HEAD_STATS = [
 
 C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
     "Points",
-    "Points/Match (exclude p.d.)",
+    "Points/Match (excl. p.d.)",
     "xG For",
     "xG For/Match",
     "xG Against",

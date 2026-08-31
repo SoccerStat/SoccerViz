@@ -15,7 +15,7 @@ from config import COMPETITIONS
 from utils.file_helper.reader import read_sql_file
 
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_history_stats(_db_conn, team, country, all_comps, all_season_schemas, side) -> pd.DataFrame:
     sql_file = read_sql_file(
         "components/queries/team_stats/all_competitions/by_country_head_to_head_history/get_head_to_head_history_stats.sql",
@@ -29,7 +29,7 @@ def get_history_stats(_db_conn, team, country, all_comps, all_season_schemas, si
     return execute_query(_db_conn, sql_file)
 
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_history_matches(_db_conn, team, country, all_comps, all_season_schemas, side) -> pd.DataFrame:
     sql_file = read_sql_file(
         "components/queries/team_stats/all_competitions/by_country_head_to_head_history/get_head_to_head_history_matches.sql",

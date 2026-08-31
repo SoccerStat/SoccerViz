@@ -221,8 +221,13 @@ def get_stats_and_matches_one_team(db_conn):
                     slots
                 )
 
-                team_stats_first_row = team_stats[["Club", "M", "W", "D", "L", "GF", "GA", "GD"]]
-                team_stats_second_row = team_stats[["Club", "Points/Match (exclude p.d.)", "% Succ Passes"]]
+                team_stats_first_row = team_stats[["Club", "Pts", "M", "W", "D", "L", "GF", "GA", "GD"]]
+                if team_stats.loc[0, "Points Deductions"] == 0:
+                    team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
+                else:
+                    team_stats_second_row = team_stats[
+                        ["Club", "Points Deductions", "Points (excl. p.d.)", "Points/Match",
+                         "Points/Match (excl. p.d.)", "% Succ Passes"]]
                 team_stats_third_row = team_stats[
                     [
                         "Club",

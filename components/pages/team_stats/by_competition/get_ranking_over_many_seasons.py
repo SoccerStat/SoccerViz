@@ -29,7 +29,7 @@ def ranking_by_season(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     return complete_df
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def overall_ranking_by_season(_db_conn, chosen_comp, chosen_seasons):
     complete_df = pd.DataFrame()
 
@@ -261,11 +261,12 @@ def set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
                 text=df_club[f"Ranking"].astype(str),
                 textposition='top center',
                 textfont=dict(color=club_colors[club]),
-                customdata=df_club[["Ranking"]],
+                customdata=df_club[["Ranking", "Ranking (excl. p.d.)"]],
                 hovertemplate=(
                         f"<b>{club}</b><br>" +
                         "<b>Season: </b>%{x}<br><br>" +
-                        "Overall Ranking: %{customdata[0]}<extra></extra>"
+                        "<b>Overall Ranking:</b> %{customdata[0]}<br>"
+                        "<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>"
                 ),
                 showlegend=True
             )
