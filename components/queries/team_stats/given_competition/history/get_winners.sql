@@ -14,7 +14,8 @@ CROSS JOIN LATERAL (
 		"Goals For",
 		"Goals Against",
 		"Goals Diff",
-		"Points"
+		"Points",
+		"Points Deductions"
 	FROM analytics.overall_teams_ranking(chps."Competition", ARRAY['{{ season }}'])
 	LIMIT 3
 ) rk

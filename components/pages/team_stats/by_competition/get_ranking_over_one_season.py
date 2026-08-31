@@ -13,7 +13,7 @@ from config import COMPETITIONS, KIND_C_CUP, KIND_CHP, \
 from utils.file_helper.reader import read_sql_file
 
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb_chp_weeks):
     complete_df = pd.DataFrame()
 
@@ -31,7 +31,7 @@ def ranking_by_chp_week(_db_conn, chosen_ranking, chosen_comp, chosen_season, nb
     return complete_df
 
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def ranking_by_c_cup_week(_db_conn, chosen_ranking, chosen_comp, chosen_season):
     complete_df = pd.DataFrame()
 

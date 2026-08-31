@@ -29,7 +29,7 @@ def ranking_by_season(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     return complete_df
 
-# @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def overall_ranking_by_season(_db_conn, chosen_comp, chosen_seasons):
     complete_df = pd.DataFrame()
 

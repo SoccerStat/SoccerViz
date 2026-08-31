@@ -27,7 +27,7 @@ def get_promoted_teams(db_conn):
 
     chosen_season = select__get_one_season(
         prefix=prefix,
-        custom_options=all_seasons[1:]
+        custom_options=all_seasons
     )
 
     if chosen_season:
