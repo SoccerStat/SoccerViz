@@ -42,12 +42,12 @@ class TeamStatsPage(BasePage):
             self.set_sub_sub_title("Ranking over the season")
             get_ranking_over_one_season(db_conn)
 
-        with self.set_expander("Global ranking over the completed seasons"):
-            self.set_sub_sub_title("Global ranking over the completed seasons")
+        with self.set_expander("Ranking over the completed seasons"):
+            self.set_sub_sub_title("Ranking over the completed seasons")
             get_ranking_over_many_seasons(db_conn)
 
-        with self.set_expander("Global ranking over each season"):
-            self.set_sub_sub_title("Global ranking over each season")
+        with self.set_expander("Overall ranking over each season"):
+            self.set_sub_sub_title("Overall ranking over each season")
             get_ranking_by_season(db_conn)
 
         with self.set_expander("History of competitions"):
