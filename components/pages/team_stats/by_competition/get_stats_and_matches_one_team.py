@@ -222,7 +222,7 @@ def get_stats_and_matches_one_team(db_conn):
                 )
 
                 team_stats_first_row = team_stats[["Club", "M", "W", "D", "L", "GF", "GA", "GD"]]
-                team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
+                team_stats_second_row = team_stats[["Club", "Points/Match (exclude p.d.)", "% Succ Passes"]]
                 team_stats_third_row = team_stats[
                     [
                         "Club",

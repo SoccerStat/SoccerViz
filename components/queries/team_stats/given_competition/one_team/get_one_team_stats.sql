@@ -9,7 +9,7 @@ SELECT
     "Goals Against" as "GA",
     "Goals Diff" as "GD",
     "Succ Passes Rate" as "% Succ Passes",
-    "Points/Match",
+    "Points/Match (exclude p.d.)",
     "Shots/onTarget Conversion Rate For" as "Shots/onTarget For CR",
  	"Shots/onTarget Conversion Rate Against" as "Shots/onTarget Against CR",
  	"Shots/Goals Conversion Rate For" as "Shots/Goals For CR",

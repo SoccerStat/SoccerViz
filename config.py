@@ -181,7 +181,7 @@ TEAM_RANKINGS = [
     "Attendance",
     "Matches",
     "Points",
-    "Points/Match",
+    "Points/Match (exclude p.d.)",
     "Wins",
     "Draws",
     "Loses",
@@ -240,7 +240,7 @@ HEAD_TO_HEAD_STATS = [
 
 C_CUPS_TEAMS_EXCLUDED_RANKINGS = [
     "Points",
-    "Points/Match",
+    "Points/Match (exclude p.d.)",
     "xG For",
     "xG For/Match",
     "xG Against",
