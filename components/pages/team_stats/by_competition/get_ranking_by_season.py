@@ -7,7 +7,7 @@ import streamlit as st
 from components.commons.clubs import get_teams_by_comp_by_season
 from components.commons.seasons import get_seasons_by_comp
 from components.commons.streamlit.widgets import select__get_one_comp, select__get_many_teams, \
-    download_button, select__get_many_seasons
+    download_button, select__get_many_seasons, check__generic
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -87,9 +87,11 @@ def get_ranking_by_season(db_conn):
 
             if chosen_teams:
 
+                display_points_deductions = check__generic(prefix=prefix, suffix="points_deductions", label="Display points deductions")
+
                 # set_plot(df, chosen_comp, chosen_teams, n_teams)
-                set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams)
-                set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams)
+                set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams, display_points_deductions)
+                set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams, display_points_deductions)
 
                 csv = df.to_csv(index=False, sep='|', decimal=',')
                 download_button(
@@ -132,7 +134,7 @@ def set_plot(df, chosen_comp, chosen_teams, n_teams):
     st.altair_chart(chart, use_container_width=True)
 
 
-def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams):
+def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams, display_points_deductions):
     filtered_df = df[df["Club"].isin(chosen_teams)].copy()
     filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"].astype(str)
 
@@ -161,10 +163,10 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams):
                     "Result: %{customdata[1]}<br>" +
                     "Opponent: %{customdata[2]}<br><br>" +
                     "<b>Points:</b> %{y}<br>" +
-                    "<b>Ranking:</b> %{text}<extra></extra>"
-                    "<b>Ranking (excl. p.d.):</b> %{text}<extra></extra>"
+                    "<b>Ranking:</b> %{text}" + ("<br>" if display_points_deductions else "<extra></extra>") +
+                    ("<b>Ranking (excl. p.d.):</b> %{customdata[3]}<extra></extra>" if display_points_deductions else "")
                 ),
-                customdata=df_cs[["Side", "Result", "Opponent"]],
+                customdata=df_cs[["Side", "Result", "Opponent", "Ranking (excl. p.d.)"]],
                 showlegend=True,
             )
         )
@@ -183,7 +185,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams):
+def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams, display_points_deductions):
     filtered_df = df[df["Club"].isin(chosen_teams)].copy()
     filtered_df["Club_Season"] = filtered_df["Club"] + ' - ' + filtered_df["Season"].astype(str)
 
@@ -212,9 +214,10 @@ def set_plot_cumulative_ranking_per_match(df, chosen_comp, chosen_teams, n_teams
                     "Result: %{customdata[1]}<br>" +
                     "Opponent: %{customdata[2]}<br><br>" +
                     "<b>Points/Match:</b> %{y:.2f}<br>" +
-                    "<b>Ranking:</b> %{text}<extra></extra>"
+                    "<b>Ranking:</b> %{text}" + ("<br>" if display_points_deductions else "<extra></extra>") +
+                    ("<b>Ranking (excl. p.d.):</b> %{customdata[3]}<extra></extra>" if display_points_deductions else "")
                 ),
-                customdata=df_cs[["Side", "Result", "Opponent"]],
+                customdata=df_cs[["Side", "Result", "Opponent", "Ranking (excl. p.d.)"]],
                 showlegend=True,
             )
         )
