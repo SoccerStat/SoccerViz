@@ -3,6 +3,7 @@ with stats as (
         "Club",
         '{{ season }}' as "Season",
         "Ranking" as "Overall Ranking",
+        "Ranking (excl. p.d.)" as "Overall Ranking (excl. p.d.)",
         "Stat" as "{{ ranking }}"
     FROM analytics.one_teams_ranking(
         in_ranking := '{{ ranking }}',

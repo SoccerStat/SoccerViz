@@ -7,7 +7,7 @@ import streamlit as st
 from components.commons.clubs import get_teams_by_comp_by_season
 from components.commons.seasons import get_seasons_by_comp
 from components.commons.streamlit.widgets import select__get_one_comp, select__get_one_ranking, select__get_many_teams, \
-    download_button
+    download_button, check__points_deductions
 from components.queries.execute_query import execute_query
 from config import TEAM_STATS_RANKINGS_PLOTTABLE
 from utils.file_helper.reader import read_sql_file
@@ -99,10 +99,12 @@ def get_ranking_over_many_seasons(db_conn):
                     chosen_teams = teams
 
                 if chosen_teams:
+                    display_points_deductions = check__points_deductions(prefix=prefix)
+
                     if chosen_ranking == "Overall":
-                        set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams)
+                        set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams, display_points_deductions)
                     else:
-                        set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams)
+                        set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams, display_points_deductions)
 
                     csv = df.to_csv(index=False, sep='|')
                     download_button(
@@ -169,7 +171,7 @@ def get_ranking_over_many_seasons(db_conn):
 #     st.altair_chart(chart, use_container_width=True)
 
 
-def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
+def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams, display_points_deductions):
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
     clubs = sorted(filtered_df['Club'].unique())
@@ -178,7 +180,7 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
 
     traces = []
 
-    if chosen_ranking == "Points":
+    if chosen_ranking in ["Points", "Points (excl. p.d.)"]:
         weeks_per_season = (
             df[df["Overall Ranking"].notnull()].groupby('Season')['Club']
             .nunique()
@@ -214,13 +216,14 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
                 text=df_club[f"{chosen_ranking} Ranking"].astype(str),
                 textposition='top center',
                 textfont=dict(color=club_colors[club]),
-                customdata=df_club[["Overall Ranking"]],
+                customdata=df_club[["Overall Ranking", "Overall Ranking (excl. p.d.)"]],
                 hovertemplate=(
                         f"<b>{club}</b><br>" +
                         "<b>Season: </b>%{x}<br><br>" +
                         f"<b>{chosen_ranking}: </b>%{{y}}<br>" +
                         f"<b>{chosen_ranking} Ranking: </b>%{{text}}<br>" +
-                        "Overall Ranking: %{customdata[0]}<extra></extra>"
+                        "<b>Overall Ranking:</b> %{customdata[0]}" + ("<br>" if display_points_deductions else "<extra></extra>") +
+                        ("<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>" if display_points_deductions else "")
                 ),
                 showlegend=True
             )
@@ -239,7 +242,7 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
+def set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams, display_points_deductions):
     filtered_df = df[df["Club"].isin(chosen_teams)]
 
     clubs = sorted(filtered_df['Club'].unique())
@@ -265,8 +268,8 @@ def set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams):
                 hovertemplate=(
                         f"<b>{club}</b><br>" +
                         "<b>Season: </b>%{x}<br><br>" +
-                        "<b>Overall Ranking:</b> %{customdata[0]}<br>"
-                        "<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>"
+                        "<b>Overall Ranking:</b> %{customdata[0]}" + ("<br>" if display_points_deductions else "<extra></extra>") +
+                        ("<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>" if display_points_deductions else "")
                 ),
                 showlegend=True
             )

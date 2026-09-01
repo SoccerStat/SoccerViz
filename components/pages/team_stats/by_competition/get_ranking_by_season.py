@@ -7,7 +7,7 @@ import streamlit as st
 from components.commons.clubs import get_teams_by_comp_by_season
 from components.commons.seasons import get_seasons_by_comp
 from components.commons.streamlit.widgets import select__get_one_comp, select__get_many_teams, \
-    download_button, select__get_many_seasons, check__generic
+    download_button, select__get_many_seasons, check__points_deductions
 from components.queries.execute_query import execute_query
 
 from utils.file_helper.reader import read_sql_file
@@ -87,7 +87,7 @@ def get_ranking_by_season(db_conn):
 
             if chosen_teams:
 
-                display_points_deductions = check__generic(prefix=prefix, suffix="points_deductions", label="Display points deductions")
+                display_points_deductions = check__points_deductions(prefix=prefix)
 
                 # set_plot(df, chosen_comp, chosen_teams, n_teams)
                 set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams, display_points_deductions)
@@ -143,6 +143,21 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_teams, n_teams, display_
     club_colors = {cs: colors[i % len(colors)] for i, cs in enumerate(club_seasons)}
 
     traces = []
+
+    # Ligne Max Possible
+    weeks = sorted(df['Week'].unique())
+    max_ranking = [3 * int(w) for w in weeks]
+    max_line = go.Scatter(
+        x=weeks,
+        y=max_ranking,
+        mode='lines',
+        line=dict(color='gray', dash='dash'),
+        name='Max Possible',
+        hoverinfo='skip',
+        showlegend=True
+    )
+    traces.append(max_line)
+
     for cs in club_seasons:
         df_cs = filtered_df[filtered_df['Club_Season'] == cs].sort_values('Week')
         traces.append(

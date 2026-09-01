@@ -120,7 +120,7 @@ def set_plots(df, n_teams, chosen_comp, chosen_season, chosen_ranking, chosen_te
 def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, n_teams):
     data = []
 
-    if chosen_ranking == "Points":
+    if chosen_ranking in ["Points", "Points (excl. p.d.)"]:
         # Ligne Max Possible
         weeks = sorted(df['Week'].unique())
         max_ranking = [3 * int(w) for w in weeks]
@@ -133,7 +133,7 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
             hoverinfo='skip',
             showlegend=True
         )
-        data = data + [max_line]
+        data.append(max_line)
 
     # Points réels
     df_actual = df[[
