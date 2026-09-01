@@ -2,7 +2,7 @@ from utils.database_helper.connection import get_connection
 from components.pages.team_stats.by_competition.get_combined_ranking_one_season import get_combined_ranking_one_season
 from components.pages.team_stats.by_competition.get_promoted_teams import get_promoted_teams
 from components.pages.team_stats.by_competition.get_ranking_by_season import get_ranking_by_season
-from components.pages.team_stats.by_competition.get_ranking_over_many_seasons import get_ranking_over_many_seasons
+from components.pages.team_stats.by_competition.get_ranking_over_completed_seasons import get_ranking_over_completed_seasons
 from components.pages.team_stats.by_competition.get_ranking_over_one_season import get_ranking_over_one_season
 from components.pages.team_stats.by_competition.get_single_stat_and_squad_age_rankings_one_season import (
     get_single_stat_and_squad_age_rankings_one_season)
@@ -44,7 +44,7 @@ class TeamStatsPage(BasePage):
 
         with self.set_expander("Ranking over the completed seasons"):
             self.set_sub_sub_title("Ranking over the completed seasons")
-            get_ranking_over_many_seasons(db_conn)
+            get_ranking_over_completed_seasons(db_conn)
 
         with self.set_expander("Overall ranking over each season"):
             self.set_sub_sub_title("Overall ranking over each season")

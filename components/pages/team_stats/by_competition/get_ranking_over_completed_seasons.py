@@ -19,7 +19,7 @@ def ranking_by_season(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/over_many_seasons/get_ranking_over_many_seasons.sql",
+            file_name="components/queries/team_stats/given_competition/over_completed_seasons/get_ranking_over_completed_seasons.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -35,7 +35,7 @@ def overall_ranking_by_season(_db_conn, chosen_comp, chosen_seasons):
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/over_many_seasons/get_overall_ranking_over_many_seasons.sql",
+            file_name="components/queries/team_stats/given_competition/over_completed_seasons/get_overall_ranking_over_completed_seasons.sql",
             name_comp=chosen_comp,
             season=season,
         )
@@ -45,8 +45,8 @@ def overall_ranking_by_season(_db_conn, chosen_comp, chosen_seasons):
     return complete_df
 
 
-def get_ranking_over_many_seasons(db_conn):
-    prefix = "ranking_over_many_seasons"
+def get_ranking_over_completed_seasons(db_conn):
+    prefix = "ranking_over_completed_seasons"
     # comps_and_kind = {comp["label"]: comp["kind"] for comp in COMPETITIONS.values()}
 
     chosen_comp = select__get_one_comp(prefix=prefix)
@@ -110,7 +110,7 @@ def get_ranking_over_many_seasons(db_conn):
                     download_button(
                         prefix=prefix,
                         data=csv,
-                        file_name=f"{chosen_comp.replace(' ', '_').lower()}_ranking_over_many_seasons.csv",
+                        file_name=f"{chosen_comp.replace(' ', '_').lower()}_ranking_over_completed_seasons.csv",
                         mime="text/csv"
                     )
 
@@ -256,15 +256,15 @@ def set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams, display_poin
         traces.append(
             go.Scatter(
                 x=df_club['Season'],
-                y=df_club['Ranking'],
+                y=df_club['Overall Ranking'],
                 mode='lines+markers+text',
                 name=club,
                 line=dict(color=club_colors[club]),
                 marker=dict(color=club_colors[club]),
-                text=df_club[f"Ranking"].astype(str),
+                text=df_club["Overall Ranking"].astype(str),
                 textposition='top center',
                 textfont=dict(color=club_colors[club]),
-                customdata=df_club[["Ranking", "Ranking (excl. p.d.)"]],
+                customdata=df_club[["Overall Ranking", "Overall Ranking (excl. p.d.)"]],
                 hovertemplate=(
                         f"<b>{club}</b><br>" +
                         "<b>Season: </b>%{x}<br><br>" +
