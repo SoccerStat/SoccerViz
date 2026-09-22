@@ -36,8 +36,8 @@ ALL_BUTTON_CONFIG = {
     "label_comps": "All Competitions",
     "label_seasons": "All Seasons",
     "style": {
-            "bg_color": "#888888"
-        }
+        "bg_color": "#888888"
+    }
 }
 
 SELECTED_BUTTON_CONFIG = {
