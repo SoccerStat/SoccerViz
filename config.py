@@ -293,6 +293,9 @@ PLAYER_RANKING = [
 
 TEMPLATES_PATH = "Maquettes Insta/v5/Streamlit/"
 
+# SoccerAutomated service (SoccerAutomated/api/server.py)
+AUTOMATED_API_URL = os.environ.get("SOCCER_AUTOMATED_URL", "http://localhost:8765")
+
 INSTAGRAM_SUBJECTS = {
     "VS": TEMPLATES_PATH + "VS.pptx",
     "Tour d'Europe": TEMPLATES_PATH + "Tour d'Europe.pptx",
