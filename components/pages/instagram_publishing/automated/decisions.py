@@ -298,6 +298,8 @@ def show_result(run: dict):
     if result.get("rendered_files"):
         _gallery(run["id"], result["rendered_files"])
         st.caption(f"Dossier : {result['rendered_files'][0].rsplit('/', 2)[0]}")
+    if result.get("pptx_file"):
+        st.caption(f"Présentation PowerPoint remplie : {result['pptx_file']}")
     draft = result.get("draft")
     if draft:
         st.download_button("Télécharger la légende", draft["caption"] + "\n\n" + " ".join(draft["hashtags"]),
