@@ -120,16 +120,7 @@ def _poll(run_id: str):
     _progress_log(run, expanded=True)
 
 
-def _run_view(run_id: str):
-    try:
-        run = client.get_run(run_id)
-    except client.ApiError as e:
-        st.error(str(e))
-        if st.button("Nouveau post"):
-            st.session_state.pop(RUN_KEY, None)
-            st.rerun()
-        return
-
+def _run_header(run: dict):
     st.markdown(f"### {esc(run['title'][:120])}")
     col1, col2, _ = st.columns([1, 1, 4])
     if col1.button("Nouveau", icon="➕", key="automated_publishing__new"):
@@ -137,28 +128,26 @@ def _run_view(run_id: str):
         st.rerun()
     if run["status"] in ("running", "waiting") and col2.button(
             "Annuler", icon="🛑", key="automated_publishing__cancel_run"):
-        client.cancel(run_id)
+        client.cancel(run["id"])
         st.rerun()
 
-    if run["status"] == "running":
-        _poll(run_id)
-        return
 
-    if run["status"] == "waiting":
-        pending = run["pending"]
-        stepper(STEP_OF[pending["type"]])
-        st.markdown(f"#### {TITLES[pending['type']]}")
-        decision = VIEWS[pending["type"]](run, pending)
-        if decision is not None:
-            try:
-                client.decide(run_id, decision)
-            except client.ApiError as e:
-                st.error(str(e))
-                return
-            st.rerun()
-        _progress_log(run, expanded=False)
-        return
+def _waiting_view(run: dict):
+    pending = run["pending"]
+    stepper(STEP_OF[pending["type"]])
+    st.markdown(f"#### {TITLES[pending['type']]}")
+    decision = VIEWS[pending["type"]](run, pending)
+    if decision is not None:
+        try:
+            client.decide(run["id"], decision)
+        except client.ApiError as e:
+            st.error(str(e))
+            return
+        st.rerun()
+    _progress_log(run, expanded=False)
 
+
+def _final_view(run: dict):
     if run["status"] == "done":
         stepper(len(STEP_OF), done=True)
         show_result(run)
@@ -170,6 +159,25 @@ def _run_view(run_id: str):
     else:
         st.info("Run annulé.", icon="🛑")
     _progress_log(run, expanded=False)
+
+
+def _run_view(run_id: str):
+    try:
+        run = client.get_run(run_id)
+    except client.ApiError as e:
+        st.error(str(e))
+        if st.button("Nouveau post"):
+            st.session_state.pop(RUN_KEY, None)
+            st.rerun()
+        return
+
+    _run_header(run)
+    if run["status"] == "running":
+        _poll(run_id)
+    elif run["status"] == "waiting":
+        _waiting_view(run)
+    else:
+        _final_view(run)
 
 
 def automated_publishing():
