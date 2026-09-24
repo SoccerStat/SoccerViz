@@ -195,52 +195,72 @@ def _slide_colors(draft: dict, side: Optional[str]) -> str:
     return f"linear-gradient(160deg, {DEFAULT_THEME}, #1B3A66)"
 
 
-def _post_preview(draft: dict):
-    slides = [slide_html(
-        " vs ".join(e["name"] for e in draft["entities"] if e["id"] in draft["sides"].values()) or draft["chronicle"],
-        draft["title"], draft["chronicle"], draft["intro"], _slide_colors(draft, "home" if draft["sides"] else None),
-        cover=True,
-    )]
+def _platforms(run: dict) -> list[str]:
+    return run["request"].get("platforms") or ["instagram", "x"]
+
+
+def _post_preview(draft: dict, with_cover: bool = True):
+    """Instagram: the whole carousel. X only: the stat images attached to the tweets."""
+    slides = []
+    if with_cover:
+        slides.append(slide_html(
+            " vs ".join(e["name"] for e in draft["entities"] if e["id"] in draft["sides"].values())
+            or draft["chronicle"], draft["title"], draft["chronicle"], draft["intro"],
+            _slide_colors(draft, "home" if draft["sides"] else None), cover=True,
+        ))
     for card in draft["cards"]:
         slides.append(slide_html(card["title"], card["stat"], card["sub_title"], card["text"],
                                  _slide_colors(draft, card["side"])))
-    slides.append(slide_html("En résumé", "", "", draft["conclusion"],
-                             _slide_colors(draft, "away" if draft["sides"] else None)))
+    if with_cover:
+        slides.append(slide_html("En résumé", "", "", draft["conclusion"],
+                                 _slide_colors(draft, "away" if draft["sides"] else None)))
     st.markdown(f'<div class="sa-slides">{"".join(slides)}</div>', unsafe_allow_html=True)
 
 
-def _social_preview(caption: str, hashtags: list[str], thread: list[str]):
-    col_insta, col_x = st.columns(2)
-    with col_insta:
-        st.markdown("**📸 Légende Instagram**")
-        st.markdown(f'<div class="sa-post"><div class="head">soccerstat</div>{esc(caption)}\n\n'
-                    f'<span style="color:#00376B">{esc(" ".join(hashtags))}</span></div>', unsafe_allow_html=True)
-    with col_x:
-        st.markdown(f"**✖️ Thread X ({len(thread)} posts)**")
-        for i, tweet in enumerate(thread, start=1):
-            over = len(tweet) > X_MAX_CHARS
-            st.markdown(f'<div class="sa-tweet">{esc(tweet)}<div class="meta{" over" if over else ""}">'
-                        f'{i}/{len(thread)} · {len(tweet)}/{X_MAX_CHARS} caractères</div></div>',
-                        unsafe_allow_html=True)
+def _instagram_preview(caption: str, hashtags: list[str]):
+    st.markdown("**📸 Légende Instagram**")
+    st.markdown(f'<div class="sa-post"><div class="head">soccerstat</div>{esc(caption)}\n\n'
+                f'<span style="color:#00376B">{esc(" ".join(hashtags))}</span></div>', unsafe_allow_html=True)
+
+
+def _social_preview(caption: str, hashtags: list[str], thread: list[str], platforms: list[str]):
+    columns = iter(st.columns(len(platforms)))
+    if "instagram" in platforms:
+        with next(columns):
+            _instagram_preview(caption, hashtags)
+    if "x" in platforms:
+        with next(columns):
+            _x_preview(thread)
+
+
+def _x_preview(thread: list[str]):
+    st.markdown(f"**✖️ Thread X ({len(thread)} posts)**")
+    for i, tweet in enumerate(thread, start=1):
+        over = len(tweet) > X_MAX_CHARS
+        st.markdown(f'<div class="sa-tweet">{esc(tweet)}<div class="meta{" over" if over else ""}">'
+                    f'{i}/{len(thread)} · {len(tweet)}/{X_MAX_CHARS} caractères</div></div>',
+                    unsafe_allow_html=True)
 
 
 def review_draft(run: dict, pending: dict) -> Optional[dict]:
-    draft = pending["draft"]
-    st.markdown("#### Aperçu du carrousel")
-    _post_preview(draft)
-    _social_preview(draft["caption"], draft["hashtags"], draft["x_thread"])
+    draft, platforms = pending["draft"], _platforms(run)
+    instagram = "instagram" in platforms
+    st.markdown("#### Aperçu du carrousel" if instagram else "#### Images des tweets")
+    _post_preview(draft, with_cover=instagram)
+    _social_preview(draft["caption"], draft["hashtags"], draft["x_thread"], platforms)
     _warnings(draft["warnings"])
 
-    with st.expander("✏️ Retoucher la légende avant validation"):
-        caption = st.text_area("Légende", value=draft["caption"], height=220, key=f"{run['id']}__caption")
-        hashtags = st.text_input("Hashtags", value=" ".join(draft["hashtags"]), key=f"{run['id']}__hashtags")
-    if st.button("Valider le brouillon et générer les visuels", type="primary", icon="🎨", key=f"{run['id']}__draft_ok"):
-        edits = {}
+    edits = {}
+    if instagram:
+        with st.expander("✏️ Retoucher la légende avant validation"):
+            caption = st.text_area("Légende", value=draft["caption"], height=220, key=f"{run['id']}__caption")
+            hashtags = st.text_input("Hashtags", value=" ".join(draft["hashtags"]), key=f"{run['id']}__hashtags")
         if caption.strip() != draft["caption"].strip():
             edits["caption"] = caption.strip()
         tags = [t if t.startswith("#") else f"#{t}" for t in hashtags.split()]
         if tags != draft["hashtags"]:
             edits["hashtags"] = tags
+    if st.button("Valider le brouillon et générer les visuels", type="primary", icon="🎨", key=f"{run['id']}__draft_ok"):
         return {"action": "approve", "edits": edits}
     return _feedback_form(run["id"] + "__draft", "Ou demande une réécriture :", "Réécrire")
 
@@ -258,14 +278,16 @@ def _gallery(run_id: str, files: list[str]):
 
 
 def validate_publication(run: dict, pending: dict) -> Optional[dict]:
-    st.markdown(f"#### Visuels générés ({len(pending['files'])})")
+    available = pending["platforms"]  # platforms whose copy was written; they can only be removed here
+    label = "Visuels générés" if "instagram" in available else "Images des tweets"
+    st.markdown(f"#### {label} ({len(pending['files'])})")
     _gallery(run["id"], pending["files"])
     caption, _, hashtags = pending["caption"].rpartition("\n\n")
-    _social_preview(caption, hashtags.split(), pending["x_thread"])
+    _social_preview(caption, hashtags.split(), pending["x_thread"], available)
     _warnings(pending["warnings"])
 
     with st.container(border=True):
-        platforms = st.pills("Plateformes", ["instagram", "x"], selection_mode="multi", default=pending["platforms"],
+        platforms = st.pills("Plateformes", available, selection_mode="multi", default=available,
                              key=f"{run['id']}__platforms",
                              format_func=lambda p: "📸 Instagram" if p == "instagram" else "✖️ X (Twitter)")
         live = st.toggle("Publication réelle (sinon simulation : rien n'est publié)", key=f"{run['id']}__live")
@@ -301,7 +323,7 @@ def show_result(run: dict):
     if result.get("pptx_file"):
         st.caption(f"Présentation PowerPoint remplie : {result['pptx_file']}")
     draft = result.get("draft")
-    if draft:
+    if draft and draft.get("caption"):
         st.download_button("Télécharger la légende", draft["caption"] + "\n\n" + " ".join(draft["hashtags"]),
                            file_name="caption.txt", icon="⬇️")
 
