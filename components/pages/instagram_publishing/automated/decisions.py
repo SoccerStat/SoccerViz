@@ -200,7 +200,7 @@ def _platforms(run: dict) -> list[str]:
 
 
 def _post_preview(draft: dict, with_cover: bool = True):
-    """Instagram: the whole carousel. X only: the stat images attached to the tweets."""
+    """Preview of the Instagram carousel (cover, one slide per stat, closing slide)."""
     slides = []
     if with_cover:
         slides.append(slide_html(
@@ -245,8 +245,9 @@ def _x_preview(thread: list[str]):
 def review_draft(run: dict, pending: dict) -> Optional[dict]:
     draft, platforms = pending["draft"], _platforms(run)
     instagram = "instagram" in platforms
-    st.markdown("#### Aperçu du carrousel" if instagram else "#### Images des tweets")
-    _post_preview(draft, with_cover=instagram)
+    if instagram:  # X is text only: no visual to preview
+        st.markdown("#### Aperçu du carrousel")
+        _post_preview(draft)
     _social_preview(draft["caption"], draft["hashtags"], draft["x_thread"], platforms)
     _warnings(draft["warnings"])
 
@@ -260,7 +261,8 @@ def review_draft(run: dict, pending: dict) -> Optional[dict]:
         tags = [t if t.startswith("#") else f"#{t}" for t in hashtags.split()]
         if tags != draft["hashtags"]:
             edits["hashtags"] = tags
-    if st.button("Valider le brouillon et générer les visuels", type="primary", icon="🎨", key=f"{run['id']}__draft_ok"):
+    label = "Valider le brouillon et générer les visuels" if instagram else "Valider le thread"
+    if st.button(label, type="primary", icon="🎨" if instagram else "✅", key=f"{run['id']}__draft_ok"):
         return {"action": "approve", "edits": edits}
     return _feedback_form(run["id"] + "__draft", "Ou demande une réécriture :", "Réécrire")
 
@@ -279,9 +281,9 @@ def _gallery(run_id: str, files: list[str]):
 
 def validate_publication(run: dict, pending: dict) -> Optional[dict]:
     available = pending["platforms"]  # platforms whose copy was written; they can only be removed here
-    label = "Visuels générés" if "instagram" in available else "Images des tweets"
-    st.markdown(f"#### {label} ({len(pending['files'])})")
-    _gallery(run["id"], pending["files"])
+    if pending["files"]:  # Instagram carousel (X is text only)
+        st.markdown(f"#### Visuels générés ({len(pending['files'])})")
+        _gallery(run["id"], pending["files"])
     caption, _, hashtags = pending["caption"].rpartition("\n\n")
     _social_preview(caption, hashtags.split(), pending["x_thread"], available)
     _warnings(pending["warnings"])
