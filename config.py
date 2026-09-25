@@ -291,7 +291,8 @@ PLAYER_RANKING = [
 
 # INSTAGRAM PUBLISHING
 
-TEMPLATES_PATH = "Maquettes Insta/v5/Streamlit/"
+TEMPLATES_PATH = ("/Users/thomas/Library/CloudStorage/GoogleDrive-thomasleblay98@gmail.com/Autres ordinateurs/"
+                  "Mon ordinateur portable/SoccerStat-II/Maquettes Insta/v5/Streamlit/")
 
 # SoccerAutomated service (SoccerAutomated/api/server.py)
 AUTOMATED_API_URL = os.environ.get("SOCCER_AUTOMATED_URL", "http://localhost:8765")
