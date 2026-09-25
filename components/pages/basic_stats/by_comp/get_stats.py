@@ -14,6 +14,6 @@ def get_stats(_db_conn, name_comp, seasons_ids, chosen_ranking, ranking):
     )
 
     df = execute_query(_db_conn, sql_file)
-    df.index = range(1, len(df)+1)
+    df.index = range(1, len(df) + 1)
 
     return df

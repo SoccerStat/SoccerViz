@@ -1,6 +1,7 @@
 import streamlit as st
 
 from components.commons.streamlit.titles import set_sub_title, set_sub_sub_title
+from components.pages.instagram_publishing.automated.panel import automated_publishing
 from components.pages.instagram_publishing.publish_vs_post import publish_vs_post
 
 from config import PUBLISHING_PAGE, INSTAGRAM_SUBJECTS
@@ -10,24 +11,30 @@ from utils.page_helper.BasePage import BasePage
 
 class PublishingPage(BasePage):
     def content(self):
-        set_sub_title("Automated generation of an Instagram post")
+        set_sub_title("Automated generation of social posts")
 
-        if 'powerpoint_path' not in st.session_state:
-            st.session_state.powerpoint_path = None
-        if 'slides_png_paths' not in st.session_state:
-            st.session_state.slides_png_paths = []
+        automated_tab, manual_tab = st.tabs(["🤖 Génération automatique", "🛠️ Création manuelle"])
 
-        chosen_subject = st.selectbox(
-            key="instagram_publishing__subject",
-            label="Select a subject...",
-            options=[""] + list(INSTAGRAM_SUBJECTS.keys())
-        )
+        with automated_tab:
+            automated_publishing()
 
-        if chosen_subject:
-            set_sub_sub_title(chosen_subject)
+        with manual_tab:
+            if 'powerpoint_path' not in st.session_state:
+                st.session_state.powerpoint_path = None
+            if 'slides_png_paths' not in st.session_state:
+                st.session_state.slides_png_paths = []
 
-            if chosen_subject == "VS":
-                publish_vs_post()
+            chosen_subject = st.selectbox(
+                key="instagram_publishing__subject",
+                label="Select a subject...",
+                options=[""] + list(INSTAGRAM_SUBJECTS.keys())
+            )
+
+            if chosen_subject:
+                set_sub_sub_title(chosen_subject)
+
+                if chosen_subject == "VS":
+                    publish_vs_post()
 
 
 if __name__ == "__main__" or True:

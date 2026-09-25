@@ -36,8 +36,8 @@ ALL_BUTTON_CONFIG = {
     "label_comps": "All Competitions",
     "label_seasons": "All Seasons",
     "style": {
-            "bg_color": "#888888"
-        }
+        "bg_color": "#888888"
+    }
 }
 
 SELECTED_BUTTON_CONFIG = {
@@ -291,7 +291,11 @@ PLAYER_RANKING = [
 
 # INSTAGRAM PUBLISHING
 
-TEMPLATES_PATH = "Maquettes Insta/v5/Streamlit/"
+TEMPLATES_PATH = ("/Users/thomas/Library/CloudStorage/GoogleDrive-thomasleblay98@gmail.com/Autres ordinateurs/"
+                  "Mon ordinateur portable/SoccerStat-II/Maquettes Insta/v5/Streamlit/")
+
+# SoccerAutomated service (SoccerAutomated/api/server.py)
+AUTOMATED_API_URL = os.environ.get("SOCCER_AUTOMATED_URL", "http://localhost:8765")
 
 INSTAGRAM_SUBJECTS = {
     "VS": TEMPLATES_PATH + "VS.pptx",

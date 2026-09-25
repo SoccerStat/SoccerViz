@@ -176,7 +176,8 @@ def set_plot_cumulative_ranking(df, chosen_comp, chosen_season, chosen_ranking, 
                     "<b>Global Ranking:</b> %{customdata[0]}<br>"
                     "<b>Global Ranking (excl. p.d.):</b> %{customdata[5]}<extra></extra>"
                 ),
-                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent", "Global Ranking (excl. p.d.)"]],
+                customdata=df_club[["Global Ranking", f"{chosen_ranking} Ranking", "Side", "Result", "Opponent",
+                                    "Global Ranking (excl. p.d.)"]],
                 line=dict(color=club_colors[club]),
                 marker=dict(color=club_colors[club]),
                 showlegend=True,
