@@ -46,6 +46,35 @@ def _health_bar() -> Optional[dict]:
     return health
 
 
+@st.cache_data(ttl=30, show_spinner=False)
+def _templates() -> dict:
+    try:
+        return client.templates()
+    except client.ApiError:
+        return {}
+
+
+def _template_picker(chronicle: Optional[str]) -> Optional[object]:
+    """Shows the default template of the chronicle; returns the .pptx imported for this run, if any."""
+    info = (_templates().get("chronicles") or {}).get(chronicle) if chronicle else None
+    if chronicle is None:
+        st.caption("📄 Le template PowerPoint de la chronique choisie avec le sujet sera utilisé, "
+                   "sinon les slides sont générées automatiquement.")
+    elif info and info.get("file") and info.get("wired"):
+        st.caption(f"📄 Template par défaut : **{info['file']}**")
+    elif info and info.get("file"):
+        st.caption(f"📄 {info['file']} trouvé, mais le remplissage de la chronique {chronicle} n'est pas encore "
+                   "branché : slides générées automatiquement.")
+    else:
+        st.caption(f"📄 Aucun template pour {chronicle} : slides générées automatiquement.")
+        if info and info.get("error") and "accès refusé" in info["error"]:
+            st.warning(info["error"], icon="🔒")
+    if chronicle is None or not (info or {}).get("wired"):
+        return None
+    return st.file_uploader("Importer un autre template pour ce post (optionnel)", type=["pptx"],
+                            key="automated_publishing__template")
+
+
 def _start_form(health: dict):
     power = health.get("power_mode") or {}
     with st.container(border=True):
@@ -68,6 +97,7 @@ def _start_form(health: dict):
         platforms = col2.pills("Plateformes", ["instagram", "x"], selection_mode="multi",
                                default=["instagram", "x"], key="automated_publishing__platforms",
                                format_func=lambda p: "📸 Instagram" if p == "instagram" else "✖️ X (Twitter)")
+        uploaded = _template_picker(chronicle) if "instagram" in (platforms or []) else None
         power_mode = st.toggle(
             "⚡ Power mode", key="automated_publishing__power_mode", disabled=not power.get("available"),
             help="Plan, rédaction et SQL libre confiés au modèle cloud "
@@ -78,7 +108,8 @@ def _start_form(health: dict):
         if st.button("Lancer la génération", type="primary", icon="🚀",
                      disabled=not (text or "").strip() or not platforms or not mode):
             try:
-                run = client.create_run(mode, text.strip(), chronicle, platforms, power_mode)
+                template_path = client.upload_template(uploaded.name, uploaded.getvalue()) if uploaded else None
+                run = client.create_run(mode, text.strip(), chronicle, platforms, power_mode, template_path)
             except client.ApiError as e:
                 st.error(str(e))
                 return

@@ -233,12 +233,38 @@ def _social_preview(caption: str, hashtags: list[str], thread: list[str], platfo
             _x_preview(thread)
 
 
+def x_length(text: str) -> int:
+    """Approximation of X's weighted length (emojis count double), as on the service side."""
+    return sum(2 if ord(ch) > 0x10FF else 1 for ch in text)
+
+
+def _x_thread_editor(run_id: str, thread: list[str]) -> Optional[list[dict]]:
+    """Kept and edited tweets ([{"index", "text"}]), or None when the thread is unchanged."""
+    kept = []
+    for i, tweet in enumerate(thread):
+        col1, col2 = st.columns([1, 12])
+        keep = col1.checkbox(f"{i + 1}", value=True, key=f"{run_id}__keep_{i}", help="Décocher pour exclure ce post")
+        text = col2.text_area(f"Post {i + 1}", value=tweet, height=110, key=f"{run_id}__tweet_{i}",
+                              disabled=not keep, label_visibility="collapsed")
+        length = x_length(text)
+        col2.caption(f"{length}/{X_MAX_CHARS} caractères" + (" · trop long, il sera coupé" if length > X_MAX_CHARS
+                                                             else "") + ("" if keep else " · exclu"))
+        if keep:
+            kept.append({"index": i, "text": text.strip()})
+    if not kept:
+        st.warning("Garde au moins un post, sinon le thread X est vide.", icon="⚠️")
+    if len(thread) - 1 not in {k["index"] for k in kept} and kept and "#" in thread[-1]:
+        st.caption("Les hashtags du dernier post exclu seront ajoutés au dernier post gardé.")
+    unchanged = [k["text"] for k in kept] == [t.strip() for t in thread]
+    return None if unchanged else kept
+
+
 def _x_preview(thread: list[str]):
     st.markdown(f"**✖️ Thread X ({len(thread)} posts)**")
     for i, tweet in enumerate(thread, start=1):
-        over = len(tweet) > X_MAX_CHARS
+        over = x_length(tweet) > X_MAX_CHARS
         st.markdown(f'<div class="sa-tweet">{esc(tweet)}<div class="meta{" over" if over else ""}">'
-                    f'{i}/{len(thread)} · {len(tweet)}/{X_MAX_CHARS} caractères</div></div>',
+                    f'{i}/{len(thread)} · {x_length(tweet)}/{X_MAX_CHARS} caractères</div></div>',
                     unsafe_allow_html=True)
 
 
@@ -261,8 +287,15 @@ def review_draft(run: dict, pending: dict) -> Optional[dict]:
         tags = [t if t.startswith("#") else f"#{t}" for t in hashtags.split()]
         if tags != draft["hashtags"]:
             edits["hashtags"] = tags
+    if "x" in platforms and draft["x_thread"]:
+        with st.expander("✏️ Retoucher le thread X (modifier ou exclure des posts)"):
+            x_thread = _x_thread_editor(run["id"], draft["x_thread"])
+        if x_thread is not None:
+            edits["x_thread"] = x_thread
     label = "Valider le brouillon et générer les visuels" if instagram else "Valider le thread"
-    if st.button(label, type="primary", icon="🎨" if instagram else "✅", key=f"{run['id']}__draft_ok"):
+    empty_thread = edits.get("x_thread") == []
+    if st.button(label, type="primary", icon="🎨" if instagram else "✅", key=f"{run['id']}__draft_ok",
+                 disabled=empty_thread):
         return {"action": "approve", "edits": edits}
     return _feedback_form(run["id"] + "__draft", "Ou demande une réécriture :", "Réécrire")
 

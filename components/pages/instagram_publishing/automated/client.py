@@ -33,9 +33,22 @@ def health() -> Optional[dict]:
         return None
 
 
-def create_run(mode: str, text: str, chronicle: Optional[str], platforms: list[str], power_mode: bool = False) -> dict:
-    payload = {"mode": mode, "text": text, "chronicle": chronicle, "platforms": platforms, "power_mode": power_mode}
+def create_run(mode: str, text: str, chronicle: Optional[str], platforms: list[str], power_mode: bool = False,
+               template_path: Optional[str] = None) -> dict:
+    payload = {"mode": mode, "text": text, "chronicle": chronicle, "platforms": platforms, "power_mode": power_mode,
+               "template_path": template_path}
     return _call("POST", "/runs", json=payload).json()
+
+
+def templates() -> dict:
+    """Default PowerPoint template of each chronicle (templates_dir of the service)."""
+    return _call("GET", "/templates").json()
+
+
+def upload_template(name: str, content: bytes) -> str:
+    """Import a .pptx for one run; returns the path to give to create_run."""
+    files = {"file": (name, content, "application/vnd.openxmlformats-officedocument.presentationml.presentation")}
+    return _call("POST", "/templates/upload", files=files).json()["path"]
 
 
 def list_runs() -> list[dict]:
