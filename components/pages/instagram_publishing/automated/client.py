@@ -12,9 +12,9 @@ class ApiError(Exception):
     pass
 
 
-def _call(method: str, path: str, **kwargs):
+def _call(method: str, path: str, timeout: int = TIMEOUT, **kwargs):
     try:
-        response = requests.request(method, f"{AUTOMATED_API_URL}{path}", timeout=TIMEOUT, **kwargs)
+        response = requests.request(method, f"{AUTOMATED_API_URL}{path}", timeout=timeout, **kwargs)
     except requests.RequestException as e:
         raise ApiError(f"Service SoccerAutomated injoignable ({AUTOMATED_API_URL}) : {e}") from e
     if response.status_code >= 400:
@@ -65,6 +65,21 @@ def decide(run_id: str, decision: dict) -> dict:
 
 def cancel(run_id: str) -> dict:
     return _call("POST", f"/runs/{run_id}/cancel").json()
+
+
+def pptx(run_id: str) -> bytes:
+    """Filled copy of the PowerPoint template of the run."""
+    return _call("GET", f"/runs/{run_id}/pptx").content
+
+
+def open_pptx(run_id: str) -> str:
+    """Opens the presentation in PowerPoint on the machine running the service."""
+    return _call("POST", f"/runs/{run_id}/pptx/open").json()["path"]
+
+
+def refresh_slides(run_id: str) -> dict:
+    """Re-exports the PNG slides from the saved presentation (can take a minute)."""
+    return _call("POST", f"/runs/{run_id}/pptx/refresh", timeout=300).json()
 
 
 def rendered_file(run_id: str, index: int) -> bytes:

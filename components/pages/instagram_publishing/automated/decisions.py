@@ -312,11 +312,41 @@ def _gallery(run_id: str, files: list[str]):
             columns[i % 4].warning(str(e))
 
 
+def _slides_editor(run: dict, pending: dict):
+    """Edit the filled copy of the template in PowerPoint, then re-export the slides shown above."""
+    with st.container(border=True):
+        st.markdown("**🖍️ Modifier les slides**")
+        st.caption("Ouvre la maquette dans PowerPoint, fais tes retouches et enregistre (⌘S), puis régénère les "
+                   "slides : ce sont elles qui seront publiées.")
+        col1, col2, col3 = st.columns(3)
+        if col1.button("Ouvrir dans PowerPoint", icon="📂", use_container_width=True, key=f"{run['id']}__open_pptx"):
+            try:
+                client.open_pptx(run["id"])
+            except client.ApiError as e:
+                st.error(str(e))
+        if col2.button("Régénérer les slides", icon="🔄", use_container_width=True, key=f"{run['id']}__refresh"):
+            with st.spinner("Export des slides depuis PowerPoint…"):
+                try:
+                    client.refresh_slides(run["id"])
+                except client.ApiError as e:
+                    st.error(str(e))
+                    return
+            st.rerun()
+        try:
+            col3.download_button("Télécharger la maquette", client.pptx(run["id"]), icon="⬇️",
+                                 file_name=pending["pptx_file"].rsplit("/", 1)[-1], use_container_width=True,
+                                 key=f"{run['id']}__download_pptx")
+        except client.ApiError:
+            pass
+
+
 def validate_publication(run: dict, pending: dict) -> Optional[dict]:
     available = pending["platforms"]  # platforms whose copy was written; they can only be removed here
     if pending["files"]:  # Instagram carousel (X is text only)
         st.markdown(f"#### Visuels générés ({len(pending['files'])})")
         _gallery(run["id"], pending["files"])
+    if pending.get("pptx_file") and "instagram" in available:
+        _slides_editor(run, pending)
     caption, _, hashtags = pending["caption"].rpartition("\n\n")
     _social_preview(caption, hashtags.split(), pending["x_thread"], available)
     _warnings(pending["warnings"])

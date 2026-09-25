@@ -175,20 +175,17 @@ def _poll(run_id: str):
 def _power_badge(run: dict) -> str:
     usage = run.get("cloud_usage") or {}
     if not usage.get("enabled"):
-        return ""
-    if not usage.get("calls"):
-        if run["status"] == "done":
-            return badge("⚡ Power mode : aucun appel cloud (cloud indisponible, le local a tout fait)", "ok")
-        return badge("⚡ Power mode activé · le cloud prendra le relais au plan d'analyse et à la rédaction", "accent")
-    cost = f"{usage['cost_usd']:.3f}".replace(".", ",")
-    return badge(f"⚡ Power mode : {usage['calls']}/{usage['max_calls']} appels · ~{cost} $ · "
-                 f"{', '.join(usage.get('steps', []))}", "accent")
+        return badge("Power mode désactivé · 100 % local")
+    text = f"⚡ Power mode activé · {_model_name(usage.get('model', ''))}"
+    if usage.get("calls"):
+        cost = f"{usage['cost_usd']:.3f}".replace(".", ",")
+        text += f" · {usage['calls']}/{usage['max_calls']} appels · ~{cost} $"
+    return badge(text, "accent")
 
 
 def _run_header(run: dict):
     st.markdown(f"### {esc(run['title'][:120])}")
-    if _power_badge(run):
-        st.markdown(_power_badge(run), unsafe_allow_html=True)
+    st.markdown(_power_badge(run), unsafe_allow_html=True)
     col1, col2, _ = st.columns([1, 1, 4])
     if col1.button("Nouveau", icon="➕", key="automated_publishing__new"):
         st.session_state.pop(RUN_KEY, None)
