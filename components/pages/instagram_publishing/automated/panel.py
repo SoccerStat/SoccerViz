@@ -70,10 +70,10 @@ def _start_form(health: dict):
                                format_func=lambda p: "📸 Instagram" if p == "instagram" else "✖️ X (Twitter)")
         power_mode = st.toggle(
             "⚡ Power mode", key="automated_publishing__power_mode", disabled=not power.get("available"),
-            help="Tout est d'abord fait en local. Seuls les textes et requêtes SQL encore rejetés par le "
-                 "vérificateur sont confiés au modèle cloud "
-                 f"({_model_name(power.get('model', ''))}, {power.get('max_calls_per_run', 0)} appels max par run). "
-                 "Seuls les faits calculés et les consignes sont envoyés, jamais la base de données.",
+            help="Plan, rédaction et SQL libre confiés au modèle cloud "
+                 f"({_model_name(power.get('model', ''))}, {power.get('max_calls_per_run', 0)} appels max par run), "
+                 "plus rapide et de meilleure qualité, contrôlé par le même vérificateur ; le local reprend la main "
+                 "si le cloud échoue. Seuls les faits calculés et les consignes sont envoyés, jamais la base.",
         )
         if st.button("Lancer la génération", type="primary", icon="🚀",
                      disabled=not (text or "").strip() or not platforms or not mode):
@@ -147,8 +147,8 @@ def _power_badge(run: dict) -> str:
         return ""
     if not usage.get("calls"):
         if run["status"] == "done":
-            return badge("⚡ Power mode : aucun appel cloud nécessaire, tout a été validé en local", "ok")
-        return badge("⚡ Power mode activé · le cloud ne sert qu'en rédaction et SQL, si le local échoue", "accent")
+            return badge("⚡ Power mode : aucun appel cloud (cloud indisponible, le local a tout fait)", "ok")
+        return badge("⚡ Power mode activé · le cloud prendra le relais au plan d'analyse et à la rédaction", "accent")
     cost = f"{usage['cost_usd']:.3f}".replace(".", ",")
     return badge(f"⚡ Power mode : {usage['calls']}/{usage['max_calls']} appels · ~{cost} $ · "
                  f"{', '.join(usage.get('steps', []))}", "accent")
