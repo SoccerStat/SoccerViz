@@ -146,7 +146,9 @@ def _power_badge(run: dict) -> str:
     if not usage.get("enabled"):
         return ""
     if not usage.get("calls"):
-        return badge("⚡ Power mode : aucun appel cloud (tout en local)", "ok")
+        if run["status"] == "done":
+            return badge("⚡ Power mode : aucun appel cloud nécessaire, tout a été validé en local", "ok")
+        return badge("⚡ Power mode activé · le cloud ne sert qu'en rédaction et SQL, si le local échoue", "accent")
     cost = f"{usage['cost_usd']:.3f}".replace(".", ",")
     return badge(f"⚡ Power mode : {usage['calls']}/{usage['max_calls']} appels · ~{cost} $ · "
                  f"{', '.join(usage.get('steps', []))}", "accent")
