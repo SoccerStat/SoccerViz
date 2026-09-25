@@ -1,4 +1,6 @@
 """Streamlit front of the SoccerAutomated pipeline: subject -> analysis -> publication."""
+from typing import Optional
+
 import streamlit as st
 
 from components.pages.instagram_publishing.automated import client
@@ -11,7 +13,11 @@ STATUS_LABELS = {"running": "En cours", "waiting": "Ta décision est attendue", 
                  "error": "Erreur", "cancelled": "Annulé"}
 
 
-def _health_bar() -> bool:
+def _model_name(spec: str) -> str:
+    return spec.split(":", 1)[-1]
+
+
+def _health_bar() -> Optional[dict]:
     health = client.health()
     if health is None:
         st.error(
@@ -19,21 +25,29 @@ def _health_bar() -> bool:
             "`.venv/bin/uvicorn api.server:app --port 8765`",
             icon="🔌",
         )
-        return False
+        return None
     parts = [
         badge("API", "ok"),
         badge("Ollama", "ok" if health.get("ollama") else "ko"),
         badge("Base de données", "ok" if health.get("database") else "ko"),
     ]
     parts += [badge(f"modèle manquant : {m}", "ko") for m in health.get("missing_models", [])]
+    power = health.get("power_mode") or {}
+    if power.get("available"):
+        parts.append(badge(f"⚡ Power mode dispo : {_model_name(power['model'])}", "ok"))
+    elif power:
+        parts.append(badge("⚡ Power mode indisponible (clé OpenAI absente)"))
     st.markdown("".join(parts), unsafe_allow_html=True)
     with st.popover("Modèles utilisés", icon="🧠"):
         for role, spec in health.get("models", {}).items():
             st.markdown(f"- **{role}** : `{spec}`")
-    return True
+        if power:
+            st.markdown(f"- **power mode (cloud)** : `{power['model']}`, {power['max_calls_per_run']} appels max par run")
+    return health
 
 
-def _start_form():
+def _start_form(health: dict):
+    power = health.get("power_mode") or {}
     with st.container(border=True):
         st.markdown("#### Nouveau post")
         mode = st.segmented_control(
@@ -54,10 +68,17 @@ def _start_form():
         platforms = col2.pills("Plateformes", ["instagram", "x"], selection_mode="multi",
                                default=["instagram", "x"], key="automated_publishing__platforms",
                                format_func=lambda p: "📸 Instagram" if p == "instagram" else "✖️ X (Twitter)")
+        power_mode = st.toggle(
+            "⚡ Power mode", key="automated_publishing__power_mode", disabled=not power.get("available"),
+            help="Tout est d'abord fait en local. Seuls les textes et requêtes SQL encore rejetés par le "
+                 "vérificateur sont confiés au modèle cloud "
+                 f"({_model_name(power.get('model', ''))}, {power.get('max_calls_per_run', 0)} appels max par run). "
+                 "Seuls les faits calculés et les consignes sont envoyés, jamais la base de données.",
+        )
         if st.button("Lancer la génération", type="primary", icon="🚀",
                      disabled=not (text or "").strip() or not platforms or not mode):
             try:
-                run = client.create_run(mode, text.strip(), chronicle, platforms)
+                run = client.create_run(mode, text.strip(), chronicle, platforms, power_mode)
             except client.ApiError as e:
                 st.error(str(e))
                 return
@@ -120,8 +141,21 @@ def _poll(run_id: str):
     _progress_log(run, expanded=True)
 
 
+def _power_badge(run: dict) -> str:
+    usage = run.get("cloud_usage") or {}
+    if not usage.get("enabled"):
+        return ""
+    if not usage.get("calls"):
+        return badge("⚡ Power mode : aucun appel cloud (tout en local)", "ok")
+    cost = f"{usage['cost_usd']:.3f}".replace(".", ",")
+    return badge(f"⚡ Power mode : {usage['calls']}/{usage['max_calls']} appels · ~{cost} $ · "
+                 f"{', '.join(usage.get('steps', []))}", "accent")
+
+
 def _run_header(run: dict):
     st.markdown(f"### {esc(run['title'][:120])}")
+    if _power_badge(run):
+        st.markdown(_power_badge(run), unsafe_allow_html=True)
     col1, col2, _ = st.columns([1, 1, 4])
     if col1.button("Nouveau", icon="➕", key="automated_publishing__new"):
         st.session_state.pop(RUN_KEY, None)
@@ -182,11 +216,12 @@ def _run_view(run_id: str):
 
 def automated_publishing():
     inject_css()
-    if not _health_bar():
+    health = _health_bar()
+    if health is None:
         return
     run_id = st.session_state.get(RUN_KEY)
     if run_id:
         _run_view(run_id)
     else:
-        _start_form()
+        _start_form(health)
     _history()

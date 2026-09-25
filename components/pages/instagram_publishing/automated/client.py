@@ -33,8 +33,8 @@ def health() -> Optional[dict]:
         return None
 
 
-def create_run(mode: str, text: str, chronicle: Optional[str], platforms: list[str]) -> dict:
-    payload = {"mode": mode, "text": text, "chronicle": chronicle, "platforms": platforms}
+def create_run(mode: str, text: str, chronicle: Optional[str], platforms: list[str], power_mode: bool = False) -> dict:
+    payload = {"mode": mode, "text": text, "chronicle": chronicle, "platforms": platforms, "power_mode": power_mode}
     return _call("POST", "/runs", json=payload).json()
 
 
