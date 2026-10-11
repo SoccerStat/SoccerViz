@@ -60,9 +60,9 @@ def badge(text: str, kind: str = "") -> str:
     return f'<span class="sa-badge {kind}">{esc(text)}</span>'
 
 
-def stepper(active: int, done: bool = False):
+def stepper(active: int, done: bool = False, steps: list[str] = None):
     items = []
-    for i, label in enumerate(STEPS):
+    for i, label in enumerate(steps or STEPS):
         state = "done" if done or i < active else ("active" if i == active else "")
         mark = "✓" if state == "done" else str(i + 1)
         items.append(f'<div class="sa-step {state}"><div class="sa-dot">{mark}</div>{esc(label)}</div>')
