@@ -40,9 +40,13 @@ def create_run(mode: str, text: str, chronicle: Optional[str], platforms: list[s
     return _call("POST", "/runs", json=payload).json()
 
 
-def ask_question(question: str, power_mode: bool = False) -> dict:
-    """Question -> SQL -> result (can take a few minutes with the local model)."""
-    return _call("POST", "/questions", json={"question": question, "power_mode": power_mode}, timeout=600).json()
+def ask_question(question: str, power_mode: bool = False, entities: Optional[list] = None,
+                 unresolved: Optional[list] = None, clarifications: Optional[list] = None) -> dict:
+    """Question -> SQL -> result (can take a few minutes with the local model). Status "clarify": an entity must be
+    specified, call again with the entities and unresolved of that answer and the human clarifications."""
+    payload = {"question": question, "power_mode": power_mode, "entities": entities, "unresolved": unresolved,
+               "clarifications": clarifications}
+    return _call("POST", "/questions", json=payload, timeout=600).json()
 
 
 def templates() -> dict:

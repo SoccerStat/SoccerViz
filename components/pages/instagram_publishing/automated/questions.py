@@ -3,9 +3,11 @@ import pandas as pd
 import streamlit as st
 
 from components.pages.instagram_publishing.automated import client
+from components.pages.instagram_publishing.automated.decisions import clarify_entities
 from components.pages.instagram_publishing.automated.styles import badge, inject_css
 
 HISTORY_KEY = "automated_publishing__questions"
+PENDING_KEY = "automated_publishing__question_pending"  # answer waiting for the entities to be specified
 EXAMPLES = ("Combien de buts le PSG a-t-il marqués à domicile en Ligue 1 en 2024-2025 ?",
             "Qui sont les 5 meilleurs passeurs de Ligue 1 cette saison ?",
             "Quel club de Premier League concède le moins de tirs par match cette saison ?")
@@ -33,7 +35,40 @@ def _form(power_available: bool):
                 except client.ApiError as e:
                     st.error(str(e))
                     return
-            st.session_state.setdefault(HISTORY_KEY, []).insert(0, answer)
+            _store(answer, power)
+
+
+def _store(answer: dict, power: bool):
+    """A "clarify" answer waits for the human; a final one goes to the history."""
+    if answer.get("status") == "clarify":
+        rounds = (st.session_state.get(PENDING_KEY) or {}).get("round", 0) + 1
+        st.session_state[PENDING_KEY] = {"answer": answer, "power": power, "round": rounds}
+    else:
+        st.session_state.pop(PENDING_KEY, None)
+        st.session_state.setdefault(HISTORY_KEY, []).insert(0, answer)
+
+
+def _clarify(pending: dict):
+    """Same screen as the automated pipeline: pick a candidate, reformulate or skip each entity."""
+    answer = pending["answer"]
+    with st.container(border=True):
+        st.markdown(f"**{answer['question']}**")
+        decision = clarify_entities({"id": f"question_{pending['round']}"},
+                                    {"resolved": answer["entities"], "unresolved": answer["unresolved"]})
+        if st.button("Abandonner cette question", icon="🛑", key=f"automated_publishing__question_drop_{pending['round']}"):
+            st.session_state.pop(PENDING_KEY, None)
+            st.rerun()
+    if decision is None:
+        return
+    with st.spinner("Écriture et exécution de la requête…"):
+        try:
+            result = client.ask_question(answer["question"], pending["power"], answer["entities"],
+                                         answer["unresolved"], decision["clarifications"])
+        except client.ApiError as e:
+            st.error(str(e))
+            return
+    _store(result, pending["power"])
+    st.rerun()
 
 
 def _answer(answer: dict):
@@ -76,6 +111,8 @@ def question_to_stat():
         st.error("Le service SoccerAutomated ne répond pas.", icon="🔌")
         return
     _form(bool((health.get("power_mode") or {}).get("available")))
+    if st.session_state.get(PENDING_KEY):
+        _clarify(st.session_state[PENDING_KEY])
     history = st.session_state.get(HISTORY_KEY, [])
     if history:
         with st.container(border=True):
