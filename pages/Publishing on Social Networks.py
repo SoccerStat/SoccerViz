@@ -15,7 +15,7 @@ class PublishingPage(BasePage):
         set_sub_title("Automated generation of social posts")
 
         automated_tab, question_tab, manual_tab = st.tabs(
-            ["🤖 Génération automatique", "❓ Question → stat", "🛠️ Création manuelle"])
+            ["Auto. Publishing", "Ask something", "Manually Publishing"])
 
         with automated_tab:
             automated_publishing()
