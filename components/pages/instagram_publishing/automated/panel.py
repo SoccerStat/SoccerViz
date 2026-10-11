@@ -13,6 +13,25 @@ STATUS_LABELS = {"running": "En cours", "waiting": "Ta décision est attendue", 
                  "error": "Erreur", "cancelled": "Annulé"}
 
 
+def _duration(seconds: int) -> str:
+    """125 -> '2 min 05 s'."""
+    seconds = int(seconds or 0)
+    if seconds < 60:
+        return f"{seconds} s"
+    if seconds < 3600:
+        return f"{seconds // 60} min {seconds % 60:02d} s"
+    return f"{seconds // 3600} h {seconds % 3600 // 60:02d} min"
+
+
+def _chrono(run: dict) -> str:
+    """Live while the run works or waits, final duration once it is over."""
+    elapsed, compute = run.get("elapsed_s", 0), run.get("compute_s", 0)
+    detail = f" (dont {_duration(compute)} de calcul)" if compute and elapsed - compute >= 5 else ""
+    if run["status"] in ("running", "waiting"):
+        return badge(f"⏱ {_duration(elapsed)} depuis le lancement{detail}")
+    return badge(f"⏱ Run de {_duration(elapsed)}{detail}", "ok" if run["status"] == "done" else "")
+
+
 def _model_name(spec: str) -> str:
     return spec.split(":", 1)[-1]
 
@@ -127,7 +146,8 @@ def _history():
     with st.expander(f"🗂️ Runs de la session ({len(runs)})"):
         for run in runs:
             col1, col2, col3 = st.columns([5, 2, 1])
-            col1.markdown(f"**{esc(run['title'][:80])}**  \n`{run['id']}` · {run['created_at'][11:16]}")
+            col1.markdown(f"**{esc(run['title'][:80])}**  \n`{run['id']}` · {run['created_at'][11:16]}"
+                          f" · ⏱ {_duration(run.get('elapsed_s', 0))}")
             col2.markdown(badge(STATUS_LABELS.get(run["status"], run["status"]),
                                 {"done": "ok", "error": "ko", "waiting": "accent"}.get(run["status"], "")),
                           unsafe_allow_html=True)
@@ -167,7 +187,8 @@ def _poll(run_id: str):
         st.rerun(scope="app")
     stepper(_running_step(run))
     last = run["progress"][-1]["message"] if run["progress"] else "Démarrage"
-    with st.status(f"Traitement en cours… (dernière étape : {last})", state="running", expanded=False):
+    with st.status(f"Traitement en cours… ⏱ {_duration(run.get('elapsed_s', 0))} (dernière étape : {last})",
+                   state="running", expanded=False):
         st.caption("Les modèles tournent en local : compter environ 1 à 2 minutes par étape d'IA.")
     _progress_log(run, expanded=True)
 
@@ -185,7 +206,7 @@ def _power_badge(run: dict) -> str:
 
 def _run_header(run: dict):
     st.markdown(f"### {esc(run['title'][:120])}")
-    st.markdown(_power_badge(run), unsafe_allow_html=True)
+    st.markdown(_power_badge(run) + _chrono(run), unsafe_allow_html=True)
     col1, col2, _ = st.columns([1, 1, 4])
     if col1.button("Nouveau", icon="➕", key="automated_publishing__new"):
         st.session_state.pop(RUN_KEY, None)
