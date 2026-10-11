@@ -17,7 +17,7 @@ TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competition"
 PLAYER_STATS_PAGE = "Player Stats"
 PLAYER_X_TEAM_STATS_PAGE = "Player x Team Stats"
 COACHES_STATS_PAGE = "Coaches Stats"
-PUBLISHING_PAGE = "Publishing on Instagram"
+PUBLISHING_PAGE = "Publishing on Social Networks"
 
 PAGES_CONFIG = [
     BASIC_STATS_PAGE,
