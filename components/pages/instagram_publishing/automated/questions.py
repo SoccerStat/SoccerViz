@@ -127,8 +127,6 @@ def _result_view(entry: dict):
             st.metric(stat["label"], _number(stat["value"]), help=" · ".join(stat["context"]) or None)
         frame = pd.DataFrame(answer["rows"], columns=answer["columns"])
         st.dataframe(frame, use_container_width=True, hide_index=True)
-        st.download_button("Télécharger le résultat (CSV)", frame.to_csv(index=False).encode("utf-8"), icon="⬇️",
-                           file_name="resultat.csv", key=f"automated_publishing__csv_{entry['id']}")
     with st.expander("Requête SQL et explication"):
         if answer["reasoning"]:
             st.markdown(answer["reasoning"])
@@ -158,7 +156,7 @@ def _history():
 
 def question_to_stat():
     inject_css()
-    health = _health_bar()
+    health = _health_bar(roles=("grounder", "sql"))  # the two models a question uses
     if health is None:
         return
     power = health.get("power_mode") or {}

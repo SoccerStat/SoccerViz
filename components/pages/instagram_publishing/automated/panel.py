@@ -36,12 +36,20 @@ def _model_name(spec: str) -> str:
     return spec.split(":", 1)[-1]
 
 
-def _health_bar() -> Optional[dict]:
+# What each model role does (SoccerAutomated, ai/llm.py), and which roles the cloud model takes in power mode.
+ROLE_LABELS = {"validator": "validation du thème ou du sujet", "subject_generator": "sujets à partir des articles",
+               "prompt_builder": "prompt d'analyse", "grounder": "extraction des entités", "planner": "plan d'analyse",
+               "writer": "rédaction (slides, légende, thread X)", "sql": "requête SQL libre"}
+CLOUD_ROLES = ("planner", "writer", "sql")
+
+
+def _health_bar(roles: Optional[tuple] = None) -> Optional[dict]:
+    """Status of the service; ``roles``: the model roles used by this tab (all of them by default)."""
     health = client.health()
     if health is None:
         st.error(
             "Le service SoccerAutomated ne répond pas. Lance-le depuis le dossier SoccerAutomated :\n\n"
-            "`.venv/bin/uvicorn api.server:app --port 8765`",
+            "`.venv3.13/bin/uvicorn api.server:app --port 8765`",
             icon="🔌",
         )
         return None
@@ -58,10 +66,13 @@ def _health_bar() -> Optional[dict]:
         parts.append(badge("⚡ Power mode indisponible (clé OpenAI absente)"))
     st.markdown("".join(parts), unsafe_allow_html=True)
     with st.popover("Modèles utilisés", icon="🧠"):
-        for role, spec in health.get("models", {}).items():
-            st.markdown(f"- **{role}** : `{spec}`")
-        if power:
-            st.markdown(f"- **power mode (cloud)** : `{power['model']}`, {power['max_calls_per_run']} appels max par run")
+        models = {r: s for r, s in health.get("models", {}).items() if roles is None or r in roles}
+        for role, spec in models.items():
+            st.markdown(f"- **{ROLE_LABELS.get(role, role)}** (`{role}`) : `{spec}`")
+        cloud = [ROLE_LABELS.get(r, r) for r in CLOUD_ROLES if r in models]
+        if power and cloud:
+            st.markdown(f"- **power mode** : `{power['model']}` pour {', '.join(cloud)} ; "
+                        f"{power['max_calls_per_run']} appels cloud au plus par run")
     return health
 
 
@@ -200,7 +211,8 @@ def _power_badge(run: dict) -> str:
     text = f"⚡ Power mode activé · {_model_name(usage.get('model', ''))}"
     if usage.get("calls"):
         cost = f"{usage['cost_usd']:.3f}".replace(".", ",")
-        text += f" · {usage['calls']}/{usage['max_calls']} appels · ~{cost} $"
+        calls = usage["calls"]
+        text += f" · {calls} appel{'s' if calls > 1 else ''} cloud ({usage['max_calls']} max) · ~{cost} $"
     return badge(text, "accent")
 
 
