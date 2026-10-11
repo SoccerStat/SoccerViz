@@ -40,6 +40,11 @@ def create_run(mode: str, text: str, chronicle: Optional[str], platforms: list[s
     return _call("POST", "/runs", json=payload).json()
 
 
+def ask_question(question: str, power_mode: bool = False) -> dict:
+    """Question -> SQL -> result (can take a few minutes with the local model)."""
+    return _call("POST", "/questions", json={"question": question, "power_mode": power_mode}, timeout=600).json()
+
+
 def templates() -> dict:
     """Default PowerPoint template of each chronicle (templates_dir of the service)."""
     return _call("GET", "/templates").json()

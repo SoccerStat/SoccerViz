@@ -2,6 +2,7 @@ import streamlit as st
 
 from components.commons.streamlit.titles import set_sub_title, set_sub_sub_title
 from components.pages.instagram_publishing.automated.panel import automated_publishing
+from components.pages.instagram_publishing.automated.questions import question_to_stat
 from components.pages.instagram_publishing.publish_vs_post import publish_vs_post
 
 from config import PUBLISHING_PAGE, INSTAGRAM_SUBJECTS
@@ -13,10 +14,14 @@ class PublishingPage(BasePage):
     def content(self):
         set_sub_title("Automated generation of social posts")
 
-        automated_tab, manual_tab = st.tabs(["🤖 Génération automatique", "🛠️ Création manuelle"])
+        automated_tab, question_tab, manual_tab = st.tabs(
+            ["🤖 Génération automatique", "❓ Question → stat", "🛠️ Création manuelle"])
 
         with automated_tab:
             automated_publishing()
+
+        with question_tab:
+            question_to_stat()
 
         with manual_tab:
             if 'powerpoint_path' not in st.session_state:
