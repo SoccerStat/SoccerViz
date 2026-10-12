@@ -3,9 +3,9 @@ from typing import Optional
 
 import streamlit as st
 
-from components.pages.instagram_publishing.automated import client
-from components.pages.instagram_publishing.automated.decisions import CHRONICLES, STEP_OF, TITLES, VIEWS, show_result
-from components.pages.instagram_publishing.automated.styles import badge, esc, inject_css, stepper
+from components.pages.publishing.automated import client
+from components.pages.publishing.automated.decisions import CHRONICLES, STEP_OF, TITLES, VIEWS, show_result
+from components.pages.publishing.automated.styles import badge, esc, inject_css, stepper
 
 RUN_KEY = "automated_publishing__run_id"
 POLL_SECONDS = 2

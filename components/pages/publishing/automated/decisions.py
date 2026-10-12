@@ -7,8 +7,8 @@ from typing import Optional
 import pandas as pd
 import streamlit as st
 
-from components.pages.instagram_publishing.automated import client
-from components.pages.instagram_publishing.automated.styles import badge, esc, slide_html
+from components.pages.publishing.automated import client
+from components.pages.publishing.automated.styles import badge, esc, slide_html
 
 CHRONICLES = {
     "Focus": "Portrait d'un club ou d'un joueur",

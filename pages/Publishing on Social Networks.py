@@ -1,8 +1,8 @@
 import streamlit as st
 
 from components.commons.streamlit.titles import set_sub_title
-from components.pages.instagram_publishing.automated.panel import automated_publishing
-from components.pages.instagram_publishing.automated.questions import question_to_stat
+from components.pages.publishing.automated.panel import automated_publishing
+from components.pages.publishing.questions import question_to_stat
 
 from config import PUBLISHING_PAGE
 
