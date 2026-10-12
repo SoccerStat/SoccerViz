@@ -17,7 +17,7 @@ TEAM_STATS_SPECIFIC_PAGE = "Team Stats - Given Competition"
 PLAYER_STATS_PAGE = "Player Stats"
 PLAYER_X_TEAM_STATS_PAGE = "Player x Team Stats"
 COACHES_STATS_PAGE = "Coaches Stats"
-PUBLISHING_PAGE = "Publishing on Instagram"
+PUBLISHING_PAGE = "Publishing on Social Networks"
 
 PAGES_CONFIG = [
     BASIC_STATS_PAGE,
@@ -36,8 +36,8 @@ ALL_BUTTON_CONFIG = {
     "label_comps": "All Competitions",
     "label_seasons": "All Seasons",
     "style": {
-            "bg_color": "#888888"
-        }
+        "bg_color": "#888888"
+    }
 }
 
 SELECTED_BUTTON_CONFIG = {
@@ -291,7 +291,11 @@ PLAYER_RANKING = [
 
 # INSTAGRAM PUBLISHING
 
-TEMPLATES_PATH = "Maquettes Insta/v5/Streamlit/"
+TEMPLATES_PATH = ("/Users/thomas/Library/CloudStorage/GoogleDrive-thomasleblay98@gmail.com/Autres ordinateurs/"
+                  "Mon ordinateur portable/SoccerStat-II/Maquettes Insta/v5/Streamlit/")
+
+# SoccerAutomated service (SoccerAutomated/api/server.py)
+AUTOMATED_API_URL = os.environ.get("SOCCER_AUTOMATED_URL", "http://localhost:8765")
 
 INSTAGRAM_SUBJECTS = {
     "VS": TEMPLATES_PATH + "VS.pptx",

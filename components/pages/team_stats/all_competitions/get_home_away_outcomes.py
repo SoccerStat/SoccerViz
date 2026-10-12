@@ -17,9 +17,9 @@ def get_balance(_db_conn):
 
 def compute_goals_ratio(row):
     if row["Side"] == "Home Goals":
-        return row["% Home Goals"]*100
+        return row["% Home Goals"] * 100
     elif row["Side"] == "Away Goals":
-        return row["% Away Goals"]*100
+        return row["% Away Goals"] * 100
     else:
         return 100
 
@@ -165,11 +165,11 @@ def get_stats_by_season_plotly(df, prefix, stat, side, colors):
 
     fig.update_traces(
         hovertemplate=(
-                "<b>Competition: </b>%{fullData.name}<br>" +
-                "<b>Season: </b>%{x}<br>" +
-                f"<b>Side: </b>{side_stat}<br><br>" +
-                f"<b>{stat} / Match: </b>%{{y:.2f}}" +
-                "<extra></extra>"
+            "<b>Competition: </b>%{fullData.name}<br>" +
+            "<b>Season: </b>%{x}<br>" +
+            f"<b>Side: </b>{side_stat}<br><br>" +
+            f"<b>{stat} / Match: </b>%{{y:.2f}}" +
+            "<extra></extra>"
         )
     )
     st.plotly_chart(fig, use_container_width=True)

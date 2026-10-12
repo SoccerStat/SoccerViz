@@ -7,7 +7,7 @@ from config import COMPETITIONS, ALL_BUTTON_CONFIG
 def choose_comp():
     competitions = list(COMPETITIONS.keys())
 
-    key_all_comps = f"{ALL_BUTTON_CONFIG["id"]}_comps"
+    key_all_comps = f"{ALL_BUTTON_CONFIG['id']}_comps"
 
     st.session_state.setdefault("basic_stats__id_comp_selected", key_all_comps)
 

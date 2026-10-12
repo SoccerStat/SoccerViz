@@ -127,83 +127,8 @@ def get_stats_and_matches_one_team(db_conn):
             )
 
             if chosen_team:
-                first_week = 1
-                last_week = 100
-                first_date = '1970-01-01'
-                last_date = '2099-12-31'
-                slots = []
-
-                if comps_and_kind[chosen_comp] == KIND_CHP:
-
-                    filter_weeks = check__filter_by_week(prefix=prefix)
-
-                    if filter_weeks:
-                        col1, col2 = st.columns(2)
-                        max_week = 2 * (n_teams - 1)
-
-                        with col1:
-                            first_week = slider__get_one_week(
-                                prefix=prefix,
-                                suffix="first_week",
-                                label="First week",
-                                min_value=1,
-                                max_value=max_week,
-                                default_value=1
-                            )
-
-                        if first_week == max_week:
-                            last_week = max_week
-                        else:
-                            with col2:
-                                last_week = slider__get_one_week(
-                                    prefix=prefix,
-                                    suffix="last_week",
-                                    label="Last week",
-                                    min_value=first_week,
-                                    max_value=max_week,
-                                    default_value=first_week
-                                )
-
-                filter_dates = check__filter_by_date(prefix=prefix)
-
-                if filter_dates:
-                    col1, col2 = st.columns(2)
-
-                    with col1:
-                        first_date = date__get_one_date(
-                            prefix=prefix,
-                            suffix="first_date",
-                            label="First date"
-                        )
-
-                    with col2:
-                        last_date = date__get_one_date(
-                            prefix=prefix,
-                            suffix="last_date",
-                            label="Last date",
-                            default_value=first_date
-                        )
-
-                filter_slots = check__filter_by_slot(prefix=prefix)
-
-                if filter_slots:
-                    col, _ = st.columns(2)
-
-                    with col:
-                        slots = multiselect__get_slots(
-                            prefix=prefix,
-                            options=get_distinct_slots(db_conn, chosen_comp, [chosen_season])
-                        )
-
-                if comps_and_kind[chosen_comp] == KIND_C_CUP:
-                    sides = ["Home", "Both", "Away", "Neutral", "All"]
-                else:
-                    sides = ["Home", "Both", "Away"]
-
-                side = radio__select_side(
-                    prefix=prefix,
-                    label="Side",
-                    custom_options=sides
+                first_week, last_week, first_date, last_date, slots, side = _select_filters(
+                    db_conn, prefix, chosen_comp, chosen_season, comps_and_kind[chosen_comp], n_teams
                 )
 
                 set_sub_sub_sub_title("Basic Stats")
@@ -221,32 +146,7 @@ def get_stats_and_matches_one_team(db_conn):
                     slots
                 )
 
-                team_stats_first_row = team_stats[["Club", "Pts", "M", "W", "D", "L", "GF", "GA", "GD"]]
-                if team_stats.loc[0, "Points Deductions"] == 0:
-                    team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
-                else:
-                    team_stats_second_row = team_stats[
-                        ["Club", "Points Deductions", "Points (excl. p.d.)", "Points/Match",
-                         "Points/Match (excl. p.d.)", "% Succ Passes"]]
-                team_stats_third_row = team_stats[
-                    [
-                        "Club",
-                        "Shots/onTarget For CR",
-                        "Shots/Goals For CR",
-                        "onTarget/Goals For CR"
-                    ]
-                ]
-                team_stats_fourth_row = team_stats[[
-                    "Club",
-                    "Shots/onTarget Against CR",
-                    "Shots/Goals Against CR",
-                    "onTarget/Goals Against CR"
-                ]]
-
-                st.dataframe(team_stats_first_row, hide_index=True)
-                st.dataframe(team_stats_second_row, hide_index=True)
-                st.dataframe(team_stats_third_row, hide_index=True)
-                st.dataframe(team_stats_fourth_row, hide_index=True)
+                _display_team_stats(team_stats)
 
                 get_selected_matches(
                     db_conn,
@@ -352,3 +252,121 @@ def get_team_squad(
         st.write("**% of minutes played** corresponds to the minutes played by the player "
                  "divided by the playable minutes **of the the team**, "
                  "not of the sum of minutes of the games the player has participated to.")
+
+
+def _select_weeks(prefix, n_teams):
+    """Week range filter (championships only)."""
+    first_week, last_week = 1, 100
+    if not check__filter_by_week(prefix=prefix):
+        return first_week, last_week
+
+    col1, col2 = st.columns(2)
+    max_week = 2 * (n_teams - 1)
+
+    with col1:
+        first_week = slider__get_one_week(
+            prefix=prefix,
+            suffix="first_week",
+            label="First week",
+            min_value=1,
+            max_value=max_week,
+            default_value=1
+        )
+
+    if first_week == max_week:
+        last_week = max_week
+    else:
+        with col2:
+            last_week = slider__get_one_week(
+                prefix=prefix,
+                suffix="last_week",
+                label="Last week",
+                min_value=first_week,
+                max_value=max_week,
+                default_value=first_week
+            )
+    return first_week, last_week
+
+
+def _select_filters(db_conn, prefix, chosen_comp, chosen_season, comp_kind, n_teams):
+    """Weeks, dates, slots and side filters. Returns (first_week, last_week, first_date, last_date, slots, side)."""
+    first_week, last_week = 1, 100
+    first_date = '1970-01-01'
+    last_date = '2099-12-31'
+    slots = []
+
+    if comp_kind == KIND_CHP:
+        first_week, last_week = _select_weeks(prefix, n_teams)
+
+    filter_dates = check__filter_by_date(prefix=prefix)
+
+    if filter_dates:
+        col1, col2 = st.columns(2)
+
+        with col1:
+            first_date = date__get_one_date(
+                prefix=prefix,
+                suffix="first_date",
+                label="First date"
+            )
+
+        with col2:
+            last_date = date__get_one_date(
+                prefix=prefix,
+                suffix="last_date",
+                label="Last date",
+                default_value=first_date
+            )
+
+    filter_slots = check__filter_by_slot(prefix=prefix)
+
+    if filter_slots:
+        col, _ = st.columns(2)
+
+        with col:
+            slots = multiselect__get_slots(
+                prefix=prefix,
+                options=get_distinct_slots(db_conn, chosen_comp, [chosen_season])
+            )
+
+    if comp_kind == KIND_C_CUP:
+        sides = ["Home", "Both", "Away", "Neutral", "All"]
+    else:
+        sides = ["Home", "Both", "Away"]
+
+    side = radio__select_side(
+        prefix=prefix,
+        label="Side",
+        custom_options=sides
+    )
+
+    return first_week, last_week, first_date, last_date, slots, side
+
+
+def _display_team_stats(team_stats):
+    team_stats_first_row = team_stats[["Club", "Pts", "M", "W", "D", "L", "GF", "GA", "GD"]]
+    if team_stats.loc[0, "Points Deductions"] == 0:
+        team_stats_second_row = team_stats[["Club", "Points/Match", "% Succ Passes"]]
+    else:
+        team_stats_second_row = team_stats[
+            ["Club", "Points Deductions", "Points (excl. p.d.)", "Points/Match",
+             "Points/Match (excl. p.d.)", "% Succ Passes"]]
+    team_stats_third_row = team_stats[
+        [
+            "Club",
+            "Shots/onTarget For CR",
+            "Shots/Goals For CR",
+            "onTarget/Goals For CR"
+        ]
+    ]
+    team_stats_fourth_row = team_stats[[
+        "Club",
+        "Shots/onTarget Against CR",
+        "Shots/Goals Against CR",
+        "onTarget/Goals Against CR"
+    ]]
+
+    st.dataframe(team_stats_first_row, hide_index=True)
+    st.dataframe(team_stats_second_row, hide_index=True)
+    st.dataframe(team_stats_third_row, hide_index=True)
+    st.dataframe(team_stats_fourth_row, hide_index=True)
