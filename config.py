@@ -1,7 +1,7 @@
 import os
 
 APP_CONFIG = {
-    'icon': '⚽️',
+    'icon': 'logo.png',
     'layout': 'wide'
 }
 
