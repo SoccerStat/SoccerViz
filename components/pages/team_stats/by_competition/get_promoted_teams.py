@@ -31,7 +31,7 @@ def get_promoted_teams(db_conn):
     )
 
     if chosen_season:
-        previous_season_schema = all_seasons[all_seasons.index(chosen_season)+1]
+        previous_season_schema = all_seasons[all_seasons.index(chosen_season) + 1]
 
         set_sub_sub_sub_title(f"Promoted teams in {chosen_season.replace('_', '-')}")
 

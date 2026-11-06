@@ -42,7 +42,7 @@ class BasePage(ABC):
         )
 
     def _set_page_title(self):
-        set_main_title(self.page_title)
+        set_main_title(self.page_title, APP_CONFIG['icon'])
 
     def set_expander(self, label):
         return st.expander(f"**{label}**")

@@ -1,4 +1,3 @@
-import altair as alt
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -13,13 +12,23 @@ from config import TEAM_STATS_RANKINGS_PLOTTABLE
 from utils.file_helper.reader import read_sql_file
 
 
+QUERIES_DIR = "components/queries/team_stats/given_competition/over_completed_seasons"
+
+
+def _overall_ranking_hover(display_points_deductions):
+    if display_points_deductions:
+        return ("<b>Overall Ranking:</b> %{customdata[0]}<br>"
+                "<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>")
+    return "<b>Overall Ranking:</b> %{customdata[0]}<extra></extra>"
+
+
 @st.cache_data(show_spinner=False)
 def ranking_by_season(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
     complete_df = pd.DataFrame()
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/over_completed_seasons/get_ranking_over_completed_seasons.sql",
+            file_name=f"{QUERIES_DIR}/get_ranking_over_completed_seasons.sql",
             ranking=chosen_ranking,
             name_comp=chosen_comp,
             season=season,
@@ -29,13 +38,14 @@ def ranking_by_season(_db_conn, chosen_ranking, chosen_comp, chosen_seasons):
 
     return complete_df
 
+
 @st.cache_data(show_spinner=False)
 def overall_ranking_by_season(_db_conn, chosen_comp, chosen_seasons):
     complete_df = pd.DataFrame()
 
     for season in chosen_seasons:
         sql_file = read_sql_file(
-            file_name="components/queries/team_stats/given_competition/over_completed_seasons/get_overall_ranking_over_completed_seasons.sql",
+            file_name=f"{QUERIES_DIR}/get_overall_ranking_over_completed_seasons.sql",
             name_comp=chosen_comp,
             season=season,
         )
@@ -218,12 +228,11 @@ def set_plot_plotly(df, chosen_comp, chosen_teams, chosen_ranking, n_teams, disp
                 textfont=dict(color=club_colors[club]),
                 customdata=df_club[["Overall Ranking", "Overall Ranking (excl. p.d.)"]],
                 hovertemplate=(
-                        f"<b>{club}</b><br>" +
-                        "<b>Season: </b>%{x}<br><br>" +
-                        f"<b>{chosen_ranking}: </b>%{{y}}<br>" +
-                        f"<b>{chosen_ranking} Ranking: </b>%{{text}}<br>" +
-                        "<b>Overall Ranking:</b> %{customdata[0]}" + ("<br>" if display_points_deductions else "<extra></extra>") +
-                        ("<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>" if display_points_deductions else "")
+                    f"<b>{club}</b><br>" +
+                    "<b>Season: </b>%{x}<br><br>" +
+                    f"<b>{chosen_ranking}: </b>%{{y}}<br>" +
+                    f"<b>{chosen_ranking} Ranking: </b>%{{text}}<br>" +
+                    _overall_ranking_hover(display_points_deductions)
                 ),
                 showlegend=True
             )
@@ -266,10 +275,9 @@ def set_overall_plot_plotly(df, chosen_comp, chosen_teams, n_teams, display_poin
                 textfont=dict(color=club_colors[club]),
                 customdata=df_club[["Overall Ranking", "Overall Ranking (excl. p.d.)"]],
                 hovertemplate=(
-                        f"<b>{club}</b><br>" +
-                        "<b>Season: </b>%{x}<br><br>" +
-                        "<b>Overall Ranking:</b> %{customdata[0]}" + ("<br>" if display_points_deductions else "<extra></extra>") +
-                        ("<b>Overall Ranking (excl. p.d.):</b> %{customdata[1]}<extra></extra>" if display_points_deductions else "")
+                    f"<b>{club}</b><br>" +
+                    "<b>Season: </b>%{x}<br><br>" +
+                    _overall_ranking_hover(display_points_deductions)
                 ),
                 showlegend=True
             )

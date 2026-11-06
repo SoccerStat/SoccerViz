@@ -73,8 +73,10 @@ def check__group_by_competition(prefix, label="Group by competition"):
 def check__group_by_season(prefix, label="Group by season"):
     return check__generic(prefix=prefix, suffix="group_by_season", label=label)
 
+
 def check__points_deductions(prefix, label="Display points deductions labels"):
     return check__generic(prefix=prefix, suffix="points_deductions", label=label)
+
 
 def slider__get_one_week(prefix, suffix, min_value, max_value, default_value, label="Select a week"):
     return slider__generic(
